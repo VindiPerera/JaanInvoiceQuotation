@@ -1,0 +1,36 @@
+<script>
+function invoiceForm() {
+    return {
+        items: @json(old('items', isset($invoice) && $invoice ? $invoice->items->map(fn($i) => ['description' => $i->description, 'quantity' => (float)$i->quantity, 'unit_price' => (float)$i->unit_price, 'total' => (float)$i->total])->toArray() : (isset($quotation) && $quotation ? $quotation->items->map(fn($i) => ['description' => $i->description, 'quantity' => (float)$i->quantity, 'unit_price' => (float)$i->unit_price, 'total' => (float)$i->total])->toArray() : []))),
+        taxAmount: {{ old('tax_amount', isset($invoice) ? $invoice->tax_amount : (isset($quotation) ? $quotation->tax_amount : 0)) }},
+        subtotal: 0,
+        total: 0,
+
+        init() {
+            if (!this.items.length) { this.items = [{ description: '', quantity: 1, unit_price: 0, total: 0 }]; }
+            this.calcTotal();
+        },
+
+        addItem()    { this.items.push({ description: '', quantity: 1, unit_price: 0, total: 0 }); },
+        removeItem(i){ this.items.splice(i, 1); this.calcTotal(); },
+
+        calcRow(i) {
+            this.items[i].total = (this.items[i].quantity || 0) * (this.items[i].unit_price || 0);
+            this.calcTotal();
+        },
+        calcTotal() {
+            this.subtotal = this.items.reduce((s, r) => s + (r.total || 0), 0);
+            this.total = this.subtotal + (this.taxAmount || 0);
+        },
+        formatNum(v) {
+            return Number(v || 0).toLocaleString('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        },
+        fillCustomer(e) {
+            const opt = e.target.selectedOptions[0];
+            document.getElementById('inv_customer_name').value = opt.text === '— Select customer —' ? '' : opt.text;
+            document.getElementById('inv_customer_address').value = opt.dataset.address || '';
+            document.getElementById('inv_customer_contact').value = opt.dataset.contact || '';
+        },
+    };
+}
+</script>
