@@ -9,6 +9,32 @@
 @endsection
 
 @section('content')
+<div class="space-y-4">
+
+    {{-- Summary --}}
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white rounded-xl border border-gray-200 p-4">
+            <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Total Quotations</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($totals['count']) }}</p>
+            <p class="text-xs text-gray-400 mt-0.5">all time</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-4">
+            <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Total Value</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1">LKR {{ number_format($totals['total_value']) }}</p>
+            <p class="text-xs text-gray-400 mt-0.5">quoted amount</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-4 border-l-4 border-l-green-400">
+            <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Accepted</p>
+            <p class="text-2xl font-bold text-green-600 mt-1">{{ number_format($totals['accepted_count']) }}</p>
+            <p class="text-xs text-gray-400 mt-0.5">quotations won</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-4 border-l-4 border-l-green-400">
+            <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Accepted Value</p>
+            <p class="text-2xl font-bold text-green-600 mt-1">LKR {{ number_format($totals['accepted_value']) }}</p>
+            <p class="text-xs text-gray-400 mt-0.5">revenue won</p>
+        </div>
+    </div>
+
 <div class="bg-white rounded-xl border border-gray-200">
     {{-- Filters --}}
     <form method="GET" class="flex flex-wrap gap-3 p-4 border-b border-gray-100">
@@ -94,5 +120,7 @@
     <div class="px-5 py-4 border-t border-gray-100">
         {{ $quotations->links() }}
     </div>
+</div>
+
 </div>
 @endsection

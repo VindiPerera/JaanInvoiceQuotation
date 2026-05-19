@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\HardwareCatalog;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Payment;
@@ -37,6 +38,7 @@ class InvoiceController extends Controller
         $invoices = $query->orderBy('created_at', 'desc')->paginate(25)->withQueryString();
 
         $totals = [
+            'count'         => Invoice::count(),
             'total_amount'  => Invoice::sum('total_amount'),
             'total_paid'    => Invoice::sum('paid_amount'),
             'total_balance' => Invoice::sum('balance'),
@@ -56,7 +58,9 @@ class InvoiceController extends Controller
             $quotation = Quotation::with('items')->find($request->quotation_id);
         }
 
-        return view('invoices.create', compact('customers', 'nextNumber', 'settings', 'quotation'));
+        $hardware = HardwareCatalog::active()->orderBy('name')->get(['id', 'name', 'description', 'unit_price']);
+
+        return view('invoices.create', compact('customers', 'nextNumber', 'settings', 'quotation', 'hardware'));
     }
 
     public function store(Request $request)
@@ -129,7 +133,8 @@ class InvoiceController extends Controller
         $invoice->load('items');
         $customers = Customer::orderBy('name')->get();
         $settings = Setting::pluck('value', 'key');
-        return view('invoices.edit', compact('invoice', 'customers', 'settings'));
+        $hardware = HardwareCatalog::active()->orderBy('name')->get(['id', 'name', 'description', 'unit_price']);
+        return view('invoices.edit', compact('invoice', 'customers', 'settings', 'hardware'));
     }
 
     public function update(Request $request, Invoice $invoice)

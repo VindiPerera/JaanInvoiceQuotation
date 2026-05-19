@@ -20,9 +20,6 @@
     $rawFeatures = old('software_features', $quotation?->software_features ?? ($defaultFeatures ?? []));
     $formFeatures = $normalizeEntries(is_array($rawFeatures) ? $rawFeatures : []);
 
-    $rawBenefits = old('additional_benefits', $quotation?->additional_benefits ?? ($defaultBenefits ?? []));
-    $formBenefits = $normalizeEntries(is_array($rawBenefits) ? $rawBenefits : []);
-
     $formTerms = old('terms_conditions', $quotation?->terms_conditions ?? $defaultTerms ?? '');
     $isNewQuotation = !$quotation && !old('quote_type');
 
@@ -40,14 +37,13 @@
         'key'      => $t->key,
         'items'    => $normalizeItems($t->hardware_items    ?? []),
         'features' => $t->software_features   ?? [],
-        'benefits' => $t->additional_benefits ?? [],
         'terms'    => $t->terms_conditions    ?? '',
     ])->values()->all();
 @endphp
 <script>
 const _tplData = @json($tplData);
 const quotationTypeDefaults = Object.fromEntries(
-    _tplData.map(t => [t.key, { items: t.items, features: t.features, benefits: t.benefits, terms: t.terms }])
+    _tplData.map(t => [t.key, { items: t.items, features: t.features, terms: t.terms }])
 );
 
 function quotationForm() {
@@ -56,12 +52,13 @@ function quotationForm() {
     return {
         items: items,
         features: @json($formFeatures),
-        benefits: @json($formBenefits),
         termsText: @json($formTerms),
         taxAmount: {{ old('tax_amount', $quotation?->tax_amount ?? 0) }},
         quoteType: '{{ old('quote_type', $quotation?->quote_type ?? 'full_set') }}',
         isNewQuotation: {{ $isNewQuotation ? 'true' : 'false' }},
         _skipTypeWatch: false,
+        catalogOpen: false,
+        catalogSearch: '',
         subtotal: 0,
         total: 0,
 
@@ -76,7 +73,7 @@ function quotationForm() {
             this.$watch('quoteType', (newType, oldType) => {
                 if (this._skipTypeWatch) { this._skipTypeWatch = false; return; }
                 if (!this.isNewQuotation) {
-                    const ok = confirm('Changing the template will reset Hardware Items, Software Features, Additional Benefits and Terms & Conditions to the template defaults. Continue?');
+                    const ok = confirm('Changing the template will reset Hardware Items, Software Features and Terms & Conditions to the template defaults. Continue?');
                     if (!ok) {
                         this._skipTypeWatch = true;
                         this.quoteType = oldType;
@@ -89,22 +86,29 @@ function quotationForm() {
 
         applyTypeDefaults(type) {
             const keys = Object.keys(quotationTypeDefaults);
-            const d = quotationTypeDefaults[type] || quotationTypeDefaults[keys[0]] || { items: [], features: [], benefits: [], terms: '' };
+            const d = quotationTypeDefaults[type] || quotationTypeDefaults[keys[0]] || { items: [], features: [], terms: '' };
             if (d.items && d.items.length) {
                 this.items = d.items.map(i => ({ ...i }));
             } else {
                 this.items = [{ description: '', quantity: 1, unit_price: 0, total: 0 }];
             }
             this.features  = (d.features || []).map(f => ({ ...f }));
-            this.benefits  = (d.benefits || []).map(b => ({ ...b }));
             this.termsText = d.terms || '';
             this.calcTotal();
         },
 
         addItem()         { this.items.push({ description: '', quantity: 1, unit_price: 0, total: 0 }); },
         removeItem(i)     { this.items.splice(i, 1); this.calcTotal(); },
+
+        addFromCatalog(name, desc, price) {
+            const description = desc ? name + '\n• ' + desc : name;
+            const unitPrice = parseFloat(price) || 0;
+            this.items.push({ description, quantity: 1, unit_price: unitPrice, total: unitPrice });
+            this.calcTotal();
+            this.catalogOpen = false;
+            this.catalogSearch = '';
+        },
         addFeature(kind)  { this.features.push({ kind: kind || 'item', text: '' }); },
-        addBenefit(kind)  { this.benefits.push({ kind: kind || 'item', text: '' }); },
 
         calcRow(i) {
             this.items[i].total = (this.items[i].quantity || 0) * (this.items[i].unit_price || 0);

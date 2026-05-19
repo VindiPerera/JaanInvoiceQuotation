@@ -102,6 +102,18 @@
                         <tr class="border-b border-gray-50">
                             <td class="py-2 pr-2 text-gray-400 text-xs" x-text="index + 1"></td>
                             <td class="py-2 pr-2">
+                                <select @change="pickHardware(index, $event)"
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 mb-1 text-gray-500">
+                                    <option value="">— Select from hardware catalog —</option>
+                                    @foreach($hardware as $hw)
+                                        <option value="{{ $hw->id }}"
+                                            data-name="{{ $hw->name }}"
+                                            data-desc="{{ $hw->description }}"
+                                            data-price="{{ $hw->unit_price }}">
+                                            {{ $hw->name }} — LKR {{ number_format($hw->unit_price, 2) }}
+                                        </option>
+                                    @endforeach
+                                </select>
                                 <input type="text" :name="`items[${index}][description]`" x-model="item.description"
                                     class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
                                     placeholder="Item / service description">

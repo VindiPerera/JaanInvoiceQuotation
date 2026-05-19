@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\HardwareCatalog;
 use App\Models\Quotation;
 use App\Models\QuotationItem;
 use App\Models\QuoteTemplate;
@@ -36,7 +37,14 @@ class QuotationController extends Controller
 
         $quotations = $query->orderBy('created_at', 'desc')->paginate(25)->withQueryString();
 
-        return view('quotations.index', compact('quotations'));
+        $totals = [
+            'count'          => Quotation::count(),
+            'total_value'    => Quotation::sum('total_amount'),
+            'accepted_count' => Quotation::where('status', 'accepted')->count(),
+            'accepted_value' => Quotation::where('status', 'accepted')->sum('total_amount'),
+        ];
+
+        return view('quotations.index', compact('quotations', 'totals'));
     }
 
     public function create()
@@ -48,7 +56,8 @@ class QuotationController extends Controller
         $defaultBenefits = [];
         $quotation   = null;
         $templates   = QuoteTemplate::orderBy('sort_order')->orderBy('id')->get();
-        return view('quotations.create', compact('customers', 'nextNumber', 'defaultTerms', 'quotation', 'defaultFeatures', 'defaultBenefits', 'templates'));
+        $hardware    = HardwareCatalog::active()->orderBy('category')->orderBy('name')->get(['id', 'name', 'description', 'category', 'unit_price']);
+        return view('quotations.create', compact('customers', 'nextNumber', 'defaultTerms', 'quotation', 'defaultFeatures', 'defaultBenefits', 'templates', 'hardware'));
     }
 
     public function store(Request $request)
@@ -121,7 +130,8 @@ class QuotationController extends Controller
         $defaultFeatures = [];
         $defaultBenefits = [];
         $templates       = QuoteTemplate::orderBy('sort_order')->orderBy('id')->get();
-        return view('quotations.edit', compact('quotation', 'customers', 'defaultTerms', 'defaultFeatures', 'defaultBenefits', 'templates'));
+        $hardware        = HardwareCatalog::active()->orderBy('category')->orderBy('name')->get(['id', 'name', 'description', 'category', 'unit_price']);
+        return view('quotations.edit', compact('quotation', 'customers', 'defaultTerms', 'defaultFeatures', 'defaultBenefits', 'templates', 'hardware'));
     }
 
     public function update(Request $request, Quotation $quotation)

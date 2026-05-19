@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\HardwareCatalog;
 use App\Models\QuoteTemplate;
 use Illuminate\Http\Request;
 
@@ -16,7 +17,8 @@ class QuoteTemplateController extends Controller
     public function create()
     {
         $template = null;
-        return view('quote-templates.form', compact('template'));
+        $hardwareCatalog = HardwareCatalog::active()->orderBy('category')->orderBy('name')->get(['id', 'name', 'category', 'description', 'unit_price']);
+        return view('quote-templates.form', compact('template', 'hardwareCatalog'));
     }
 
     public function store(Request $request)
@@ -34,7 +36,8 @@ class QuoteTemplateController extends Controller
     public function edit(QuoteTemplate $quoteTemplate)
     {
         $template = $quoteTemplate;
-        return view('quote-templates.form', compact('template'));
+        $hardwareCatalog = HardwareCatalog::active()->orderBy('category')->orderBy('name')->get(['id', 'name', 'category', 'description', 'unit_price']);
+        return view('quote-templates.form', compact('template', 'hardwareCatalog'));
     }
 
     public function update(Request $request, QuoteTemplate $quoteTemplate)

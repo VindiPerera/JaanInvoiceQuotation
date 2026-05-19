@@ -108,9 +108,44 @@
     <div x-show="quoteType !== 'software_only'" class="bg-white rounded-xl border border-gray-200 p-6">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-base font-semibold text-gray-800">Hardware Package Items</h2>
-            <button type="button" @click="addItem" class="inline-flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 font-medium">
-                <i class="fa-solid fa-plus"></i> Add Row
-            </button>
+            <div class="flex items-center gap-2">
+                {{-- From Catalog custom dropdown --}}
+                <div class="relative">
+                    <button type="button" @click="catalogOpen = !catalogOpen"
+                        class="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-800 border border-gray-200 rounded-lg px-3 py-1.5 bg-white transition">
+                        <i class="fa-solid fa-database text-xs"></i> From Catalog
+                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </button>
+                    <div x-show="catalogOpen" @click.outside="catalogOpen = false" style="display:none"
+                        class="absolute right-0 top-full mt-1 w-72 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
+                        <div class="p-2 border-b border-gray-100">
+                            <input type="text" x-model="catalogSearch" @click.stop
+                                placeholder="Search catalog..."
+                                class="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
+                                autocomplete="off">
+                        </div>
+                        <div class="overflow-y-auto max-h-56 py-1">
+                            @php $grouped = ($hardware ?? collect())->groupBy(fn($h) => $h->category ?: 'General'); @endphp
+                            @forelse($grouped as $category => $items)
+                                <div class="px-3 pt-2 pb-0.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">{{ $category }}</div>
+                                @foreach($items as $hw)
+                                <div x-show="{{ json_encode(strtolower($hw->name . ' ' . ($hw->description ?? ''))) }}.includes(catalogSearch.toLowerCase())"
+                                    @click="addFromCatalog({{ Js::from($hw->name) }}, {{ Js::from($hw->description ?? '') }}, {{ (float)$hw->unit_price }})"
+                                    class="flex items-center justify-between px-3 py-2 hover:bg-red-50 cursor-pointer transition">
+                                    <span class="text-sm text-gray-800 truncate mr-2">{{ $hw->name }}</span>
+                                    <span class="text-xs text-gray-400 shrink-0">LKR {{ number_format($hw->unit_price, 2) }}</span>
+                                </div>
+                                @endforeach
+                            @empty
+                                <div class="px-3 py-4 text-center text-sm text-gray-400">No hardware items in catalog.</div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+                <button type="button" @click="addItem" class="inline-flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 font-medium">
+                    <i class="fa-solid fa-plus"></i> Add
+                </button>
+            </div>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
@@ -230,63 +265,6 @@
                                 class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
                                 placeholder="Feature description">
                             <button type="button" @click="features.splice(idx,1)" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-xmark text-xs"></i></button>
-                        </div>
-                    </template>
-                </div>
-            </template>
-        </div>
-    </div>
-
-    {{-- Additional Benefits --}}
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-base font-semibold text-gray-800">Additional Benefits</h2>
-            <div class="flex items-center gap-2">
-                <button type="button" @click="addBenefit('heading')"
-                    class="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 border border-gray-200 rounded-md px-2 py-1 transition">
-                    <i class="fa-solid fa-heading text-xs"></i> Heading
-                </button>
-                <button type="button" @click="addBenefit('space')"
-                    class="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 border border-gray-200 rounded-md px-2 py-1 transition">
-                    <i class="fa-solid fa-grip-lines text-xs"></i> Space
-                </button>
-                <button type="button" @click="addBenefit('item')"
-                    class="inline-flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 font-medium">
-                    <i class="fa-solid fa-plus"></i> Add Benefit
-                </button>
-            </div>
-        </div>
-        <div class="space-y-1">
-            <template x-for="(ben, idx) in benefits" :key="idx">
-                <div>
-                    <input type="hidden" :name="`additional_benefits[${idx}][kind]`" :value="ben.kind">
-
-                    <template x-if="ben.kind === 'space'">
-                        <div class="flex items-center gap-2 py-2">
-                            <i class="fa-solid fa-grip-lines text-gray-300 text-xs shrink-0"></i>
-                            <div class="flex-1 border-t border-dashed border-gray-200"></div>
-                            <input type="hidden" :name="`additional_benefits[${idx}][text]`" value="">
-                            <button type="button" @click="benefits.splice(idx,1)" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-xmark text-xs"></i></button>
-                        </div>
-                    </template>
-
-                    <template x-if="ben.kind === 'heading'">
-                        <div class="flex items-center gap-2 py-0.5">
-                            <i class="fa-solid fa-minus text-gray-400 text-xs shrink-0 w-4 text-center"></i>
-                            <input type="text" :name="`additional_benefits[${idx}][text]`" x-model="ben.text"
-                                class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-800 focus:outline-none focus:ring-1 focus:ring-red-300"
-                                placeholder="Section heading (e.g. 2. Service Terms:)">
-                            <button type="button" @click="benefits.splice(idx,1)" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-xmark text-xs"></i></button>
-                        </div>
-                    </template>
-
-                    <template x-if="ben.kind === 'item'">
-                        <div class="flex items-center gap-2 py-0.5">
-                            <i class="fa-solid fa-circle text-red-400 text-xs shrink-0 w-4 text-center"></i>
-                            <input type="text" :name="`additional_benefits[${idx}][text]`" x-model="ben.text"
-                                class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
-                                placeholder="Benefit description">
-                            <button type="button" @click="benefits.splice(idx,1)" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-xmark text-xs"></i></button>
                         </div>
                     </template>
                 </div>

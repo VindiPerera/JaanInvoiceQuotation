@@ -97,9 +97,48 @@
         <div class="bg-white rounded-xl border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-base font-semibold text-gray-800">Hardware Package Items</h2>
-                <button type="button" @click="addItem" class="inline-flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 font-medium">
-                    <i class="fa-solid fa-plus"></i> Add Row
-                </button>
+                <div class="flex items-center gap-2">
+                    {{-- Catalog picker --}}
+                    @if($hardwareCatalog->isNotEmpty())
+                    <div class="relative" x-data="{ open: false, search: '' }">
+                        <button type="button" @click="open = !open; search = ''"
+                            class="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-800 border border-gray-200 rounded-lg px-3 py-1.5 bg-white transition">
+                            <i class="fa-solid fa-database text-xs text-gray-400"></i> From Catalog
+                            <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
+                        </button>
+                        <div x-show="open" @click.outside="open = false"
+                             class="absolute right-0 top-full mt-1 w-80 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+                            <div class="p-2 border-b border-gray-100">
+                                <input type="text" x-model="search" placeholder="Search catalog…"
+                                    class="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-red-300"
+                                    @click.stop>
+                            </div>
+                            <div class="max-h-64 overflow-y-auto">
+                                            @php $grouped = $hardwareCatalog->groupBy('category'); @endphp
+                                @foreach($grouped as $cat => $catItems)
+                                @php $catSearchStr = strtolower($catItems->map(fn($i) => $i->name . ' ' . ($i->description ?? ''))->implode(' ')); @endphp
+                                <div x-show="{{ e(json_encode($catSearchStr)) }}.includes(search.toLowerCase())">
+                                    <p class="px-3 pt-2 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">{{ $cat ?: 'General' }}</p>
+                                    @foreach($catItems as $ci)
+                                    @php $itemSearchStr = strtolower($ci->name . ' ' . ($ci->description ?? '')); @endphp
+                                    <button type="button"
+                                        x-show="{{ e(json_encode($itemSearchStr)) }}.includes(search.toLowerCase())"
+                                        @click="addItemFromCatalog({ description: {{ Js::from($ci->description ?: $ci->name) }}, unit_price: {{ (float)$ci->unit_price }} }); open = false;"
+                                        class="w-full text-left px-3 py-2 hover:bg-red-50 transition flex items-center justify-between gap-2 group">
+                                        <span class="text-sm text-gray-700 group-hover:text-red-700 truncate">{{ $ci->name }}</span>
+                                        <span class="text-xs text-gray-400 shrink-0">LKR {{ number_format($ci->unit_price, 2) }}</span>
+                                    </button>
+                                    @endforeach
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+                    <button type="button" @click="addItem" class="inline-flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 font-medium">
+                        <i class="fa-solid fa-plus"></i> Add Row
+                    </button>
+                </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
@@ -295,6 +334,10 @@ function templateForm() {
         },
 
         addItem()        { this.items.push({ description: '', quantity: 1, unit_price: 0, total: 0 }); },
+        addItemFromCatalog(catalog) {
+            this.items.push({ description: catalog.description, quantity: 1, unit_price: catalog.unit_price, total: catalog.unit_price });
+            this.calcSubtotal();
+        },
         removeItem(i)    { this.items.splice(i, 1); this.calcSubtotal(); },
         addFeature(kind) { this.features.push({ kind: kind || 'item', text: '' }); },
         addBenefit(kind) { this.benefits.push({ kind: kind || 'item', text: '' }); },

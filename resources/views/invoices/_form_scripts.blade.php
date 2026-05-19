@@ -32,6 +32,16 @@ function invoiceForm() {
         addItem()    { this.items.push({ description: '', quantity: 1, unit_price: 0, total: 0 }); },
         removeItem(i){ this.items.splice(i, 1); this.calcTotal(); },
 
+        pickHardware(i, e) {
+            const opt = e.target.selectedOptions[0];
+            if (!opt.value) return;
+            const desc = opt.dataset.desc ? opt.dataset.name + ' — ' + opt.dataset.desc : opt.dataset.name;
+            this.items[i].description = desc;
+            this.items[i].unit_price  = parseFloat(opt.dataset.price) || 0;
+            this.calcRow(i);
+            e.target.value = '';
+        },
+
         calcRow(i) {
             this.items[i].total = (this.items[i].quantity || 0) * (this.items[i].unit_price || 0);
             this.calcTotal();

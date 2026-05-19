@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\HardwareCatalogController;
 use App\Http\Controllers\QuoteTemplateController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingController;
@@ -56,6 +57,9 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::resource('quote-templates', QuoteTemplateController::class)->except(['show']);
+
+    Route::resource('hardware-catalog', HardwareCatalogController::class)->except(['show']);
+    Route::get('/api/hardware-catalog', [HardwareCatalogController::class, 'apiList'])->name('hardware-catalog.api');
 
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');

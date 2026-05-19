@@ -168,24 +168,6 @@
     </div>
     @endif
 
-    {{-- Additional Benefits --}}
-    @if(!empty($quotation->additional_benefits))
-    <div class="qpv-sec">Additional Benefits</div>
-    <div style="margin-bottom:20px;padding:4px 2px;">
-        @foreach($quotation->additional_benefits as $b)
-            @php $kind = is_array($b) ? ($b['kind'] ?? 'item') : 'item'; $text = is_array($b) ? ($b['text'] ?? '') : $b; @endphp
-            @if($kind === 'space')<div style="height:5pt;"></div>
-            @elseif($kind === 'heading')
-                <div style="font-size:9.5pt;font-weight:bold;color:#1a1a1a;margin:6px 0 3px;">{{ $text }}</div>
-            @else
-                <div style="font-size:9.5pt;margin-bottom:4px;">
-                    <span style="color:#cc1010;font-weight:bold;font-size:10pt;">&#9679;</span>&nbsp;{{ $text }}
-                </div>
-            @endif
-        @endforeach
-    </div>
-    @endif
-
     {{-- Payment Breakdown --}}
     <div class="qpv-sec">Payment Breakdown</div>
     <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e0e0e0;margin-bottom:20px;">
