@@ -68,6 +68,7 @@ class InvoiceController extends Controller
         ]);
 
         DB::transaction(function () use ($request) {
+            $status   = in_array($request->payment_status, ['pending', 'paid']) ? $request->payment_status : 'pending';
             $subtotal = 0;
             $invoice = Invoice::create([
                 'invoice_number'   => $request->invoice_number,
@@ -84,7 +85,7 @@ class InvoiceController extends Controller
                 'total_amount'     => 0,
                 'paid_amount'      => 0,
                 'balance'          => 0,
-                'payment_status'   => 'pending',
+                'payment_status'   => $status,
             ]);
 
             if ($request->items) {
@@ -103,11 +104,13 @@ class InvoiceController extends Controller
                 }
             }
 
-            $total = $subtotal + ($request->tax_amount ?? 0);
+            $grandTotal = $subtotal + ($request->tax_amount ?? 0);
             $invoice->update([
-                'subtotal'     => $subtotal,
-                'total_amount' => $total,
-                'balance'      => $total,
+                'subtotal'       => $subtotal,
+                'total_amount'   => $grandTotal,
+                'paid_amount'    => $status === 'paid' ? $grandTotal : 0,
+                'balance'        => $status === 'paid' ? 0 : $grandTotal,
+                'payment_status' => $status,
             ]);
         });
 
@@ -138,6 +141,8 @@ class InvoiceController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $invoice) {
+            $status = in_array($request->payment_status, ['pending', 'paid']) ? $request->payment_status : 'pending';
+
             $invoice->update([
                 'invoice_number'   => $request->invoice_number,
                 'invoice_date'     => $request->invoice_date,
@@ -148,6 +153,7 @@ class InvoiceController extends Controller
                 'tax_amount'       => $request->tax_amount ?? 0,
                 'terms_conditions' => $request->terms_conditions,
                 'notes'            => $request->notes,
+                'payment_status'   => $status,
             ]);
 
             $invoice->items()->delete();
@@ -171,9 +177,11 @@ class InvoiceController extends Controller
 
             $newTotal = $subtotal + ($request->tax_amount ?? 0);
             $invoice->update([
-                'subtotal'     => $subtotal,
-                'total_amount' => $newTotal,
-                'balance'      => $newTotal - $invoice->paid_amount,
+                'subtotal'       => $subtotal,
+                'total_amount'   => $newTotal,
+                'paid_amount'    => $status === 'paid' ? $newTotal : $invoice->paid_amount,
+                'balance'        => $status === 'paid' ? 0 : $newTotal - $invoice->paid_amount,
+                'payment_status' => $status,
             ]);
         });
 

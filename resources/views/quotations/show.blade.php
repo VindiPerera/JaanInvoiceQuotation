@@ -111,11 +111,18 @@
             @if(!empty($quotation->software_features))
             <div class="mb-4">
                 <h3 class="font-bold text-red-600 text-sm uppercase tracking-wide mb-2">Software Features</h3>
-                <div class="grid grid-cols-2 gap-1">
+                <div class="space-y-0.5">
                     @foreach($quotation->software_features as $f)
-                        <div class="flex items-start gap-2 text-sm text-gray-700">
-                            <i class="fa-solid fa-check text-red-500 mt-0.5 shrink-0"></i>{{ $f }}
-                        </div>
+                        @php $kind = is_array($f) ? ($f['kind'] ?? 'item') : 'item'; $text = is_array($f) ? ($f['text'] ?? '') : $f; @endphp
+                        @if($kind === 'space')
+                            <div class="py-1"><div class="border-t border-dashed border-gray-200"></div></div>
+                        @elseif($kind === 'heading')
+                            <div class="font-semibold text-gray-800 text-sm pt-1">{{ $text }}</div>
+                        @else
+                            <div class="flex items-start gap-2 text-sm text-gray-700 pl-2">
+                                <i class="fa-solid fa-check text-red-500 mt-0.5 shrink-0 text-xs"></i>{{ $text }}
+                            </div>
+                        @endif
                     @endforeach
                 </div>
             </div>
@@ -124,11 +131,20 @@
             @if(!empty($quotation->additional_benefits))
             <div class="mb-4">
                 <h3 class="font-bold text-red-600 text-sm uppercase tracking-wide mb-2">Additional Benefits</h3>
-                <ul class="space-y-1">
+                <div class="space-y-0.5">
                     @foreach($quotation->additional_benefits as $b)
-                        <li class="flex items-start gap-2 text-sm text-gray-700"><i class="fa-solid fa-circle text-red-400 text-xs mt-1.5 shrink-0"></i>{{ $b }}</li>
+                        @php $kind = is_array($b) ? ($b['kind'] ?? 'item') : 'item'; $text = is_array($b) ? ($b['text'] ?? '') : $b; @endphp
+                        @if($kind === 'space')
+                            <div class="py-1"><div class="border-t border-dashed border-gray-200"></div></div>
+                        @elseif($kind === 'heading')
+                            <div class="font-semibold text-gray-800 text-sm pt-1">{{ $text }}</div>
+                        @else
+                            <div class="flex items-start gap-2 text-sm text-gray-700 pl-2">
+                                <i class="fa-solid fa-circle text-red-400 text-xs mt-1.5 shrink-0"></i>{{ $text }}
+                            </div>
+                        @endif
                     @endforeach
-                </ul>
+                </div>
             </div>
             @endif
 

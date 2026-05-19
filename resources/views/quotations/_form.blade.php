@@ -99,9 +99,9 @@
                         <tr class="border-b border-gray-50">
                             <td class="py-2 pr-2 text-gray-400 text-xs" x-text="index + 1"></td>
                             <td class="py-2 pr-2">
-                                <input type="text" :name="`items[${index}][description]`" x-model="item.description"
-                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
-                                    placeholder="Item description">
+                                <textarea :name="`items[${index}][description]`" x-model="item.description" rows="3"
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 resize-y leading-snug"
+                                    placeholder="ITEM NAME (first line bold in PDF)&#10;• Sub-detail one&#10;• Sub-detail two"></textarea>
                                 <input type="hidden" :name="`items[${index}][item_type]`" value="hardware">
                             </td>
                             <td class="py-2 pr-2">
@@ -154,18 +154,54 @@
     <div class="bg-white rounded-xl border border-gray-200 p-6">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-base font-semibold text-gray-800">Software Features</h2>
-            <button type="button" @click="addFeature" class="inline-flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 font-medium">
-                <i class="fa-solid fa-plus"></i> Add Feature
-            </button>
+            <div class="flex items-center gap-2">
+                <button type="button" @click="addFeature('heading')"
+                    class="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 border border-gray-200 rounded-md px-2 py-1 transition">
+                    <i class="fa-solid fa-heading text-xs"></i> Heading
+                </button>
+                <button type="button" @click="addFeature('space')"
+                    class="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 border border-gray-200 rounded-md px-2 py-1 transition">
+                    <i class="fa-solid fa-grip-lines text-xs"></i> Space
+                </button>
+                <button type="button" @click="addFeature('item')"
+                    class="inline-flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 font-medium">
+                    <i class="fa-solid fa-plus"></i> Add Feature
+                </button>
+            </div>
         </div>
-        <div class="space-y-2">
-            <template x-for="(feature, idx) in features" :key="idx">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-check text-red-500 text-xs shrink-0"></i>
-                    <input type="text" :name="`software_features[${idx}]`" x-model="features[idx]"
-                        class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
-                        placeholder="Feature description">
-                    <button type="button" @click="features.splice(idx, 1)" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+        <div class="space-y-1">
+            <template x-for="(feat, idx) in features" :key="idx">
+                <div>
+                    <input type="hidden" :name="`software_features[${idx}][kind]`" :value="feat.kind">
+
+                    <template x-if="feat.kind === 'space'">
+                        <div class="flex items-center gap-2 py-2">
+                            <i class="fa-solid fa-grip-lines text-gray-300 text-xs shrink-0"></i>
+                            <div class="flex-1 border-t border-dashed border-gray-200"></div>
+                            <input type="hidden" :name="`software_features[${idx}][text]`" value="">
+                            <button type="button" @click="features.splice(idx,1)" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-xmark text-xs"></i></button>
+                        </div>
+                    </template>
+
+                    <template x-if="feat.kind === 'heading'">
+                        <div class="flex items-center gap-2 py-0.5">
+                            <i class="fa-solid fa-minus text-gray-400 text-xs shrink-0 w-4 text-center"></i>
+                            <input type="text" :name="`software_features[${idx}][text]`" x-model="feat.text"
+                                class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-800 focus:outline-none focus:ring-1 focus:ring-red-300"
+                                placeholder="Section heading (e.g. 1. Software Warranty:)">
+                            <button type="button" @click="features.splice(idx,1)" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-xmark text-xs"></i></button>
+                        </div>
+                    </template>
+
+                    <template x-if="feat.kind === 'item'">
+                        <div class="flex items-center gap-2 py-0.5">
+                            <i class="fa-solid fa-check text-red-500 text-xs shrink-0 w-4 text-center"></i>
+                            <input type="text" :name="`software_features[${idx}][text]`" x-model="feat.text"
+                                class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
+                                placeholder="Feature description">
+                            <button type="button" @click="features.splice(idx,1)" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-xmark text-xs"></i></button>
+                        </div>
+                    </template>
                 </div>
             </template>
         </div>
@@ -175,18 +211,54 @@
     <div class="bg-white rounded-xl border border-gray-200 p-6">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-base font-semibold text-gray-800">Additional Benefits</h2>
-            <button type="button" @click="addBenefit" class="inline-flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 font-medium">
-                <i class="fa-solid fa-plus"></i> Add Benefit
-            </button>
+            <div class="flex items-center gap-2">
+                <button type="button" @click="addBenefit('heading')"
+                    class="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 border border-gray-200 rounded-md px-2 py-1 transition">
+                    <i class="fa-solid fa-heading text-xs"></i> Heading
+                </button>
+                <button type="button" @click="addBenefit('space')"
+                    class="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 border border-gray-200 rounded-md px-2 py-1 transition">
+                    <i class="fa-solid fa-grip-lines text-xs"></i> Space
+                </button>
+                <button type="button" @click="addBenefit('item')"
+                    class="inline-flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 font-medium">
+                    <i class="fa-solid fa-plus"></i> Add Benefit
+                </button>
+            </div>
         </div>
-        <div class="space-y-2">
-            <template x-for="(benefit, idx) in benefits" :key="idx">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-circle text-red-400 text-xs shrink-0"></i>
-                    <input type="text" :name="`additional_benefits[${idx}]`" x-model="benefits[idx]"
-                        class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
-                        placeholder="Benefit description">
-                    <button type="button" @click="benefits.splice(idx, 1)" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+        <div class="space-y-1">
+            <template x-for="(ben, idx) in benefits" :key="idx">
+                <div>
+                    <input type="hidden" :name="`additional_benefits[${idx}][kind]`" :value="ben.kind">
+
+                    <template x-if="ben.kind === 'space'">
+                        <div class="flex items-center gap-2 py-2">
+                            <i class="fa-solid fa-grip-lines text-gray-300 text-xs shrink-0"></i>
+                            <div class="flex-1 border-t border-dashed border-gray-200"></div>
+                            <input type="hidden" :name="`additional_benefits[${idx}][text]`" value="">
+                            <button type="button" @click="benefits.splice(idx,1)" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-xmark text-xs"></i></button>
+                        </div>
+                    </template>
+
+                    <template x-if="ben.kind === 'heading'">
+                        <div class="flex items-center gap-2 py-0.5">
+                            <i class="fa-solid fa-minus text-gray-400 text-xs shrink-0 w-4 text-center"></i>
+                            <input type="text" :name="`additional_benefits[${idx}][text]`" x-model="ben.text"
+                                class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-800 focus:outline-none focus:ring-1 focus:ring-red-300"
+                                placeholder="Section heading (e.g. 2. Service Terms:)">
+                            <button type="button" @click="benefits.splice(idx,1)" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-xmark text-xs"></i></button>
+                        </div>
+                    </template>
+
+                    <template x-if="ben.kind === 'item'">
+                        <div class="flex items-center gap-2 py-0.5">
+                            <i class="fa-solid fa-circle text-red-400 text-xs shrink-0 w-4 text-center"></i>
+                            <input type="text" :name="`additional_benefits[${idx}][text]`" x-model="ben.text"
+                                class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
+                                placeholder="Benefit description">
+                            <button type="button" @click="benefits.splice(idx,1)" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-xmark text-xs"></i></button>
+                        </div>
+                    </template>
                 </div>
             </template>
         </div>

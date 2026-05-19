@@ -40,11 +40,13 @@ class QuotationController extends Controller
 
     public function create()
     {
-        $customers = Customer::orderBy('name')->get();
-        $nextNumber = Quotation::generateNumber();
-        $defaultTerms = Setting::get('default_terms', '');
+        $customers      = Customer::orderBy('name')->get();
+        $nextNumber     = Quotation::generateNumber();
+        $defaultTerms   = Setting::get('default_terms', '');
+        $defaultFeatures = json_decode(Setting::get('default_software_features', '[]'), true) ?: [];
+        $defaultBenefits = json_decode(Setting::get('default_additional_benefits', '[]'), true) ?: [];
         $quotation = null;
-        return view('quotations.create', compact('customers', 'nextNumber', 'defaultTerms', 'quotation'));
+        return view('quotations.create', compact('customers', 'nextNumber', 'defaultTerms', 'quotation', 'defaultFeatures', 'defaultBenefits'));
     }
 
     public function store(Request $request)
@@ -64,8 +66,8 @@ class QuotationController extends Controller
                 'customer_address'  => $request->customer_address,
                 'customer_contact'  => $request->customer_contact,
                 'subject'           => $request->subject,
-                'software_features' => $request->software_features ? array_values(array_filter($request->software_features)) : [],
-                'additional_benefits' => $request->additional_benefits ? array_values(array_filter($request->additional_benefits)) : [],
+                'software_features'   => $this->filterEntries($request->software_features),
+                'additional_benefits' => $this->filterEntries($request->additional_benefits),
                 'tax_amount'        => $request->tax_amount ?? 0,
                 'terms_conditions'  => $request->terms_conditions,
                 'status'            => $request->status ?? 'draft',
@@ -108,9 +110,11 @@ class QuotationController extends Controller
     public function edit(Quotation $quotation)
     {
         $quotation->load('items');
-        $customers = Customer::orderBy('name')->get();
-        $defaultTerms = Setting::get('default_terms', '');
-        return view('quotations.edit', compact('quotation', 'customers', 'defaultTerms'));
+        $customers       = Customer::orderBy('name')->get();
+        $defaultTerms    = Setting::get('default_terms', '');
+        $defaultFeatures = [];
+        $defaultBenefits = [];
+        return view('quotations.edit', compact('quotation', 'customers', 'defaultTerms', 'defaultFeatures', 'defaultBenefits'));
     }
 
     public function update(Request $request, Quotation $quotation)
@@ -130,8 +134,8 @@ class QuotationController extends Controller
                 'customer_address'    => $request->customer_address,
                 'customer_contact'    => $request->customer_contact,
                 'subject'             => $request->subject,
-                'software_features'   => $request->software_features ? array_values(array_filter($request->software_features)) : [],
-                'additional_benefits' => $request->additional_benefits ? array_values(array_filter($request->additional_benefits)) : [],
+                'software_features'   => $this->filterEntries($request->software_features),
+                'additional_benefits' => $this->filterEntries($request->additional_benefits),
                 'tax_amount'          => $request->tax_amount ?? 0,
                 'terms_conditions'    => $request->terms_conditions,
                 'status'              => $request->status ?? 'draft',
@@ -205,5 +209,14 @@ class QuotationController extends Controller
         $nextNumber = \App\Models\Invoice::generateNumber();
         $settings = Setting::pluck('value', 'key');
         return view('invoices.create', compact('quotation', 'customers', 'nextNumber', 'settings'));
+    }
+
+    private function filterEntries(?array $entries): array
+    {
+        if (!$entries) { return []; }
+        return array_values(array_filter($entries, fn($e) =>
+            is_array($e) && isset($e['kind']) &&
+            ($e['kind'] === 'space' || !empty(trim($e['text'] ?? '')))
+        ));
     }
 }

@@ -8,15 +8,29 @@
             'total'       => $i->total,
           ])->toArray()
         : $defaultItems);
+
+    // Normalize stored entries to [{kind, text}] — handles both old string[] and new object[] formats
+    $normalizeEntries = fn(array $arr) => array_values(array_map(
+        fn($e) => is_array($e) && isset($e['kind'])
+            ? ['kind' => $e['kind'], 'text' => (string)($e['text'] ?? '')]
+            : ['kind' => 'item', 'text' => (string)$e],
+        $arr
+    ));
+
+    $rawFeatures = old('software_features', $quotation?->software_features ?? ($defaultFeatures ?? []));
+    $formFeatures = $normalizeEntries(is_array($rawFeatures) ? $rawFeatures : []);
+
+    $rawBenefits = old('additional_benefits', $quotation?->additional_benefits ?? ($defaultBenefits ?? []));
+    $formBenefits = $normalizeEntries(is_array($rawBenefits) ? $rawBenefits : []);
 @endphp
 <script>
 function quotationForm() {
     const items = @json($formItems);
-    
+
     return {
         items: items,
-        features: @json(old('software_features', $quotation?->software_features ?? [])),
-        benefits: @json(old('additional_benefits', $quotation?->additional_benefits ?? [])),
+        features: @json($formFeatures),
+        benefits: @json($formBenefits),
         taxAmount: {{ old('tax_amount', $quotation?->tax_amount ?? 0) }},
         subtotal: 0,
         total: 0,
@@ -26,10 +40,10 @@ function quotationForm() {
             this.calcTotal();
         },
 
-        addItem()    { this.items.push({ description: '', quantity: 1, unit_price: 0, total: 0 }); },
-        removeItem(i){ this.items.splice(i, 1); this.calcTotal(); },
-        addFeature() { this.features.push(''); },
-        addBenefit() { this.benefits.push(''); },
+        addItem()         { this.items.push({ description: '', quantity: 1, unit_price: 0, total: 0 }); },
+        removeItem(i)     { this.items.splice(i, 1); this.calcTotal(); },
+        addFeature(kind)  { this.features.push({ kind: kind || 'item', text: '' }); },
+        addBenefit(kind)  { this.benefits.push({ kind: kind || 'item', text: '' }); },
 
         calcRow(i) {
             this.items[i].total = (this.items[i].quantity || 0) * (this.items[i].unit_price || 0);

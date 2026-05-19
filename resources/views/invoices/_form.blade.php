@@ -29,6 +29,14 @@
                 <input type="date" name="invoice_date" value="{{ old('invoice_date', $invoice ? $invoice->invoice_date->format('Y-m-d') : now()->format('Y-m-d')) }}"
                     class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300" required>
             </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Payment Status</label>
+                <select name="payment_status" x-model="paymentStatus"
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300">
+                    <option value="pending" {{ old('payment_status', $invoice->payment_status ?? 'pending') === 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="paid" {{ old('payment_status', $invoice->payment_status ?? '') === 'paid' ? 'selected' : '' }}>Paid</option>
+                </select>
+            </div>
         </div>
     </div>
 
@@ -144,8 +152,8 @@
         </div>
     </div>
 
-    {{-- Payment details info --}}
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
+    {{-- Payment details info (hidden when status is paid) --}}
+    <div x-show="paymentStatus !== 'paid'" class="bg-white rounded-xl border border-gray-200 p-6">
         <h2 class="text-base font-semibold text-gray-800 mb-3">Payment Details (shown on invoice)</h2>
         <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700 space-y-1">
             <p><span class="font-medium">Bank Name:</span> {{ $settings['bank_name'] ?? 'DFCC Bank' }}</p>

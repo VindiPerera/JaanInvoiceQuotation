@@ -3,7 +3,7 @@
 @section('breadcrumb', 'System settings')
 
 @section('content')
-<form method="POST" action="{{ route('settings.update') }}" class="max-w-3xl space-y-6">
+<form method="POST" action="{{ route('settings.update') }}" enctype="multipart/form-data" class="max-w-3xl space-y-6">
 @csrf
 
     {{-- Company --}}
@@ -36,6 +36,26 @@
                     class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300">{{ $settings['company_address'] ?? '' }}</textarea>
             </div>
         </div>
+    </div>
+
+    {{-- Company Logo --}}
+    <div class="bg-white rounded-xl border border-gray-200 p-6">
+        <h2 class="text-base font-semibold text-gray-800 mb-1">Company Logo</h2>
+        <p class="text-xs text-gray-400 mb-4">Appears in PDF headers. PNG with transparent background recommended. Max 2 MB.</p>
+
+        @if(!empty($settings['company_logo']) && file_exists(public_path($settings['company_logo'])))
+        <div class="flex items-center gap-4 mb-4">
+            <img src="{{ asset($settings['company_logo']) }}" alt="Company logo"
+                 class="h-14 object-contain border border-gray-100 rounded p-2 bg-gray-50">
+            <span class="text-xs text-gray-400">Current logo</span>
+        </div>
+        @endif
+
+        <input type="file" name="company_logo" accept="image/png,image/jpeg,image/gif,image/svg+xml"
+            class="block text-sm text-gray-500
+                   file:mr-3 file:py-1.5 file:px-4 file:rounded file:border-0
+                   file:text-sm file:font-semibold file:bg-red-50 file:text-red-700
+                   hover:file:bg-red-100 cursor-pointer">
     </div>
 
     {{-- Bank / Payment --}}

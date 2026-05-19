@@ -1,8 +1,26 @@
+@php
+    $existingItems = old('items', isset($invoice) && $invoice
+        ? $invoice->items->map(fn($i) => [
+            'description' => $i->description,
+            'quantity'    => (float) $i->quantity,
+            'unit_price'  => (float) $i->unit_price,
+            'total'       => (float) $i->total,
+          ])->toArray()
+        : (isset($quotation) && $quotation
+            ? $quotation->items->map(fn($i) => [
+                'description' => $i->description,
+                'quantity'    => (float) $i->quantity,
+                'unit_price'  => (float) $i->unit_price,
+                'total'       => (float) $i->total,
+              ])->toArray()
+            : []));
+@endphp
 <script>
 function invoiceForm() {
     return {
-        items: @json(old('items', isset($invoice) && $invoice ? $invoice->items->map(fn($i) => ['description' => $i->description, 'quantity' => (float)$i->quantity, 'unit_price' => (float)$i->unit_price, 'total' => (float)$i->total])->toArray() : (isset($quotation) && $quotation ? $quotation->items->map(fn($i) => ['description' => $i->description, 'quantity' => (float)$i->quantity, 'unit_price' => (float)$i->unit_price, 'total' => (float)$i->total])->toArray() : []))),
+        items: @json($existingItems),
         taxAmount: {{ old('tax_amount', isset($invoice) ? $invoice->tax_amount : (isset($quotation) ? $quotation->tax_amount : 0)) }},
+        paymentStatus: '{{ old('payment_status', isset($invoice) ? $invoice->payment_status : 'pending') }}',
         subtotal: 0,
         total: 0,
 

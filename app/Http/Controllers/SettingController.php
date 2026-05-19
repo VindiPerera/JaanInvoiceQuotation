@@ -27,6 +27,13 @@ class SettingController extends Controller
             }
         }
 
+        if ($request->hasFile('company_logo')) {
+            $file = $request->file('company_logo');
+            $ext  = $file->getClientOriginalExtension();
+            $file->move(public_path('images'), 'company_logo.' . $ext);
+            Setting::set('company_logo', 'images/company_logo.' . $ext);
+        }
+
         return redirect()->route('settings.index')->with('success', 'Settings saved.');
     }
 }
