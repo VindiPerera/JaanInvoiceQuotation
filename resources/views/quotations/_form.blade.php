@@ -8,6 +8,41 @@
     </div>
     @endif
 
+    {{-- Quote Type Selector --}}
+    <div class="bg-white rounded-xl border border-gray-200 p-6">
+        <h2 class="text-base font-semibold text-gray-800 mb-4">Quote Template</h2>
+        <input type="hidden" name="quote_type" x-model="quoteType">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <button type="button" @click="quoteType = 'full_set'"
+                :class="quoteType === 'full_set'
+                    ? 'border-red-500 bg-red-50 text-red-700 ring-2 ring-red-300'
+                    : 'border-gray-200 text-gray-600 hover:border-red-300 hover:bg-red-50'"
+                class="flex flex-col items-center gap-2 border-2 rounded-xl p-4 transition cursor-pointer text-left">
+                <i class="fa-solid fa-desktop text-2xl"></i>
+                <span class="font-semibold text-sm">MariaPOS PC Full Set</span>
+                <span class="text-xs text-gray-400">Hardware + Software</span>
+            </button>
+            <button type="button" @click="quoteType = 'software_only'"
+                :class="quoteType === 'software_only'
+                    ? 'border-red-500 bg-red-50 text-red-700 ring-2 ring-red-300'
+                    : 'border-gray-200 text-gray-600 hover:border-red-300 hover:bg-red-50'"
+                class="flex flex-col items-center gap-2 border-2 rounded-xl p-4 transition cursor-pointer text-left">
+                <i class="fa-solid fa-code text-2xl"></i>
+                <span class="font-semibold text-sm">Software Only</span>
+                <span class="text-xs text-gray-400">Software features only</span>
+            </button>
+            <button type="button" @click="quoteType = 'hardware_only'"
+                :class="quoteType === 'hardware_only'
+                    ? 'border-red-500 bg-red-50 text-red-700 ring-2 ring-red-300'
+                    : 'border-gray-200 text-gray-600 hover:border-red-300 hover:bg-red-50'"
+                class="flex flex-col items-center gap-2 border-2 rounded-xl p-4 transition cursor-pointer text-left">
+                <i class="fa-solid fa-microchip text-2xl"></i>
+                <span class="font-semibold text-sm">Hardware Only</span>
+                <span class="text-xs text-gray-400">Hardware package only</span>
+            </button>
+        </div>
+    </div>
+
     {{-- Header card --}}
     <div class="bg-white rounded-xl border border-gray-200 p-6">
         <h2 class="text-base font-semibold text-gray-800 mb-4">Quotation Details</h2>
@@ -75,7 +110,7 @@
     </div>
 
     {{-- Items / Hardware Package --}}
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <div x-show="quoteType !== 'software_only'" class="bg-white rounded-xl border border-gray-200 p-6">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-base font-semibold text-gray-800">Hardware Package Items</h2>
             <button type="button" @click="addItem" class="inline-flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 font-medium">
@@ -151,7 +186,7 @@
     </div>
 
     {{-- Software Features --}}
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <div x-show="quoteType !== 'hardware_only'" class="bg-white rounded-xl border border-gray-200 p-6">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-base font-semibold text-gray-800">Software Features</h2>
             <div class="flex items-center gap-2">
@@ -267,8 +302,8 @@
     {{-- Terms --}}
     <div class="bg-white rounded-xl border border-gray-200 p-6">
         <h2 class="text-base font-semibold text-gray-800 mb-3">Terms & Conditions</h2>
-        <textarea name="terms_conditions" rows="8"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 font-mono">{{ old('terms_conditions', $quotation?->terms_conditions ?? $defaultTerms) }}</textarea>
+        <textarea name="terms_conditions" x-model="termsText" rows="8"
+            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 font-mono"></textarea>
     </div>
 
     {{-- Actions --}}

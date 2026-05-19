@@ -163,8 +163,10 @@ body { font-family: 'DejaVu Sans', Arial, sans-serif; font-size: 10pt; color: #1
     us for any clarifications or further assistance.
 </div>
 
-{{-- HARDWARE PACKAGE --}}
-@if($quotation->items->count())
+@php $quoteType = $quotation->quote_type ?? 'full_set'; @endphp
+
+{{-- HARDWARE PACKAGE — shown for full_set and hardware_only --}}
+@if($quoteType !== 'software_only' && $quotation->items->count())
 <div class="sec-head">Hardware Package</div>
 <table class="hw-table" style="margin-bottom:20px;">
     <thead>
@@ -205,8 +207,8 @@ body { font-family: 'DejaVu Sans', Arial, sans-serif; font-size: 10pt; color: #1
 </table>
 @endif
 
-{{-- SOFTWARE FEATURES --}}
-@if(!empty($quotation->software_features))
+{{-- SOFTWARE FEATURES — shown for full_set and software_only --}}
+@if($quoteType !== 'hardware_only' && !empty($quotation->software_features))
 <div class="sec-head">Maria POS &#8212; Software Features</div>
 <div style="margin-bottom:20px;padding:0 2px;">
     @foreach($quotation->software_features as $f)
@@ -232,8 +234,8 @@ body { font-family: 'DejaVu Sans', Arial, sans-serif; font-size: 10pt; color: #1
 </div>
 @endif
 
-{{-- ADDITIONAL BENEFITS --}}
-@if(!empty($quotation->additional_benefits))
+{{-- ADDITIONAL BENEFITS — shown for full_set and software_only --}}
+@if($quoteType !== 'hardware_only' && !empty($quotation->additional_benefits))
 <div class="sec-head">Additional Benefits</div>
 <div style="margin-bottom:20px;padding:4px 2px;">
     @foreach($quotation->additional_benefits as $b)
@@ -261,7 +263,10 @@ body { font-family: 'DejaVu Sans', Arial, sans-serif; font-size: 10pt; color: #1
     <tr style="background:#fafafa;">
         <td style="padding:12px 14px;font-size:9.5pt;font-weight:bold;color:#333;
                    border-left:3px solid #cc1010;vertical-align:middle;">
-            COMPLETE PACKAGE PRICE
+            @if($quoteType === 'software_only') SOFTWARE PACKAGE PRICE
+            @elseif($quoteType === 'hardware_only') HARDWARE PACKAGE PRICE
+            @else COMPLETE PACKAGE PRICE
+            @endif
         </td>
         <td style="padding:12px 14px;font-size:15pt;font-weight:bold;color:#cc1010;
                    text-align:right;white-space:nowrap;vertical-align:middle;">

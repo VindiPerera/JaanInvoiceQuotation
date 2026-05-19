@@ -58,19 +58,23 @@ class QuotationController extends Controller
         ]);
 
         DB::transaction(function () use ($request) {
+            $quoteType = in_array($request->quote_type, ['full_set', 'software_only', 'hardware_only'])
+                ? $request->quote_type : 'full_set';
+
             $quotation = Quotation::create([
-                'quotation_number'  => $request->quotation_number,
-                'quotation_date'    => $request->quotation_date,
-                'customer_id'       => $request->customer_id ?: null,
-                'customer_name'     => $request->customer_name,
-                'customer_address'  => $request->customer_address,
-                'customer_contact'  => $request->customer_contact,
-                'subject'           => $request->subject,
+                'quotation_number'    => $request->quotation_number,
+                'quotation_date'      => $request->quotation_date,
+                'customer_id'         => $request->customer_id ?: null,
+                'customer_name'       => $request->customer_name,
+                'customer_address'    => $request->customer_address,
+                'customer_contact'    => $request->customer_contact,
+                'subject'             => $request->subject,
+                'quote_type'          => $quoteType,
                 'software_features'   => $this->filterEntries($request->software_features),
                 'additional_benefits' => $this->filterEntries($request->additional_benefits),
-                'tax_amount'        => $request->tax_amount ?? 0,
-                'terms_conditions'  => $request->terms_conditions,
-                'status'            => $request->status ?? 'draft',
+                'tax_amount'          => $request->tax_amount ?? 0,
+                'terms_conditions'    => $request->terms_conditions,
+                'status'              => $request->status ?? 'draft',
             ]);
 
             $subtotal = 0;
@@ -126,6 +130,9 @@ class QuotationController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $quotation) {
+            $quoteType = in_array($request->quote_type, ['full_set', 'software_only', 'hardware_only'])
+                ? $request->quote_type : 'full_set';
+
             $quotation->update([
                 'quotation_number'    => $request->quotation_number,
                 'quotation_date'      => $request->quotation_date,
@@ -134,6 +141,7 @@ class QuotationController extends Controller
                 'customer_address'    => $request->customer_address,
                 'customer_contact'    => $request->customer_contact,
                 'subject'             => $request->subject,
+                'quote_type'          => $quoteType,
                 'software_features'   => $this->filterEntries($request->software_features),
                 'additional_benefits' => $this->filterEntries($request->additional_benefits),
                 'tax_amount'          => $request->tax_amount ?? 0,
