@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\HardwareCatalog;
 use App\Models\QuoteTemplate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class QuoteTemplateController extends Controller
 {
@@ -24,9 +25,9 @@ class QuoteTemplateController extends Controller
     public function store(Request $request)
     {
         $data = $this->validated($request);
-        $data['hardware_items']      = $this->filterItems($request->hardware_items);
-        $data['software_features']   = $this->filterEntries($request->software_features);
-        $data['additional_benefits'] = $this->filterEntries($request->additional_benefits);
+        $data['key']               = $this->uniqueKey($request->input('name'));
+        $data['hardware_items']    = $this->filterItems($request->input('hardware_items', []));
+        $data['software_features'] = $this->filterEntries($request->input('software_features', []));
 
         QuoteTemplate::create($data);
 
@@ -42,10 +43,9 @@ class QuoteTemplateController extends Controller
 
     public function update(Request $request, QuoteTemplate $quoteTemplate)
     {
-        $data = $this->validated($request, $quoteTemplate->id);
-        $data['hardware_items']      = $this->filterItems($request->hardware_items);
-        $data['software_features']   = $this->filterEntries($request->software_features);
-        $data['additional_benefits'] = $this->filterEntries($request->additional_benefits);
+        $data = $this->validated($request);
+        $data['hardware_items']    = $this->filterItems($request->input('hardware_items', []));
+        $data['software_features'] = $this->filterEntries($request->input('software_features', []));
 
         $quoteTemplate->update($data);
 
@@ -58,16 +58,24 @@ class QuoteTemplateController extends Controller
         return redirect()->route('quote-templates.index')->with('success', 'Template deleted.');
     }
 
-    private function validated(Request $request, ?int $ignoreId = null): array
+    private function validated(Request $request): array
     {
         return $request->validate([
             'name'             => 'required|string|max:255',
-            'key'              => 'required|string|max:100|alpha_dash|unique:quote_templates,key' . ($ignoreId ? ",$ignoreId" : ''),
-            'icon'             => 'nullable|string|max:100',
             'subtitle'         => 'nullable|string|max:255',
             'terms_conditions' => 'nullable|string',
-            'sort_order'       => 'nullable|integer|min:0',
         ]);
+    }
+
+    private function uniqueKey(string $name): string
+    {
+        $base = Str::slug($name, '_');
+        $key  = $base;
+        $i    = 2;
+        while (QuoteTemplate::where('key', $key)->exists()) {
+            $key = $base . '_' . $i++;
+        }
+        return $key;
     }
 
     private function filterItems(?array $items): array

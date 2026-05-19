@@ -12,26 +12,29 @@
 <div class="space-y-4">
 
     {{-- Summary --}}
+    @php $dateLabel = request('date_from') || request('date_to')
+        ? trim((request('date_from') ? date('d M Y', strtotime(request('date_from'))) : '') . ' – ' . (request('date_to') ? date('d M Y', strtotime(request('date_to'))) : ''))
+        : 'all time'; @endphp
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-white rounded-xl border border-gray-200 p-4">
             <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Total Invoices</p>
             <p class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($totals['count']) }}</p>
-            <p class="text-xs text-gray-400 mt-0.5">all time</p>
+            <p class="text-xs text-gray-400 mt-0.5">{{ $dateLabel }}</p>
         </div>
         <div class="bg-white rounded-xl border border-gray-200 p-4">
             <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Total Revenue</p>
             <p class="text-2xl font-bold text-gray-900 mt-1">LKR {{ number_format($totals['total_amount']) }}</p>
-            <p class="text-xs text-gray-400 mt-0.5">invoiced amount</p>
+            <p class="text-xs text-gray-400 mt-0.5">{{ $dateLabel }}</p>
         </div>
         <div class="bg-white rounded-xl border border-gray-200 p-4 border-l-4 border-l-green-400">
             <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Revenue Collected</p>
             <p class="text-2xl font-bold text-green-600 mt-1">LKR {{ number_format($totals['total_paid']) }}</p>
-            <p class="text-xs text-gray-400 mt-0.5">payments received</p>
+            <p class="text-xs text-gray-400 mt-0.5">{{ $dateLabel }}</p>
         </div>
         <div class="bg-white rounded-xl border border-gray-200 p-4 border-l-4 border-l-red-400">
             <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Outstanding</p>
             <p class="text-2xl font-bold text-red-500 mt-1">LKR {{ number_format($totals['total_balance']) }}</p>
-            <p class="text-xs text-gray-400 mt-0.5">balance due</p>
+            <p class="text-xs text-gray-400 mt-0.5">{{ $dateLabel }}</p>
         </div>
     </div>
 

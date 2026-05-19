@@ -54,7 +54,7 @@
     </div>
 
     {{-- Quotations --}}
-    <div class="bg-white rounded-xl border border-gray-200">
+    <div id="quotations" class="bg-white rounded-xl border border-gray-200">
         <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <h3 class="text-sm font-semibold text-gray-700">Quotations</h3>
             <a href="{{ route('quotations.index') }}?customer={{ $customer->name }}" class="text-xs text-red-600 hover:underline">View all</a>
@@ -107,7 +107,7 @@
     </div>
 
     {{-- Invoices --}}
-    <div class="bg-white rounded-xl border border-gray-200">
+    <div id="invoices" class="bg-white rounded-xl border border-gray-200">
         <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <h3 class="text-sm font-semibold text-gray-700">Invoices</h3>
             <a href="{{ route('invoices.index') }}?customer={{ $customer->name }}" class="text-xs text-red-600 hover:underline">View all</a>

@@ -29,17 +29,10 @@
         </div>
 
         <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">Category <span class="text-gray-400 font-normal">(optional grouping)</span></label>
-            <input type="text" name="category" value="{{ old('category', $item?->category) }}"
-                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
-                placeholder="e.g. Computers, Peripherals, Networking">
-        </div>
-
-        <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">Description <span class="text-gray-400 font-normal">(shown in quotation — first line bold)</span></label>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Description <span class="text-gray-400 font-normal">(shown in quotation)</span></label>
             <textarea name="description" rows="4"
                 class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 leading-snug"
-                placeholder="ITEM NAME&#10;• Spec one&#10;• Spec two">{{ old('description', $item?->description) }}</textarea>
+                placeholder="• Spec one&#10;• Spec two">{{ old('description', $item?->description) }}</textarea>
         </div>
 
         <div>

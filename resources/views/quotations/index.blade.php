@@ -12,26 +12,29 @@
 <div class="space-y-4">
 
     {{-- Summary --}}
+    @php $dateLabel = request('date_from') || request('date_to')
+        ? trim((request('date_from') ? date('d M Y', strtotime(request('date_from'))) : '') . ' – ' . (request('date_to') ? date('d M Y', strtotime(request('date_to'))) : ''))
+        : 'all time'; @endphp
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-white rounded-xl border border-gray-200 p-4">
             <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Total Quotations</p>
             <p class="text-2xl font-bold text-gray-900 mt-1">{{ number_format($totals['count']) }}</p>
-            <p class="text-xs text-gray-400 mt-0.5">all time</p>
+            <p class="text-xs text-gray-400 mt-0.5">{{ $dateLabel }}</p>
         </div>
         <div class="bg-white rounded-xl border border-gray-200 p-4">
             <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Total Value</p>
             <p class="text-2xl font-bold text-gray-900 mt-1">LKR {{ number_format($totals['total_value']) }}</p>
-            <p class="text-xs text-gray-400 mt-0.5">quoted amount</p>
+            <p class="text-xs text-gray-400 mt-0.5">{{ $dateLabel }}</p>
         </div>
         <div class="bg-white rounded-xl border border-gray-200 p-4 border-l-4 border-l-green-400">
             <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Accepted</p>
             <p class="text-2xl font-bold text-green-600 mt-1">{{ number_format($totals['accepted_count']) }}</p>
-            <p class="text-xs text-gray-400 mt-0.5">quotations won</p>
+            <p class="text-xs text-gray-400 mt-0.5">{{ $dateLabel }}</p>
         </div>
         <div class="bg-white rounded-xl border border-gray-200 p-4 border-l-4 border-l-green-400">
             <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Accepted Value</p>
             <p class="text-2xl font-bold text-green-600 mt-1">LKR {{ number_format($totals['accepted_value']) }}</p>
-            <p class="text-xs text-gray-400 mt-0.5">revenue won</p>
+            <p class="text-xs text-gray-400 mt-0.5">{{ $dateLabel }}</p>
         </div>
     </div>
 

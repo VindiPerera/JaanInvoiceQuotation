@@ -30,7 +30,6 @@
             <thead>
                 <tr class="border-b border-gray-100 bg-gray-50">
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Name</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Category</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Description</th>
                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wide">Unit Price</th>
                     <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wide">Active</th>
@@ -41,13 +40,7 @@
                 @foreach($items as $item)
                 <tr class="hover:bg-gray-50 transition {{ $item->is_active ? '' : 'opacity-50' }}">
                     <td class="px-6 py-3 font-medium text-gray-800">{{ $item->name }}</td>
-                    <td class="px-6 py-3 text-gray-500">
-                        @if($item->category)
-                        <span class="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{{ $item->category }}</span>
-                        @else
-                        <span class="text-gray-300">—</span>
-                        @endif
-                    </td>
+                    
                     <td class="px-6 py-3 text-gray-500 max-w-xs truncate">{{ $item->description ?? '—' }}</td>
                     <td class="px-6 py-3 text-right font-medium text-gray-800">
                         LKR {{ number_format($item->unit_price, 2) }}

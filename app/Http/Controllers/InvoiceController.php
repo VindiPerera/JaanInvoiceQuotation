@@ -37,11 +37,15 @@ class InvoiceController extends Controller
 
         $invoices = $query->orderBy('created_at', 'desc')->paginate(25)->withQueryString();
 
+        $totalsQuery = Invoice::query();
+        if ($request->date_from) { $totalsQuery->whereDate('invoice_date', '>=', $request->date_from); }
+        if ($request->date_to)   { $totalsQuery->whereDate('invoice_date', '<=', $request->date_to); }
+
         $totals = [
-            'count'         => Invoice::count(),
-            'total_amount'  => Invoice::sum('total_amount'),
-            'total_paid'    => Invoice::sum('paid_amount'),
-            'total_balance' => Invoice::sum('balance'),
+            'count'         => (clone $totalsQuery)->count(),
+            'total_amount'  => (clone $totalsQuery)->sum('total_amount'),
+            'total_paid'    => (clone $totalsQuery)->sum('paid_amount'),
+            'total_balance' => (clone $totalsQuery)->sum('balance'),
         ];
 
         return view('invoices.index', compact('invoices', 'totals'));
@@ -94,12 +98,13 @@ class InvoiceController extends Controller
 
             if ($request->items) {
                 foreach ($request->items as $i => $item) {
-                    if (empty($item['description'])) { continue; }
+                    if (empty($item['item_name']) && empty($item['description'])) { continue; }
                     $total = ($item['quantity'] ?? 1) * ($item['unit_price'] ?? 0);
                     InvoiceItem::create([
                         'invoice_id'  => $invoice->id,
                         'item_number' => $i + 1,
-                        'description' => $item['description'],
+                        'item_name'   => $item['item_name'] ?? null,
+                        'description' => $item['description'] ?? '',
                         'quantity'    => $item['quantity'] ?? 1,
                         'unit_price'  => $item['unit_price'] ?? 0,
                         'total'       => $total,
@@ -166,12 +171,13 @@ class InvoiceController extends Controller
 
             if ($request->items) {
                 foreach ($request->items as $i => $item) {
-                    if (empty($item['description'])) { continue; }
+                    if (empty($item['item_name']) && empty($item['description'])) { continue; }
                     $total = ($item['quantity'] ?? 1) * ($item['unit_price'] ?? 0);
                     InvoiceItem::create([
                         'invoice_id'  => $invoice->id,
                         'item_number' => $i + 1,
-                        'description' => $item['description'],
+                        'item_name'   => $item['item_name'] ?? null,
+                        'description' => $item['description'] ?? '',
                         'quantity'    => $item['quantity'] ?? 1,
                         'unit_price'  => $item['unit_price'] ?? 0,
                         'total'       => $total,

@@ -27,7 +27,8 @@ class CustomerController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name'    => 'required|string|max:255',
+            'contact' => 'required|string|max:50',
         ]);
 
         $customer = Customer::create($request->only('name', 'address', 'contact', 'email', 'notes'));
@@ -47,7 +48,10 @@ class CustomerController extends Controller
 
     public function update(Request $request, Customer $customer)
     {
-        $request->validate(['name' => 'required|string|max:255']);
+        $request->validate([
+            'name'    => 'required|string|max:255',
+            'contact' => 'required|string|max:50',
+        ]);
         $customer->update($request->only('name', 'address', 'contact', 'email', 'notes'));
 
         if ($request->expectsJson()) {

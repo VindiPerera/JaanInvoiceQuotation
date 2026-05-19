@@ -37,11 +37,15 @@ class QuotationController extends Controller
 
         $quotations = $query->orderBy('created_at', 'desc')->paginate(25)->withQueryString();
 
+        $totalsQuery = Quotation::query();
+        if ($request->date_from) { $totalsQuery->whereDate('quotation_date', '>=', $request->date_from); }
+        if ($request->date_to)   { $totalsQuery->whereDate('quotation_date', '<=', $request->date_to); }
+
         $totals = [
-            'count'          => Quotation::count(),
-            'total_value'    => Quotation::sum('total_amount'),
-            'accepted_count' => Quotation::where('status', 'accepted')->count(),
-            'accepted_value' => Quotation::where('status', 'accepted')->sum('total_amount'),
+            'count'          => (clone $totalsQuery)->count(),
+            'total_value'    => (clone $totalsQuery)->sum('total_amount'),
+            'accepted_count' => (clone $totalsQuery)->where('status', 'accepted')->count(),
+            'accepted_value' => (clone $totalsQuery)->where('status', 'accepted')->sum('total_amount'),
         ];
 
         return view('quotations.index', compact('quotations', 'totals'));

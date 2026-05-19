@@ -38,8 +38,20 @@
                     <td class="px-5 py-3 font-medium text-gray-900">{{ $c->name }}</td>
                     <td class="px-5 py-3 text-gray-600">{{ $c->contact ?: '—' }}</td>
                     <td class="px-5 py-3 text-gray-600 max-w-xs truncate">{{ $c->address ?: '—' }}</td>
-                    <td class="px-5 py-3 text-center text-gray-700">{{ $c->quotations_count }}</td>
-                    <td class="px-5 py-3 text-center text-gray-700">{{ $c->invoices_count }}</td>
+                    <td class="px-5 py-3 text-center">
+                        <a href="{{ route('customers.show', $c) }}#quotations"
+                           class="inline-flex items-center justify-center min-w-[2rem] px-2 py-0.5 rounded-full text-sm font-medium
+                                  {{ $c->quotations_count ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'text-gray-400' }} transition">
+                            {{ $c->quotations_count }}
+                        </a>
+                    </td>
+                    <td class="px-5 py-3 text-center">
+                        <a href="{{ route('customers.show', $c) }}#invoices"
+                           class="inline-flex items-center justify-center min-w-[2rem] px-2 py-0.5 rounded-full text-sm font-medium
+                                  {{ $c->invoices_count ? 'bg-blue-50 text-blue-600 hover:bg-blue-100' : 'text-gray-400' }} transition">
+                            {{ $c->invoices_count }}
+                        </a>
+                    </td>
                     <td class="px-5 py-3">
                         <div class="flex items-center gap-2">
                             <a href="{{ route('customers.show', $c) }}" title="View" class="text-gray-400 hover:text-gray-700"><i class="fa-solid fa-eye"></i></a>
@@ -85,8 +97,8 @@
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-medium text-gray-500 mb-1">Contact</label>
-                    <input type="text" name="contact" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300">
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Contact *</label>
+                    <input type="text" name="contact" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300" required>
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-500 mb-1">Email</label>
@@ -121,8 +133,8 @@
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-medium text-gray-500 mb-1">Contact</label>
-                    <input type="text" id="edit_contact" name="contact" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300">
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Contact *</label>
+                    <input type="text" id="edit_contact" name="contact" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300" required>
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-500 mb-1">Email</label>

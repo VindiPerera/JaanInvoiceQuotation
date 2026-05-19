@@ -90,6 +90,7 @@
                 <thead>
                     <tr class="border-b border-gray-100">
                         <th class="pb-2 text-left text-xs font-medium text-gray-500 w-10">#</th>
+                        <th class="pb-2 text-left text-xs font-medium text-gray-500 w-40">Item Name</th>
                         <th class="pb-2 text-left text-xs font-medium text-gray-500">Description</th>
                         <th class="pb-2 text-left text-xs font-medium text-gray-500 w-24">Qty</th>
                         <th class="pb-2 text-left text-xs font-medium text-gray-500 w-36">Unit Price (LKR)</th>
@@ -104,19 +105,24 @@
                             <td class="py-2 pr-2">
                                 <select @change="pickHardware(index, $event)"
                                     class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 mb-1 text-gray-500">
-                                    <option value="">— Select from hardware catalog —</option>
+                                    <option value="">— Catalog —</option>
                                     @foreach($hardware as $hw)
                                         <option value="{{ $hw->id }}"
                                             data-name="{{ $hw->name }}"
                                             data-desc="{{ $hw->description }}"
                                             data-price="{{ $hw->unit_price }}">
-                                            {{ $hw->name }} — LKR {{ number_format($hw->unit_price, 2) }}
+                                            {{ $hw->name }}
                                         </option>
                                     @endforeach
                                 </select>
-                                <input type="text" :name="`items[${index}][description]`" x-model="item.description"
-                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
-                                    placeholder="Item / service description">
+                                <input type="text" :name="`items[${index}][item_name]`" x-model="item.item_name"
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-red-300"
+                                    placeholder="e.g. Xprinter XP-N160II">
+                            </td>
+                            <td class="py-2 pr-2">
+                                <textarea :name="`items[${index}][description]`" x-model="item.description" rows="2"
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 resize-none leading-snug"
+                                    placeholder="Specs / details (optional)"></textarea>
                             </td>
                             <td class="py-2 pr-2">
                                 <input type="number" :name="`items[${index}][quantity]`" x-model.number="item.quantity" @input="calcRow(index)"
@@ -178,9 +184,11 @@
 
     {{-- Terms & Notes --}}
     <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 class="text-base font-semibold text-gray-800 mb-3">Terms & Conditions</h2>
-        <textarea name="terms_conditions" rows="6"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 font-mono">{{ old('terms_conditions', $invoice->terms_conditions ?? '') }}</textarea>
+        <h2 class="text-base font-semibold text-gray-800 mb-1">Terms & Conditions</h2>
+        <p class="text-xs text-gray-400 mb-2">Blank line = numbered heading &nbsp;|&nbsp; • bullet &nbsp;|&nbsp; Line ending with : = bold sub-heading</p>
+        <textarea name="terms_conditions" rows="8"
+            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 font-mono"
+            placeholder="Warranty & Support&#10;• 1 year warranty on all hardware items&#10;• On-site support within 24 hours&#10;&#10;Payment Terms&#10;• Full payment due within 7 days of invoice date&#10;• Cheques payable to JAAN Network (Pvt) Ltd&#10;&#10;Delivery&#10;• Delivery within 3–5 working days after payment confirmation">{{ old('terms_conditions', $invoice->terms_conditions ?? '') }}</textarea>
         <div class="mt-4">
             <label class="block text-xs font-medium text-gray-500 mb-1">Notes (internal)</label>
             <textarea name="notes" rows="2"

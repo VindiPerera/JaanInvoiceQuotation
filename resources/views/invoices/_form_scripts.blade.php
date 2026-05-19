@@ -1,6 +1,7 @@
 @php
     $existingItems = old('items', isset($invoice) && $invoice
         ? $invoice->items->map(fn($i) => [
+            'item_name'   => $i->item_name ?? '',
             'description' => $i->description,
             'quantity'    => (float) $i->quantity,
             'unit_price'  => (float) $i->unit_price,
@@ -8,6 +9,7 @@
           ])->toArray()
         : (isset($quotation) && $quotation
             ? $quotation->items->map(fn($i) => [
+                'item_name'   => $i->item_name ?? '',
                 'description' => $i->description,
                 'quantity'    => (float) $i->quantity,
                 'unit_price'  => (float) $i->unit_price,
@@ -25,18 +27,18 @@ function invoiceForm() {
         total: 0,
 
         init() {
-            if (!this.items.length) { this.items = [{ description: '', quantity: 1, unit_price: 0, total: 0 }]; }
+            if (!this.items.length) { this.items = [{ item_name: '', description: '', quantity: 1, unit_price: 0, total: 0 }]; }
             this.calcTotal();
         },
 
-        addItem()    { this.items.push({ description: '', quantity: 1, unit_price: 0, total: 0 }); },
+        addItem()    { this.items.push({ item_name: '', description: '', quantity: 1, unit_price: 0, total: 0 }); },
         removeItem(i){ this.items.splice(i, 1); this.calcTotal(); },
 
         pickHardware(i, e) {
             const opt = e.target.selectedOptions[0];
             if (!opt.value) return;
-            const desc = opt.dataset.desc ? opt.dataset.name + ' — ' + opt.dataset.desc : opt.dataset.name;
-            this.items[i].description = desc;
+            this.items[i].item_name  = opt.dataset.name || '';
+            this.items[i].description = opt.dataset.desc || '';
             this.items[i].unit_price  = parseFloat(opt.dataset.price) || 0;
             this.calcRow(i);
             e.target.value = '';
