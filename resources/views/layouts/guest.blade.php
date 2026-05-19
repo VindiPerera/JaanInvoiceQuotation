@@ -12,10 +12,7 @@
         <div class="w-full max-w-sm">
             {{-- Logo --}}
             <div class="flex flex-col items-center mb-8">
-                <div class="w-14 h-14 bg-red-600 rounded-xl flex items-center justify-center mb-3 shadow-lg">
-                    <span class="text-white font-black text-xl">JN</span>
-                </div>
-                <h1 class="text-xl font-bold text-gray-900">JAAN Network</h1>
+                <img src="{{ asset('images/company_logo.jpg') }}" alt="JAAN Network" class="h-20 w-auto object-contain mb-3">
                 <p class="text-sm text-gray-500 mt-0.5">Invoice & Quotation System</p>
             </div>
 

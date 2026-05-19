@@ -14,13 +14,7 @@
     {{-- Sidebar --}}
     <aside class="w-60 bg-white border-r border-gray-200 flex flex-col shrink-0">
         <div class="flex items-center gap-3 px-5 py-4 border-b border-gray-200">
-            <div class="w-8 h-8 bg-red-600 rounded flex items-center justify-center">
-                <span class="text-white font-bold text-xs">JN</span>
-            </div>
-            <div>
-                <p class="font-bold text-sm text-gray-900 leading-none">JAAN Network</p>
-                <p class="text-xs text-gray-500">Invoice System</p>
-            </div>
+            <img src="{{ asset('images/company_logo.jpg') }}" alt="JAAN Network" class="h-10 w-auto object-contain">
         </div>
 
         <nav class="flex-1 px-3 py-4 space-y-1">
