@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\QuoteTemplateController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Route;
@@ -53,6 +54,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/daily', [ReportController::class, 'daily'])->name('daily');
         Route::get('/daily/pdf', [ReportController::class, 'dailyPdf'])->name('daily.pdf');
     });
+
+    Route::resource('quote-templates', QuoteTemplateController::class)->except(['show']);
 
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');

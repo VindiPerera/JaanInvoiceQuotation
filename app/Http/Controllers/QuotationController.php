@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\Quotation;
 use App\Models\QuotationItem;
+use App\Models\QuoteTemplate;
 use App\Models\Setting;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -40,13 +41,14 @@ class QuotationController extends Controller
 
     public function create()
     {
-        $customers      = Customer::orderBy('name')->get();
-        $nextNumber     = Quotation::generateNumber();
-        $defaultTerms   = Setting::get('default_terms', '');
-        $defaultFeatures = json_decode(Setting::get('default_software_features', '[]'), true) ?: [];
-        $defaultBenefits = json_decode(Setting::get('default_additional_benefits', '[]'), true) ?: [];
-        $quotation = null;
-        return view('quotations.create', compact('customers', 'nextNumber', 'defaultTerms', 'quotation', 'defaultFeatures', 'defaultBenefits'));
+        $customers    = Customer::orderBy('name')->get();
+        $nextNumber   = Quotation::generateNumber();
+        $defaultTerms = Setting::get('default_terms', '');
+        $defaultFeatures = [];
+        $defaultBenefits = [];
+        $quotation   = null;
+        $templates   = QuoteTemplate::orderBy('sort_order')->orderBy('id')->get();
+        return view('quotations.create', compact('customers', 'nextNumber', 'defaultTerms', 'quotation', 'defaultFeatures', 'defaultBenefits', 'templates'));
     }
 
     public function store(Request $request)
@@ -118,7 +120,8 @@ class QuotationController extends Controller
         $defaultTerms    = Setting::get('default_terms', '');
         $defaultFeatures = [];
         $defaultBenefits = [];
-        return view('quotations.edit', compact('quotation', 'customers', 'defaultTerms', 'defaultFeatures', 'defaultBenefits'));
+        $templates       = QuoteTemplate::orderBy('sort_order')->orderBy('id')->get();
+        return view('quotations.edit', compact('quotation', 'customers', 'defaultTerms', 'defaultFeatures', 'defaultBenefits', 'templates'));
     }
 
     public function update(Request $request, Quotation $quotation)

@@ -10,37 +10,32 @@
 
     {{-- Quote Type Selector --}}
     <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 class="text-base font-semibold text-gray-800 mb-4">Quote Template</h2>
-        <input type="hidden" name="quote_type" x-model="quoteType">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <button type="button" @click="quoteType = 'full_set'"
-                :class="quoteType === 'full_set'
-                    ? 'border-red-500 bg-red-50 text-red-700 ring-2 ring-red-300'
-                    : 'border-gray-200 text-gray-600 hover:border-red-300 hover:bg-red-50'"
-                class="flex flex-col items-center gap-2 border-2 rounded-xl p-4 transition cursor-pointer text-left">
-                <i class="fa-solid fa-desktop text-2xl"></i>
-                <span class="font-semibold text-sm">MariaPOS PC Full Set</span>
-                <span class="text-xs text-gray-400">Hardware + Software</span>
-            </button>
-            <button type="button" @click="quoteType = 'software_only'"
-                :class="quoteType === 'software_only'
-                    ? 'border-red-500 bg-red-50 text-red-700 ring-2 ring-red-300'
-                    : 'border-gray-200 text-gray-600 hover:border-red-300 hover:bg-red-50'"
-                class="flex flex-col items-center gap-2 border-2 rounded-xl p-4 transition cursor-pointer text-left">
-                <i class="fa-solid fa-code text-2xl"></i>
-                <span class="font-semibold text-sm">Software Only</span>
-                <span class="text-xs text-gray-400">Software features only</span>
-            </button>
-            <button type="button" @click="quoteType = 'hardware_only'"
-                :class="quoteType === 'hardware_only'
-                    ? 'border-red-500 bg-red-50 text-red-700 ring-2 ring-red-300'
-                    : 'border-gray-200 text-gray-600 hover:border-red-300 hover:bg-red-50'"
-                class="flex flex-col items-center gap-2 border-2 rounded-xl p-4 transition cursor-pointer text-left">
-                <i class="fa-solid fa-microchip text-2xl"></i>
-                <span class="font-semibold text-sm">Hardware Only</span>
-                <span class="text-xs text-gray-400">Hardware package only</span>
-            </button>
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-base font-semibold text-gray-800">Quote Template</h2>
+            <a href="{{ route('quote-templates.index') }}" class="text-xs text-gray-400 hover:text-red-600 transition">
+                <i class="fa-solid fa-gear mr-1"></i> Manage Templates
+            </a>
         </div>
+        <input type="hidden" name="quote_type" x-model="quoteType">
+        @if(isset($templates) && $templates->isNotEmpty())
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            @foreach($templates as $tpl)
+            <button type="button" @click="quoteType = '{{ $tpl->key }}'"
+                :class="quoteType === '{{ $tpl->key }}'
+                    ? 'border-red-500 bg-red-50 text-red-700 ring-2 ring-red-300'
+                    : 'border-gray-200 text-gray-600 hover:border-red-300 hover:bg-red-50'"
+                class="flex flex-col items-center gap-2 border-2 rounded-xl p-4 transition cursor-pointer text-left">
+                <i class="fa-solid {{ $tpl->icon ?: 'fa-file-alt' }} text-2xl"></i>
+                <span class="font-semibold text-sm">{{ $tpl->name }}</span>
+                @if($tpl->subtitle)
+                <span class="text-xs text-gray-400">{{ $tpl->subtitle }}</span>
+                @endif
+            </button>
+            @endforeach
+        </div>
+        @else
+        <p class="text-sm text-gray-400">No templates configured. <a href="{{ route('quote-templates.create') }}" class="text-red-600 hover:underline">Add one</a>.</p>
+        @endif
     </div>
 
     {{-- Header card --}}

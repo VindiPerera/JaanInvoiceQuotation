@@ -25,51 +25,30 @@
 
     $formTerms = old('terms_conditions', $quotation?->terms_conditions ?? $defaultTerms ?? '');
     $isNewQuotation = !$quotation && !old('quote_type');
+
+    $normalizeItems = fn(array $arr) => array_values(array_map(
+        fn($i) => [
+            'description' => $i['description'] ?? '',
+            'quantity'    => (float)($i['quantity']  ?? 1),
+            'unit_price'  => (float)($i['unit_price'] ?? 0),
+            'total'       => (float)($i['quantity'] ?? 1) * (float)($i['unit_price'] ?? 0),
+        ],
+        array_filter($arr, fn($i) => !empty(trim($i['description'] ?? '')))
+    ));
+
+    $tplData = ($templates ?? collect())->map(fn($t) => [
+        'key'      => $t->key,
+        'items'    => $normalizeItems($t->hardware_items    ?? []),
+        'features' => $t->software_features   ?? [],
+        'benefits' => $t->additional_benefits ?? [],
+        'terms'    => $t->terms_conditions    ?? '',
+    ])->values()->all();
 @endphp
 <script>
-const quotationTypeDefaults = {
-    full_set: {
-        benefits: [
-            { kind: 'heading', text: '1. Software Warranty (Lifetime):' },
-            { kind: 'item', text: 'Lifetime free software updates & bug fixes' },
-            { kind: 'item', text: 'Lifetime remote or on-site technical support' },
-            { kind: 'space', text: '' },
-            { kind: 'heading', text: '2. Hardware Warranty (1 Year):' },
-            { kind: 'item', text: '1 Year warranty on all hardware components' },
-            { kind: 'item', text: 'Free repair or replacement for defective parts within warranty' },
-            { kind: 'space', text: '' },
-            { kind: 'heading', text: '3. Installation & Training:' },
-            { kind: 'item', text: 'Free on-site installation and system configuration' },
-            { kind: 'item', text: 'Staff training on system usage included' },
-        ],
-        terms: `SOFTWARE WARRANTY (Lifetime Warranty for POS System)\nThe software provided with the POS system includes a lifetime warranty.\n\nCoverage:\n• Covers any bugs, defects, or malfunctions in the software\n• Includes lifetime updates and technical support\n\nExclusions:\n• Issues caused by unauthorized modifications\n• Problems arising from third-party software integrations\n• Misuse or improper handling of the system\n\nHARDWARE WARRANTY (1 Year)\nAll hardware components of the POS system are covered under a 1-year warranty from the date of purchase.\n\nThis includes:\n• PC-Full Set\n• Cash Drawer\n• Xprinter – XP – 237B\n• Desktop Barcode Scanner\n\nLIMITATIONS OF HARDWARE WARRANTY\nThe hardware warranty does not cover:\n• Physical damage caused by accidents, misuse, or neglect.\n• Damage due to unauthorized repairs, modifications, or tampering.\n• Consumable items such as batteries, printer ribbons, and thermal paper.\n• Damage caused by power surges, improper electrical connections, or environmental conditions (e.g., moisture, extreme temperatures).\n\nWARRANTY CLAIMS\n• Customers must provide proof of purchase (invoice or receipt) when making a warranty claim.\n• Defective hardware must be returned to an authorized service center for inspection.\n• Hardware will be repaired or replaced at no additional cost if the issue falls within warranty coverage.\n\nSERVICE TERMS\n• Lifetime software support will be provided either remotely or on-site, depending on the situation.\n• Hardware repair or replacement is free within the 1-year warranty period.\n\nAfter the 1-year warranty period:\n• Repair services will be chargeable\n• Replacement parts will be provided at current market prices\n\nEXCLUSIONS AND CONDITIONS\n• Any damage or malfunction caused by misuse, mishandling, or unauthorized modifications will void the warranty.\n• Warranty services are only applicable if the product is used under normal operating conditions and according to the provided instructions.`,
-    },
-    software_only: {
-        benefits: [
-            { kind: 'heading', text: '1. Software Warranty (Lifetime):' },
-            { kind: 'item', text: 'Lifetime free software updates & bug fixes' },
-            { kind: 'item', text: 'Lifetime remote or on-site technical support' },
-            { kind: 'item', text: 'Cloud backup support (optional add-on)' },
-            { kind: 'space', text: '' },
-            { kind: 'heading', text: '2. Training & Onboarding:' },
-            { kind: 'item', text: 'Online/remote training session included' },
-            { kind: 'item', text: 'User manual and documentation provided' },
-        ],
-        terms: `SOFTWARE WARRANTY (Lifetime Warranty for POS System)\nThe software provided with the POS system includes a lifetime warranty.\n\nCoverage:\n• Covers any bugs, defects, or malfunctions in the software\n• Includes lifetime updates and technical support\n\nExclusions:\n• Issues caused by unauthorized modifications\n• Problems arising from third-party software integrations\n• Misuse or improper handling of the system\n\nSERVICE TERMS\n• Lifetime software support will be provided either remotely or on-site, depending on the situation.\n\nEXCLUSIONS AND CONDITIONS\n• Any damage or malfunction caused by misuse, mishandling, or unauthorized modifications will void the warranty.\n• Warranty services are only applicable if the product is used under normal operating conditions and according to the provided instructions.`,
-    },
-    hardware_only: {
-        benefits: [
-            { kind: 'heading', text: '1. Hardware Warranty (1 Year):' },
-            { kind: 'item', text: '1 Year warranty on all hardware components' },
-            { kind: 'item', text: 'Free repair or replacement for defective parts within warranty' },
-            { kind: 'space', text: '' },
-            { kind: 'heading', text: '2. Delivery & Setup:' },
-            { kind: 'item', text: 'Free delivery within city limits' },
-            { kind: 'item', text: 'Hardware setup and basic configuration included' },
-        ],
-        terms: `HARDWARE WARRANTY (1 Year)\nAll hardware components are covered under a 1-year warranty from the date of purchase.\n\nThis includes:\n• PC-Full Set\n• Cash Drawer\n• Xprinter – XP – 237B\n• Desktop Barcode Scanner\n\nLIMITATIONS OF HARDWARE WARRANTY\nThe hardware warranty does not cover:\n• Physical damage caused by accidents, misuse, or neglect.\n• Damage due to unauthorized repairs, modifications, or tampering.\n• Consumable items such as batteries, printer ribbons, and thermal paper.\n• Damage caused by power surges, improper electrical connections, or environmental conditions (e.g., moisture, extreme temperatures).\n\nWARRANTY CLAIMS\n• Customers must provide proof of purchase (invoice or receipt) when making a warranty claim.\n• Defective hardware must be returned to an authorized service center for inspection.\n• Hardware will be repaired or replaced at no additional cost if the issue falls within warranty coverage.\n\nSERVICE TERMS\n• Hardware repair or replacement is free within the 1-year warranty period.\n\nAfter the 1-year warranty period:\n• Repair services will be chargeable\n• Replacement parts will be provided at current market prices\n\nEXCLUSIONS AND CONDITIONS\n• Any damage or malfunction caused by misuse, mishandling, or unauthorized modifications will void the warranty.\n• Warranty services are only applicable if the product is used under normal operating conditions and according to the provided instructions.`,
-    },
-};
+const _tplData = @json($tplData);
+const quotationTypeDefaults = Object.fromEntries(
+    _tplData.map(t => [t.key, { items: t.items, features: t.features, benefits: t.benefits, terms: t.terms }])
+);
 
 function quotationForm() {
     const items = @json($formItems);
@@ -97,7 +76,7 @@ function quotationForm() {
             this.$watch('quoteType', (newType, oldType) => {
                 if (this._skipTypeWatch) { this._skipTypeWatch = false; return; }
                 if (!this.isNewQuotation) {
-                    const ok = confirm('Changing the quote type will reset Additional Benefits and Terms & Conditions to the template defaults. Continue?');
+                    const ok = confirm('Changing the template will reset Hardware Items, Software Features, Additional Benefits and Terms & Conditions to the template defaults. Continue?');
                     if (!ok) {
                         this._skipTypeWatch = true;
                         this.quoteType = oldType;
@@ -109,9 +88,17 @@ function quotationForm() {
         },
 
         applyTypeDefaults(type) {
-            const d = quotationTypeDefaults[type] || quotationTypeDefaults.full_set;
-            this.benefits = d.benefits.map(b => ({ ...b }));
-            this.termsText = d.terms;
+            const keys = Object.keys(quotationTypeDefaults);
+            const d = quotationTypeDefaults[type] || quotationTypeDefaults[keys[0]] || { items: [], features: [], benefits: [], terms: '' };
+            if (d.items && d.items.length) {
+                this.items = d.items.map(i => ({ ...i }));
+            } else {
+                this.items = [{ description: '', quantity: 1, unit_price: 0, total: 0 }];
+            }
+            this.features  = (d.features || []).map(f => ({ ...f }));
+            this.benefits  = (d.benefits || []).map(b => ({ ...b }));
+            this.termsText = d.terms || '';
+            this.calcTotal();
         },
 
         addItem()         { this.items.push({ description: '', quantity: 1, unit_price: 0, total: 0 }); },
