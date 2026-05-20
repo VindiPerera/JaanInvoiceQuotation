@@ -17,6 +17,7 @@
             </a>
         </div>
         <input type="hidden" name="quote_type" x-model="quoteType">
+        <input type="hidden" name="status" value="draft">
         @if(isset($templates) && $templates->isNotEmpty())
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
             @foreach($templates as $tpl)
@@ -41,7 +42,7 @@
     {{-- Header card --}}
     <div class="bg-white rounded-xl border border-gray-200 p-6">
         <h2 class="text-base font-semibold text-gray-800 mb-4">Quotation Details</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="block text-xs font-medium text-gray-500 mb-1">Quotation Number *</label>
                 <input type="text" name="quotation_number" value="{{ old('quotation_number', $quotation?->quotation_number ?? $nextNumber) }}"
@@ -51,14 +52,6 @@
                 <label class="block text-xs font-medium text-gray-500 mb-1">Date *</label>
                 <input type="date" name="quotation_date" value="{{ old('quotation_date', $quotation ? $quotation->quotation_date->format('Y-m-d') : now()->format('Y-m-d')) }}"
                     class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300" required>
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
-                <select name="status" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300">
-                    @foreach(['draft','finalized','sent','accepted','rejected'] as $s)
-                        <option value="{{ $s }}" {{ old('status', $quotation?->status ?? 'draft') === $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>
-                    @endforeach
-                </select>
             </div>
         </div>
     </div>
@@ -275,8 +268,10 @@
     {{-- Terms --}}
     <div class="bg-white rounded-xl border border-gray-200 p-6">
         <h2 class="text-base font-semibold text-gray-800 mb-3">Terms & Conditions</h2>
-        <textarea name="terms_conditions" x-model="termsText" rows="8"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 font-mono"></textarea>
+        <p class="text-xs text-gray-400 mb-3">Blank line = section heading &nbsp;|&nbsp; • bullet &nbsp;|&nbsp; Content line</p>
+        <textarea name="terms_conditions" x-model="termsText" rows="12"
+            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 font-mono"
+            placeholder="Software Warranty (Lifetime Warranty for POS System)&#10;The software provided with the POS system includes a lifetime warranty.&#10;Coverage:&#10;● Covers any bugs, defects, or malfunctions in the software&#10;● Includes lifetime updates and technical support&#10;&#10;Hardware Warranty (1 Year)&#10;All hardware components of the POS system are covered under a 1-year warranty.&#10;● PC-Full Set&#10;● Cash Drawer&#10;● Thermal Receipt Printer&#10;● Desktop Barcode Scanner"></textarea>
     </div>
 
     {{-- Actions --}}

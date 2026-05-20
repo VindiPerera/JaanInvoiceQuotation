@@ -185,10 +185,9 @@
     {{-- Terms & Notes --}}
     <div class="bg-white rounded-xl border border-gray-200 p-6">
         <h2 class="text-base font-semibold text-gray-800 mb-1">Terms & Conditions</h2>
-        <p class="text-xs text-gray-400 mb-2">Blank line = numbered heading &nbsp;|&nbsp; • bullet &nbsp;|&nbsp; Line ending with : = bold sub-heading</p>
-        <textarea name="terms_conditions" rows="8"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 font-mono"
-            placeholder="Warranty & Support&#10;• 1 year warranty on all hardware items&#10;• On-site support within 24 hours&#10;&#10;Payment Terms&#10;• Full payment due within 7 days of invoice date&#10;• Cheques payable to JAAN Network (Pvt) Ltd&#10;&#10;Delivery&#10;• Delivery within 3–5 working days after payment confirmation">{{ old('terms_conditions', $invoice->terms_conditions ?? '') }}</textarea>
+        <p class="text-xs text-gray-400 mb-2">Blank line = section heading &nbsp;|&nbsp; • bullet &nbsp;|&nbsp; Content line</p>
+        <textarea name="terms_conditions" rows="10"
+            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 font-mono">{{ old('terms_conditions', $invoice->terms_conditions ?? ($quotation->terms_conditions ?? "Software Warranty (Lifetime Warranty):\nCovers defects, malfunctions, and lifetime support.\nUnauthorized modifications void the warranty.\n\nService Terms:\n● Lifetime software support.\n● Free Hardware repair or replacement within 1 year.\n● Post-warranty repairs are Chargeable")) }}</textarea>
         <div class="mt-4">
             <label class="block text-xs font-medium text-gray-500 mb-1">Notes (internal)</label>
             <textarea name="notes" rows="2"
