@@ -270,7 +270,7 @@
         <h2 class="text-base font-semibold text-gray-800 mb-3">Terms & Conditions</h2>
         <p class="text-xs text-gray-400 mb-3">Blank line = section heading &nbsp;|&nbsp; • bullet &nbsp;|&nbsp; Content line</p>
         <textarea name="terms_conditions" x-model="termsText" rows="16"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 font-mono">{{ old('terms_conditions', $quotation?->terms_conditions ?? '') }}</textarea>
+            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 font-mono">{{ old('terms_conditions', $quotation?->terms_conditions ?? ($defaultWarrantyTerms ?? '')) }}</textarea>
         <p class="text-xs text-gray-500 mt-2">💡 You can edit the terms as needed. Use bullet points (●) for items and leave blank lines for section headings.</p>
     </div>
 

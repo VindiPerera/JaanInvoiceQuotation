@@ -5,6 +5,8 @@
 @section('content')
 
 @php
+    $defaultWarrantyTerms = "Software Warranty (Lifetime Warranty for POS System)\nThe software provided with the POS system includes a lifetime warranty.\nCoverage:\n● Covers any bugs, defects, or malfunctions in the software\n● Includes lifetime updates and technical support\nExclusions:\n● Issues caused by unauthorized modifications\n● Problems arising from third-party software integrations\n● Misuse or improper handling of the system\n\nHardware Warranty (1 Year)\nAll hardware components of the POS system are covered under a 1-year warranty.\nThis includes:\n● PC-Full Set\n● Cash Drawer\n● Thermal Receipt Printer\n● Desktop Barcode Scanner\n\nLimitations of Hardware Warranty\nThe hardware warranty does not cover:\n● Physical damage caused by accidents, misuse, or neglect.\n● Damage due to unauthorized repairs, modifications, or tampering.\n● Consumable items such as batteries, printer ribbons, and thermal paper.\n● Damage caused by power surges, improper electrical connections, or environmental conditions (e.g., moisture, extreme temperatures).\n\nWarranty Claims\n● Customers must provide proof of purchase (invoice or receipt) when making a warranty claim.\n● Defective hardware must be returned to an authorized service center for inspection.\n● Hardware will be repaired or replaced at no additional cost if the issue falls within warranty coverage.\n\nService Terms\n● Lifetime software support will be provided either remotely or on-site, depending on the situation.\n● Hardware repair or replacement is free within the 1-year warranty period.\nAfter the 1-year warranty period:\n● Repair services will be chargeable\n● Replacement parts will be provided at current market prices\n\nExclusions and Conditions\n● Any damage or malfunction caused by misuse, mishandling, or unauthorized modifications will void the warranty\n● Warranty services are only applicable if the product is used under normal operating conditions and according to the provided instructions.";
+
     $normalizeEntries = fn(array $arr) => array_values(array_map(
         fn($e) => is_array($e) && isset($e['kind'])
             ? ['kind' => $e['kind'], 'text' => (string)($e['text'] ?? '')]
@@ -225,9 +227,8 @@
         <div class="bg-white rounded-xl border border-gray-200 p-6">
             <h2 class="text-base font-semibold text-gray-800 mb-3">Terms & Conditions</h2>
             <p class="text-xs text-gray-400 mb-3">Blank line = section heading &nbsp;|&nbsp; • bullet &nbsp;|&nbsp; Content line</p>
-            <textarea name="terms_conditions" rows="14"
-                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 font-mono"
-                placeholder="Software Warranty (Lifetime Warranty for POS System)&#10;The software provided with the POS system includes a lifetime warranty.&#10;Coverage:&#10;● Covers any bugs, defects, or malfunctions in the software&#10;● Includes lifetime updates and technical support&#10;Exclusions:&#10;● Issues caused by unauthorized modifications&#10;● Problems arising from third-party software integrations&#10;● Misuse or improper handling of the system&#10;&#10;Hardware Warranty (1 Year)&#10;All hardware components of the POS system are covered under a 1-year warranty.&#10;This includes:&#10;● PC-Full Set&#10;● Cash Drawer&#10;● Thermal Receipt Printer&#10;● Desktop Barcode Scanner">{{ old('terms_conditions', $template?->terms_conditions) }}</textarea>
+            <textarea name="terms_conditions" rows="16"
+                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 font-mono">{{ old('terms_conditions', $template?->terms_conditions ?? $defaultWarrantyTerms) }}</textarea>
             <p class="text-xs text-gray-500 mt-2">💡 This template's terms will be applied to all quotations using this template.</p>
         </div>
 
