@@ -32,8 +32,7 @@ class DatabaseSeeder extends Seeder
 
         // Call all seeders
         $this->call(SettingsSeeder::class);
-        $this->call(QuoteTemplateSeeder::class);
-        $this->call(CustomerSeeder::class);
-        $this->call(HardwareCatalogSeeder::class);
+   
+        
     }
 }

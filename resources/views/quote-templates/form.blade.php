@@ -15,9 +15,11 @@
     ));
 
     $rawFeatures  = old('software_features', $template?->software_features ?? []);
+    $rawFeatures  = is_string($rawFeatures) ? json_decode($rawFeatures, true) ?? [] : $rawFeatures;
     $formFeatures = $normalizeEntries(is_array($rawFeatures) ? $rawFeatures : []);
 
     $rawItems  = old('hardware_items', $template?->hardware_items ?? []);
+    $rawItems  = is_string($rawItems) ? json_decode($rawItems, true) ?? [] : $rawItems;
     $formItems = is_array($rawItems) ? array_map(fn($i) => [
         'description' => $i['description'] ?? '',
         'quantity'    => (float)($i['quantity']  ?? 1),
