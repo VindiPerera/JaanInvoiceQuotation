@@ -145,8 +145,8 @@
                     <i class="fa-solid fa-plus"></i> Add
                 </button>
             </div>
-            <div x-show="isTemplateApplied" class="text-xs text-gray-400 italic">
-                <i class="fa-solid fa-lock mr-1"></i> Template applied - items are locked
+            <div x-show="isTemplateApplied" class="text-xs text-gray-500 italic">
+                <i class="fa-solid fa-lock mr-1"></i> Template applied - only quantity is editable
             </div>
         </div>
         <div class="overflow-x-auto">
@@ -164,7 +164,7 @@
                 </thead>
                 <tbody>
                     <template x-for="(item, index) in items" :key="index">
-                        <tr class="border-b border-gray-50" :class="{ 'opacity-50 bg-gray-50': isTemplateApplied }">
+                        <tr class="border-b border-gray-50">
                             <td class="py-2 pr-2 text-gray-400 text-xs" x-text="index + 1"></td>
                             <td class="py-2 pr-2">
                                 <textarea :name="`items[${index}][description]`" x-model="item.description" rows="3"
@@ -181,8 +181,7 @@
                             </td>
                             <td class="py-2 pr-2">
                                 <input type="number" :name="`items[${index}][quantity]`" x-model.number="item.quantity" @input="calcRow(index)"
-                                    :disabled="isTemplateApplied"
-                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
                                     min="0" step="0.01">
                             </td>
                             <td class="py-2 pr-2 text-right">
