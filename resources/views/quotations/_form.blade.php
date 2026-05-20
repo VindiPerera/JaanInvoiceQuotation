@@ -107,7 +107,7 @@
     <div x-show="quoteType !== 'software_only'" class="bg-white rounded-xl border border-gray-200 p-6">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-base font-semibold text-gray-800">Hardware/Software Items</h2>
-            <div x-show="!isTemplateApplied" class="flex items-center gap-2">
+            <div class="flex items-center gap-2">
                 {{-- From Catalog custom dropdown --}}
                 <div class="relative">
                     <button type="button" @click="catalogOpen = !catalogOpen"
@@ -141,12 +141,9 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" @click="addItem" class="inline-flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 font-medium">
+                <button type="button" @click="addItem" x-show="!isTemplateApplied" class="inline-flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 font-medium">
                     <i class="fa-solid fa-plus"></i> Add
                 </button>
-            </div>
-            <div x-show="isTemplateApplied" class="text-xs text-gray-500 italic">
-                <i class="fa-solid fa-lock mr-1"></i> Template applied - only quantity is editable
             </div>
         </div>
         <div class="overflow-x-auto">
@@ -164,18 +161,18 @@
                 </thead>
                 <tbody>
                     <template x-for="(item, index) in items" :key="index">
-                        <tr class="border-b border-gray-50">
+                        <tr class="border-b border-gray-50" :class="{ 'bg-yellow-50': item.isFromTemplate }">
                             <td class="py-2 pr-2 text-gray-400 text-xs" x-text="index + 1"></td>
                             <td class="py-2 pr-2">
                                 <textarea :name="`items[${index}][description]`" x-model="item.description" rows="3"
-                                    :disabled="isTemplateApplied"
+                                    :disabled="item.isFromTemplate && isTemplateApplied"
                                     class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 resize-y leading-snug disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
                                     placeholder="ITEM/SERVICE NAME (first line bold in PDF)&#10;• Detail one&#10;• Detail two"></textarea>
                                 <input type="hidden" :name="`items[${index}][item_type]`" value="hardware">
                             </td>
                             <td class="py-2 pr-2">
                                 <input type="text" :name="`items[${index}][warranty]`" x-model="item.warranty"
-                                    :disabled="isTemplateApplied"
+                                    :disabled="item.isFromTemplate && isTemplateApplied"
                                     class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
                                     placeholder="e.g. 1 Year">
                             </td>
@@ -187,14 +184,14 @@
                             <td class="py-2 pr-2 text-right">
                                 <div class="flex items-center justify-end">
                                     <input type="number" :name="`items[${index}][unit_price]`" x-model.number="item.unit_price" @input="calcRow(index)"
-                                        :disabled="isTemplateApplied"
+                                        :disabled="item.isFromTemplate && isTemplateApplied"
                                         class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 text-right disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
                                         min="0" step="0.01" placeholder="0.00">
                                 </div>
                             </td>
                             <td class="py-2 text-right font-medium text-gray-700" x-text="'LKR ' + formatNum(item.total)"></td>
                             <td class="py-2 pl-2">
-                                <button type="button" @click="removeItem(index)" :disabled="isTemplateApplied" class="text-gray-300 hover:text-red-500 transition disabled:opacity-30 disabled:cursor-not-allowed">
+                                <button type="button" @click="removeItem(index)" class="text-gray-300 hover:text-red-500 transition">
                                     <i class="fa-solid fa-xmark"></i>
                                 </button>
                             </td>
