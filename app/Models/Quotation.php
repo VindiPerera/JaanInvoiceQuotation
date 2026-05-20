@@ -11,7 +11,7 @@ class Quotation extends Model
 
     protected $fillable = [
         'quotation_number', 'quotation_date', 'customer_id', 'customer_name',
-        'customer_address', 'customer_contact', 'subject', 'quote_type',
+        'customer_address', 'customer_contact', 'subject', 'project_overview', 'quote_type',
         'software_features', 'additional_benefits', 'subtotal', 'tax_amount',
         'total_amount', 'terms_conditions', 'status',
     ];

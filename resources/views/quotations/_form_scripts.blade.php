@@ -42,12 +42,13 @@
         'items'    => $normalizeItems($t->hardware_items    ?? []),
         'features' => $t->software_features   ?? [],
         'terms'    => $t->terms_conditions    ?? '',
+        'overview' => $t->project_overview    ?? '',
     ])->values()->all();
 @endphp
 <script>
 const _tplData = @json($tplData);
 const quotationTypeDefaults = Object.fromEntries(
-    _tplData.map(t => [t.key, { items: t.items, features: t.features, terms: t.terms }])
+    _tplData.map(t => [t.key, { items: t.items, features: t.features, terms: t.terms, overview: t.overview }])
 );
 
 function quotationForm() {
@@ -57,6 +58,7 @@ function quotationForm() {
         items: items,
         features: @json($formFeatures),
         termsText: @json($formTerms),
+        projectOverview: '{{ old('project_overview', $quotation?->project_overview ?? '') }}',
         taxAmount: {{ old('tax_amount', $quotation?->tax_amount ?? 0) }},
         quoteType: '{{ old('quote_type', $quotation?->quote_type ?? '') }}',
         isNewQuotation: {{ $isNewQuotation ? 'true' : 'false' }},
@@ -90,7 +92,7 @@ function quotationForm() {
 
         applyTypeDefaults(type) {
             const keys = Object.keys(quotationTypeDefaults);
-            const d = quotationTypeDefaults[type] || quotationTypeDefaults[keys[0]] || { items: [], features: [], terms: '' };
+            const d = quotationTypeDefaults[type] || quotationTypeDefaults[keys[0]] || { items: [], features: [], terms: '', overview: '' };
             if (d.items && d.items.length) {
                 this.items = d.items.map(i => ({ ...i }));
             } else {
@@ -98,6 +100,7 @@ function quotationForm() {
             }
             this.features  = (d.features || []).map(f => ({ ...f }));
             this.termsText = d.terms || '';
+            this.projectOverview = d.overview || '';
             this.calcTotal();
         },
 

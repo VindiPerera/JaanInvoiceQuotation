@@ -94,6 +94,12 @@
                     class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
                     placeholder="e.g. Quotation for Maria POS System - Complete Package">
             </div>
+            <div class="md:col-span-2">
+                <label class="block text-xs font-medium text-gray-500 mb-1">Project Overview <span class="text-gray-400 font-normal">(optional)</span></label>
+                <textarea name="project_overview" x-model="projectOverview" rows="4"
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
+                    placeholder="Enter project overview/introduction text that will appear in the quotation PDF..."></textarea>
+            </div>
         </div>
     </div>
 

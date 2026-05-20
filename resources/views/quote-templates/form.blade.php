@@ -63,6 +63,12 @@
                         placeholder="e.g. Hardware + Software">
                 </div>
             </div>
+            <div class="mt-4">
+                <label class="block text-xs font-medium text-gray-500 mb-1">Project Overview <span class="text-gray-400 font-normal">(optional)</span></label>
+                <textarea name="project_overview" rows="4"
+                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
+                    placeholder="Enter default project overview/introduction text for this template...">{{ old('project_overview', $template?->project_overview ?? '') }}</textarea>
+            </div>
         </div>
 
         {{-- Hardware/Software Package Items --}}

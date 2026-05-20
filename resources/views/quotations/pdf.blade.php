@@ -146,13 +146,19 @@ body {
 
 <hr style="border:none;border-top:1px solid #000;margin-bottom:16px;">
 
-{{-- INTRODUCTION --}}
+{{-- INTRODUCTION / PROJECT OVERVIEW --}}
+@if($quotation->project_overview)
+<div style="font-size:9pt;line-height:1.85;margin-bottom:6px;text-align:justify;">
+    {!! nl2br(htmlspecialchars($quotation->project_overview)) !!}
+</div>
+@else
 <div style="font-size:9pt;line-height:1.85;margin-bottom:4px;">Dear Valued Customer,</div>
 <div style="font-size:9pt;line-height:1.85;margin-bottom:6px;text-align:justify;">
     Thank you for your interest in our products and services. We are pleased to present the
     following quotation, carefully tailored to meet your business requirements. Please review
     the details below and feel free to contact us for any clarifications or further assistance.
 </div>
+@endif
 
 @php $quoteType = $quotation->quote_type ?? 'full_set'; @endphp
 
