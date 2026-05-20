@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class QuoteTemplate extends Model
 {
     protected $fillable = [
-        'name', 'key', 'subtitle', 'template_type',
+        'name', 'key', 'subtitle', 'project_overview', 'template_type',
         'hardware_items', 'software_features', 'additional_benefits',
         'terms_conditions',
     ];

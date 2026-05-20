@@ -18,7 +18,7 @@ class QuoteTemplateController extends Controller
     public function create()
     {
         $template = null;
-        $hardwareCatalog = HardwareCatalog::active()->orderBy('category')->orderBy('name')->get(['id', 'name', 'category', 'description', 'unit_price']);
+        $hardwareCatalog = HardwareCatalog::active()->orderBy('category')->orderBy('name')->get(['id', 'name', 'category', 'description', 'unit_price', 'warranty']);
         return view('quote-templates.form', compact('template', 'hardwareCatalog'));
     }
 
@@ -37,7 +37,7 @@ class QuoteTemplateController extends Controller
     public function edit(QuoteTemplate $quoteTemplate)
     {
         $template = $quoteTemplate;
-        $hardwareCatalog = HardwareCatalog::active()->orderBy('category')->orderBy('name')->get(['id', 'name', 'category', 'description', 'unit_price']);
+        $hardwareCatalog = HardwareCatalog::active()->orderBy('category')->orderBy('name')->get(['id', 'name', 'category', 'description', 'unit_price', 'warranty']);
         return view('quote-templates.form', compact('template', 'hardwareCatalog'));
     }
 
@@ -61,9 +61,10 @@ class QuoteTemplateController extends Controller
     private function validated(Request $request): array
     {
         return $request->validate([
-            'name'             => 'required|string|max:255',
-            'subtitle'         => 'nullable|string|max:255',
-            'terms_conditions' => 'nullable|string',
+            'name'               => 'required|string|max:255',
+            'subtitle'           => 'nullable|string|max:255',
+            'project_overview'   => 'nullable|string',
+            'terms_conditions'   => 'nullable|string',
         ]);
     }
 
