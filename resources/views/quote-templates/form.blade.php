@@ -224,8 +224,11 @@
         {{-- Terms --}}
         <div class="bg-white rounded-xl border border-gray-200 p-6">
             <h2 class="text-base font-semibold text-gray-800 mb-3">Terms & Conditions</h2>
-            <textarea name="terms_conditions" rows="12"
-                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 font-mono">{{ old('terms_conditions', $template?->terms_conditions) }}</textarea>
+            <p class="text-xs text-gray-400 mb-3">Blank line = section heading &nbsp;|&nbsp; • bullet &nbsp;|&nbsp; Content line</p>
+            <textarea name="terms_conditions" rows="14"
+                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 font-mono"
+                placeholder="Software Warranty (Lifetime Warranty for POS System)&#10;The software provided with the POS system includes a lifetime warranty.&#10;Coverage:&#10;● Covers any bugs, defects, or malfunctions in the software&#10;● Includes lifetime updates and technical support&#10;Exclusions:&#10;● Issues caused by unauthorized modifications&#10;● Problems arising from third-party software integrations&#10;● Misuse or improper handling of the system&#10;&#10;Hardware Warranty (1 Year)&#10;All hardware components of the POS system are covered under a 1-year warranty.&#10;This includes:&#10;● PC-Full Set&#10;● Cash Drawer&#10;● Thermal Receipt Printer&#10;● Desktop Barcode Scanner">{{ old('terms_conditions', $template?->terms_conditions) }}</textarea>
+            <p class="text-xs text-gray-500 mt-2">💡 This template's terms will be applied to all quotations using this template.</p>
         </div>
 
         {{-- Actions --}}

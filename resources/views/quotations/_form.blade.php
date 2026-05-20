@@ -269,9 +269,9 @@
     <div class="bg-white rounded-xl border border-gray-200 p-6">
         <h2 class="text-base font-semibold text-gray-800 mb-3">Terms & Conditions</h2>
         <p class="text-xs text-gray-400 mb-3">Blank line = section heading &nbsp;|&nbsp; • bullet &nbsp;|&nbsp; Content line</p>
-        <textarea name="terms_conditions" x-model="termsText" rows="12"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 font-mono"
-            placeholder="Software Warranty (Lifetime Warranty for POS System)&#10;The software provided with the POS system includes a lifetime warranty.&#10;Coverage:&#10;● Covers any bugs, defects, or malfunctions in the software&#10;● Includes lifetime updates and technical support&#10;&#10;Hardware Warranty (1 Year)&#10;All hardware components of the POS system are covered under a 1-year warranty.&#10;● PC-Full Set&#10;● Cash Drawer&#10;● Thermal Receipt Printer&#10;● Desktop Barcode Scanner"></textarea>
+        <textarea name="terms_conditions" x-model="termsText" rows="16"
+            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 font-mono">{{ old('terms_conditions', $quotation?->terms_conditions ?? '') }}</textarea>
+        <p class="text-xs text-gray-500 mt-2">💡 You can edit the terms as needed. Use bullet points (●) for items and leave blank lines for section headings.</p>
     </div>
 
     {{-- Actions --}}
