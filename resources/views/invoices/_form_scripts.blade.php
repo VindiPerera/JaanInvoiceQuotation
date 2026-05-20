@@ -9,7 +9,7 @@
           ])->toArray()
         : (isset($quotation) && $quotation
             ? $quotation->items->map(fn($i) => [
-                'item_name'   => $i->item_name ?? '',
+                'item_name'   => $i->description ?? '',
                 'description' => $i->description,
                 'quantity'    => (float) $i->quantity,
                 'unit_price'  => (float) $i->unit_price,

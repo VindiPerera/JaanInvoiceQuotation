@@ -233,7 +233,8 @@ class QuotationController extends Controller
         $customers = Customer::orderBy('name')->get();
         $nextNumber = \App\Models\Invoice::generateNumber();
         $settings = Setting::pluck('value', 'key');
-        return view('invoices.create', compact('quotation', 'customers', 'nextNumber', 'settings'));
+        $hardware = HardwareCatalog::active()->orderBy('category')->orderBy('name')->get(['id', 'name', 'description', 'category', 'unit_price']);
+        return view('invoices.create', compact('quotation', 'customers', 'nextNumber', 'settings', 'hardware'));
     }
 
     private function filterEntries(?array $entries): array
