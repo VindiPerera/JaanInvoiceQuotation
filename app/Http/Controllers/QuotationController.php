@@ -60,7 +60,7 @@ class QuotationController extends Controller
         $defaultBenefits = [];
         $quotation   = null;
         $templates   = QuoteTemplate::orderBy('sort_order')->orderBy('id')->get();
-        $hardware    = HardwareCatalog::active()->orderBy('category')->orderBy('name')->get(['id', 'name', 'description', 'category', 'unit_price']);
+        $hardware    = HardwareCatalog::active()->orderBy('category')->orderBy('name')->get(['id', 'name', 'description', 'category', 'unit_price', 'warranty']);
         return view('quotations.create', compact('customers', 'nextNumber', 'defaultTerms', 'quotation', 'defaultFeatures', 'defaultBenefits', 'templates', 'hardware'));
     }
 
@@ -103,6 +103,7 @@ class QuotationController extends Controller
                         'description'  => $item['description'],
                         'quantity'     => $item['quantity'] ?? 1,
                         'unit_price'   => $item['unit_price'] ?? 0,
+                        'warranty'     => $item['warranty'] ?? null,
                         'total'        => $total,
                         'item_type'    => $item['item_type'] ?? 'hardware',
                     ]);
@@ -178,6 +179,7 @@ class QuotationController extends Controller
                         'description'  => $item['description'],
                         'quantity'     => $item['quantity'] ?? 1,
                         'unit_price'   => $item['unit_price'] ?? 0,
+                        'warranty'     => $item['warranty'] ?? null,
                         'total'        => $total,
                         'item_type'    => $item['item_type'] ?? 'hardware',
                     ]);

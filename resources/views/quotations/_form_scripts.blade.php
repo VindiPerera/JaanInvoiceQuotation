@@ -1,10 +1,11 @@
 @php
-    $defaultItems = [['description' => '', 'quantity' => 1, 'unit_price' => 0, 'total' => 0]];
+    $defaultItems = [['description' => '', 'quantity' => 1, 'unit_price' => 0, 'warranty' => '', 'total' => 0]];
     $formItems = old('items', $quotation
         ? $quotation->items->map(fn($i) => [
             'description' => $i->description,
             'quantity'    => $i->quantity,
             'unit_price'  => $i->unit_price,
+            'warranty'    => $i->warranty ?? '',
             'total'       => $i->total,
           ])->toArray()
         : $defaultItems);
@@ -30,6 +31,7 @@
             'description' => $i['description'] ?? '',
             'quantity'    => (float)($i['quantity']  ?? 1),
             'unit_price'  => (float)($i['unit_price'] ?? 0),
+            'warranty'    => $i['warranty'] ?? '',
             'total'       => (float)($i['quantity'] ?? 1) * (float)($i['unit_price'] ?? 0),
         ],
         array_filter($arr, fn($i) => !empty(trim($i['description'] ?? '')))
@@ -65,7 +67,7 @@ function quotationForm() {
         total: 0,
 
         init() {
-            if (!this.items.length) { this.items = [{ description: '', quantity: 1, unit_price: 0, total: 0 }]; }
+            if (!this.items.length) { this.items = [{ description: '', quantity: 1, unit_price: 0, warranty: '', total: 0 }]; }
             this.calcTotal();
 
             if (this.isNewQuotation && this.quoteType) {
@@ -75,7 +77,7 @@ function quotationForm() {
             this.$watch('quoteType', (newType, oldType) => {
                 if (this._skipTypeWatch) { this._skipTypeWatch = false; return; }
                 if (!this.isNewQuotation) {
-                    const ok = confirm('Changing the template will reset Hardware Items, Software Features and Terms & Conditions to the template defaults. Continue?');
+                    const ok = confirm('Changing the template will reset Hardware/services, Software Features and Terms & Conditions to the template defaults. Continue?');
                     if (!ok) {
                         this._skipTypeWatch = true;
                         this.quoteType = oldType;
@@ -92,20 +94,20 @@ function quotationForm() {
             if (d.items && d.items.length) {
                 this.items = d.items.map(i => ({ ...i }));
             } else {
-                this.items = [{ description: '', quantity: 1, unit_price: 0, total: 0 }];
+                this.items = [{ description: '', quantity: 1, unit_price: 0, warranty: '', total: 0 }];
             }
             this.features  = (d.features || []).map(f => ({ ...f }));
             this.termsText = d.terms || '';
             this.calcTotal();
         },
 
-        addItem()         { this.items.push({ description: '', quantity: 1, unit_price: 0, total: 0 }); },
+        addItem()         { this.items.push({ description: '', quantity: 1, unit_price: 0, warranty: '', total: 0 }); },
         removeItem(i)     { this.items.splice(i, 1); this.calcTotal(); },
 
-        addFromCatalog(name, desc, price) {
+        addFromCatalog(name, desc, price, warranty) {
             const description = desc ? name + '\n• ' + desc : name;
             const unitPrice = parseFloat(price) || 0;
-            this.items.push({ description, quantity: 1, unit_price: unitPrice, total: unitPrice });
+            this.items.push({ description, quantity: 1, unit_price: unitPrice, warranty: warranty || '', total: unitPrice });
             this.calcTotal();
             this.catalogOpen = false;
             this.catalogSearch = '';

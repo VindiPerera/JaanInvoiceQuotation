@@ -177,7 +177,7 @@ body {
         <tr>
             <td class="c" style="font-weight:bold;">{{ $item->item_number }}</td>
             <td>
-                <div style="font-weight:bold;margin-bottom:3px;">{{ $lines[0] ?? $item->description }}</div>
+                <div style="font-weight:bold;margin-bottom:3px;">{{ $lines[0] ?? $item->description }}@if($item->warranty) <span style="font-weight:normal;color:#555;">[{{ $item->warranty }}]</span>@endif</div>
                 @foreach($specs as $spec)
                 <div style="font-size:8.5pt;color:#333;padding-left:4px;">- {{ preg_replace('/^[\s•●\-\*]+/', '', $spec) }}</div>
                 @endforeach
@@ -191,7 +191,7 @@ body {
 
 {{-- SOFTWARE FEATURES --}}
 @if($quoteType !== 'hardware_only' && !empty($quotation->software_features))
-<div class="sec">Maria POS &mdash; Software Features</div>
+<div class="sec">Software Features</div>
 <hr class="rule">
 <div style="margin-bottom:8px;">
     @foreach($quotation->software_features as $f)

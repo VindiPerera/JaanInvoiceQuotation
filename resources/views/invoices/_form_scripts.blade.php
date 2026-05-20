@@ -5,6 +5,7 @@
             'description' => $i->description,
             'quantity'    => (float) $i->quantity,
             'unit_price'  => (float) $i->unit_price,
+            'warranty'    => $i->warranty ?? '',
             'total'       => (float) $i->total,
           ])->toArray()
         : (isset($quotation) && $quotation
@@ -13,6 +14,7 @@
                 'description' => $i->description,
                 'quantity'    => (float) $i->quantity,
                 'unit_price'  => (float) $i->unit_price,
+                'warranty'    => $i->warranty ?? '',
                 'total'       => (float) $i->total,
               ])->toArray()
             : []));
@@ -27,11 +29,11 @@ function invoiceForm() {
         total: 0,
 
         init() {
-            if (!this.items.length) { this.items = [{ item_name: '', description: '', quantity: 1, unit_price: 0, total: 0 }]; }
+            if (!this.items.length) { this.items = [{ item_name: '', description: '', quantity: 1, unit_price: 0, warranty: '', total: 0 }]; }
             this.calcTotal();
         },
 
-        addItem()    { this.items.push({ item_name: '', description: '', quantity: 1, unit_price: 0, total: 0 }); },
+        addItem()    { this.items.push({ item_name: '', description: '', quantity: 1, unit_price: 0, warranty: '', total: 0 }); },
         removeItem(i){ this.items.splice(i, 1); this.calcTotal(); },
 
         pickHardware(i, e) {
@@ -40,6 +42,7 @@ function invoiceForm() {
             this.items[i].item_name  = opt.dataset.name || '';
             this.items[i].description = opt.dataset.desc || '';
             this.items[i].unit_price  = parseFloat(opt.dataset.price) || 0;
+            this.items[i].warranty    = opt.dataset.warranty || '';
             this.calcRow(i);
             e.target.value = '';
         },

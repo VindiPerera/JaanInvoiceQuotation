@@ -91,7 +91,8 @@
                     <tr class="border-b border-gray-100">
                         <th class="pb-2 text-left text-xs font-medium text-gray-500 w-10">#</th>
                         <th class="pb-2 text-left text-xs font-medium text-gray-500 w-40">Item Name</th>
-                        <th class="pb-2 text-left text-xs font-medium text-gray-500">Description</th>
+                        <th class="pb-2 text-left text-xs font-medium text-gray-500 flex-1">Description</th>
+                        <th class="pb-2 text-left text-xs font-medium text-gray-500 w-28">Warranty</th>
                         <th class="pb-2 text-left text-xs font-medium text-gray-500 w-24">Qty</th>
                         <th class="pb-2 text-left text-xs font-medium text-gray-500 w-36">Unit Price (LKR)</th>
                         <th class="pb-2 text-right text-xs font-medium text-gray-500 w-36">Total (LKR)</th>
@@ -110,7 +111,8 @@
                                         <option value="{{ $hw->id }}"
                                             data-name="{{ $hw->name }}"
                                             data-desc="{{ $hw->description }}"
-                                            data-price="{{ $hw->unit_price }}">
+                                            data-price="{{ $hw->unit_price }}"
+                                            data-warranty="{{ $hw->warranty ?? '' }}">
                                             {{ $hw->name }}
                                         </option>
                                     @endforeach
@@ -123,6 +125,11 @@
                                 <textarea :name="`items[${index}][description]`" x-model="item.description" rows="2"
                                     class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 resize-none leading-snug"
                                     placeholder="Specs / details (optional)"></textarea>
+                            </td>
+                            <td class="py-2 pr-2">
+                                <input type="text" :name="`items[${index}][warranty]`" x-model="item.warranty"
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
+                                    placeholder="e.g. 1 Year">
                             </td>
                             <td class="py-2 pr-2">
                                 <input type="number" :name="`items[${index}][quantity]`" x-model.number="item.quantity" @input="calcRow(index)"

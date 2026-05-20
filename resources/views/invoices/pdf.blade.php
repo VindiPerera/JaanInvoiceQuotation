@@ -165,7 +165,7 @@ body {
         @foreach($invoice->items as $item)
         <tr>
             <td class="c" style="font-weight:bold;">{{ $item->item_number }}</td>
-            <td>{{ $item->item_name }}</td>
+            <td>{{ $item->item_name }}@if($item->warranty) <span style="color:#555;">[{{ $item->warranty }}]</span>@endif</td>
             <td class="c">{{ number_format((float)$item->quantity, 0) }}</td>
             <td class="r">{{ number_format((float)$item->unit_price) }}</td>
             <td class="r" style="font-weight:bold;">{{ number_format((float)$item->total) }}</td>

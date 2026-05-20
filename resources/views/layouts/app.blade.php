@@ -49,7 +49,7 @@
             </a>
             <a href="{{ route('hardware-catalog.index') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('hardware-catalog.*') ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                <i class="fa-solid fa-microchip w-4"></i> Hardware Catalog
+                <i class="fa-solid fa-microchip w-4"></i> Hardware/Services
             </a>
             <a href="{{ route('settings.index') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('settings.*') ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50' }}">

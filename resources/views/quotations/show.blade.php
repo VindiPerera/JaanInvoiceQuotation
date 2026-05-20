@@ -151,7 +151,7 @@
 
     {{-- Software Features --}}
     @if($quoteType !== 'hardware_only' && !empty($quotation->software_features))
-    <div class="qpv-sec">Maria POS &#8212; Software Features</div>
+    <div class="qpv-sec">Software Features</div>
     <div style="margin-bottom:20px;padding:0 2px;">
         @foreach($quotation->software_features as $f)
             @php $kind = is_array($f) ? ($f['kind'] ?? 'item') : 'item'; $text = is_array($f) ? ($f['text'] ?? '') : $f; @endphp

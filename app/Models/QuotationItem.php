@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class QuotationItem extends Model
 {
     protected $fillable = [
-        'quotation_id', 'item_number', 'description', 'quantity', 'unit_price', 'total', 'item_type',
+        'quotation_id', 'item_number', 'description', 'quantity', 'unit_price', 'total', 'item_type', 'warranty',
     ];
 
     protected $casts = [

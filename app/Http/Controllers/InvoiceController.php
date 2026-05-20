@@ -62,7 +62,7 @@ class InvoiceController extends Controller
             $quotation = Quotation::with('items')->find($request->quotation_id);
         }
 
-        $hardware = HardwareCatalog::active()->orderBy('name')->get(['id', 'name', 'description', 'unit_price']);
+        $hardware = HardwareCatalog::active()->orderBy('name')->get(['id', 'name', 'description', 'unit_price', 'warranty']);
 
         return view('invoices.create', compact('customers', 'nextNumber', 'settings', 'quotation', 'hardware'));
     }
@@ -107,6 +107,7 @@ class InvoiceController extends Controller
                         'description' => $item['description'] ?? '',
                         'quantity'    => $item['quantity'] ?? 1,
                         'unit_price'  => $item['unit_price'] ?? 0,
+                        'warranty'    => $item['warranty'] ?? null,
                         'total'       => $total,
                     ]);
                     $subtotal += $total;
@@ -138,7 +139,7 @@ class InvoiceController extends Controller
         $invoice->load('items');
         $customers = Customer::orderBy('name')->get();
         $settings = Setting::pluck('value', 'key');
-        $hardware = HardwareCatalog::active()->orderBy('name')->get(['id', 'name', 'description', 'unit_price']);
+        $hardware = HardwareCatalog::active()->orderBy('name')->get(['id', 'name', 'description', 'unit_price', 'warranty']);
         return view('invoices.edit', compact('invoice', 'customers', 'settings', 'hardware'));
     }
 
@@ -180,6 +181,7 @@ class InvoiceController extends Controller
                         'description' => $item['description'] ?? '',
                         'quantity'    => $item['quantity'] ?? 1,
                         'unit_price'  => $item['unit_price'] ?? 0,
+                        'warranty'    => $item['warranty'] ?? null,
                         'total'       => $total,
                     ]);
                     $subtotal += $total;

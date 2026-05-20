@@ -9,7 +9,7 @@ class HardwareCatalog extends Model
     protected $table = 'hardware_catalog';
 
     protected $fillable = [
-        'name', 'description', 'category', 'unit_price', 'is_active',
+        'name', 'description', 'category', 'unit_price', 'warranty', 'is_active',
     ];
 
     protected $casts = [

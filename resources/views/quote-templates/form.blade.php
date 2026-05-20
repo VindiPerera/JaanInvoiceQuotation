@@ -22,10 +22,11 @@
         'description' => $i['description'] ?? '',
         'quantity'    => (float)($i['quantity']  ?? 1),
         'unit_price'  => (float)($i['unit_price'] ?? 0),
+        'warranty'    => $i['warranty'] ?? '',
         'total'       => (float)($i['quantity'] ?? 1) * (float)($i['unit_price'] ?? 0),
     ], $rawItems) : [];
     if (empty($formItems)) {
-        $formItems = [['description' => '', 'quantity' => 1, 'unit_price' => 0, 'total' => 0]];
+        $formItems = [['description' => '', 'quantity' => 1, 'unit_price' => 0, 'warranty' => '', 'total' => 0]];
     }
 @endphp
 
@@ -64,10 +65,10 @@
             </div>
         </div>
 
-        {{-- Hardware Package Items --}}
+        {{-- Hardware/Software Package Items --}}
         <div class="bg-white rounded-xl border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-base font-semibold text-gray-800">Hardware Package Items</h2>
+                <h2 class="text-base font-semibold text-gray-800">Hardware/Software Items</h2>
                 <div class="flex items-center gap-2">
                     @if($hardwareCatalog->isNotEmpty())
                     <div class="relative" x-data="{ open: false, search: '' }">
@@ -93,7 +94,7 @@
                                     @php $itemSearchStr = strtolower($ci->name . ' ' . ($ci->description ?? '')); @endphp
                                     <button type="button"
                                         x-show="{{ e(json_encode($itemSearchStr)) }}.includes(search.toLowerCase())"
-                                        @click="addItemFromCatalog({ description: {{ Js::from($ci->description ?: $ci->name) }}, unit_price: {{ (float)$ci->unit_price }} }); open = false;"
+                                        @click="addItemFromCatalog({ description: {{ Js::from($ci->description ?: $ci->name) }}, unit_price: {{ (float)$ci->unit_price }}, warranty: {{ Js::from($ci->warranty ?? '') }} }); open = false;"
                                         class="w-full text-left px-3 py-2 hover:bg-red-50 transition flex items-center justify-between gap-2 group">
                                         <span class="text-sm text-gray-700 group-hover:text-red-700 truncate">{{ $ci->name }}</span>
                                         <span class="text-xs text-gray-400 shrink-0">LKR {{ number_format($ci->unit_price, 2) }}</span>
@@ -117,6 +118,7 @@
                         <tr class="border-b border-gray-100">
                             <th class="pb-2 text-left text-xs font-medium text-gray-500 w-10">#</th>
                             <th class="pb-2 text-left text-xs font-medium text-gray-500">Description</th>
+                            <th class="pb-2 text-left text-xs font-medium text-gray-500 w-28">Warranty</th>
                             <th class="pb-2 text-left text-xs font-medium text-gray-500 w-24">Qty</th>
                             <th class="pb-2 text-left text-xs font-medium text-gray-500 w-32">Unit Price</th>
                             <th class="pb-2 text-right text-xs font-medium text-gray-500 w-32">Total</th>
@@ -130,7 +132,12 @@
                                 <td class="py-2 pr-2">
                                     <textarea :name="`hardware_items[${index}][description]`" x-model="item.description" rows="3"
                                         class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 resize-y leading-snug"
-                                        placeholder="• Spec one&#10;• Spec two"></textarea>
+                                        placeholder="ITEM/SERVICE NAME&#10;• Spec/Detail one&#10;• Spec/Detail two"></textarea>
+                                </td>
+                                <td class="py-2 pr-2">
+                                    <input type="text" :name="`hardware_items[${index}][warranty]`" x-model="item.warranty"
+                                        class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
+                                        placeholder="e.g. 1 Year">
                                 </td>
                                 <td class="py-2 pr-2">
                                     <input type="number" :name="`hardware_items[${index}][quantity]`" x-model.number="item.quantity" @input="calcRow(index)"
@@ -253,9 +260,9 @@ function templateForm() {
 
         init() { this.calcSubtotal(); },
 
-        addItem() { this.items.push({ description: '', quantity: 1, unit_price: 0, total: 0 }); },
+        addItem() { this.items.push({ description: '', quantity: 1, unit_price: 0, warranty: '', total: 0 }); },
         addItemFromCatalog(catalog) {
-            this.items.push({ description: catalog.description, quantity: 1, unit_price: catalog.unit_price, total: catalog.unit_price });
+            this.items.push({ description: catalog.description, quantity: 1, unit_price: catalog.unit_price, warranty: catalog.warranty || '', total: catalog.unit_price });
             this.calcSubtotal();
         },
         removeItem(i) { this.items.splice(i, 1); this.calcSubtotal(); },

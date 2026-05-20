@@ -97,10 +97,10 @@
         </div>
     </div>
 
-    {{-- Items / Hardware Package --}}
+    {{-- Items / Hardware/Software Package --}}
     <div x-show="quoteType !== 'software_only'" class="bg-white rounded-xl border border-gray-200 p-6">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-base font-semibold text-gray-800">Hardware Package Items</h2>
+            <h2 class="text-base font-semibold text-gray-800">Hardware/Software Items</h2>
             <div class="flex items-center gap-2">
                 {{-- From Catalog custom dropdown --}}
                 <div class="relative">
@@ -123,14 +123,14 @@
                                 <div class="px-3 pt-2 pb-0.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">{{ $category }}</div>
                                 @foreach($items as $hw)
                                 <div x-show="{{ json_encode(strtolower($hw->name . ' ' . ($hw->description ?? ''))) }}.includes(catalogSearch.toLowerCase())"
-                                    @click="addFromCatalog({{ Js::from($hw->name) }}, {{ Js::from($hw->description ?? '') }}, {{ (float)$hw->unit_price }})"
+                                    @click="addFromCatalog({{ Js::from($hw->name) }}, {{ Js::from($hw->description ?? '') }}, {{ (float)$hw->unit_price }}, {{ Js::from($hw->warranty ?? '') }})"
                                     class="flex items-center justify-between px-3 py-2 hover:bg-red-50 cursor-pointer transition">
                                     <span class="text-sm text-gray-800 truncate mr-2">{{ $hw->name }}</span>
                                     <span class="text-xs text-gray-400 shrink-0">LKR {{ number_format($hw->unit_price, 2) }}</span>
                                 </div>
                                 @endforeach
                             @empty
-                                <div class="px-3 py-4 text-center text-sm text-gray-400">No hardware items in catalog.</div>
+                                <div class="px-3 py-4 text-center text-sm text-gray-400">No hardware/services in catalog.</div>
                             @endforelse
                         </div>
                     </div>
@@ -146,6 +146,7 @@
                     <tr class="border-b border-gray-100">
                         <th class="pb-2 text-left text-xs font-medium text-gray-500 w-10">#</th>
                         <th class="pb-2 text-left text-xs font-medium text-gray-500">Description</th>
+                        <th class="pb-2 text-left text-xs font-medium text-gray-500 w-28">Warranty</th>
                         <th class="pb-2 text-left text-xs font-medium text-gray-500 w-24">Qty</th>
                         <th class="pb-2 text-left text-xs font-medium text-gray-500 w-32">Unit Price</th>
                         <th class="pb-2 text-right text-xs font-medium text-gray-500 w-32">Total</th>
@@ -159,8 +160,13 @@
                             <td class="py-2 pr-2">
                                 <textarea :name="`items[${index}][description]`" x-model="item.description" rows="3"
                                     class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 resize-y leading-snug"
-                                    placeholder="ITEM NAME (first line bold in PDF)&#10;• Sub-detail one&#10;• Sub-detail two"></textarea>
+                                    placeholder="ITEM/SERVICE NAME (first line bold in PDF)&#10;• Detail one&#10;• Detail two"></textarea>
                                 <input type="hidden" :name="`items[${index}][item_type]`" value="hardware">
+                            </td>
+                            <td class="py-2 pr-2">
+                                <input type="text" :name="`items[${index}][warranty]`" x-model="item.warranty"
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
+                                    placeholder="e.g. 1 Year">
                             </td>
                             <td class="py-2 pr-2">
                                 <input type="number" :name="`items[${index}][quantity]`" x-model.number="item.quantity" @input="calcRow(index)"

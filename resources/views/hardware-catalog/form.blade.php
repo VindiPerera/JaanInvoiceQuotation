@@ -42,6 +42,13 @@
                 class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300">
         </div>
 
+        <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Warranty <span class="text-gray-400 font-normal">(optional, e.g. "1 Year")</span></label>
+            <input type="text" name="warranty" value="{{ old('warranty', $item?->warranty) }}"
+                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
+                placeholder="e.g. 1 Year, 2 Years, Lifetime">
+        </div>
+
         <div class="flex items-center gap-3">
             <input type="hidden" name="is_active" value="0">
             <input type="checkbox" id="is_active" name="is_active" value="1"
