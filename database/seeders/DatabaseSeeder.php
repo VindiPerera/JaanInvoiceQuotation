@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Database\Seeders\QuoteTemplateSeeder;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -11,6 +10,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Create admin user
         User::firstOrCreate(
             ['email' => 'admin@jaan.lk'],
             [
@@ -19,7 +19,19 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        // Create demo users
+        User::firstOrCreate(
+            ['email' => 'user@jaan.lk'],
+            [
+                'name' => 'Demo User',
+                'password' => Hash::make('password'),
+            ]
+        );
+
+        // Call all seeders
         $this->call(SettingsSeeder::class);
         $this->call(QuoteTemplateSeeder::class);
+        $this->call(CustomerSeeder::class);
+        $this->call(HardwareCatalogSeeder::class);
     }
 }

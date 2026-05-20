@@ -172,7 +172,7 @@ body {
 
 {{-- HARDWARE PACKAGE --}}
 @if($quoteType !== 'software_only' && $quotation->items->count())
-<div class="sec">Hardware Package</div>
+<div class="sec">Hardware/Services</div>
 <hr class="rule">
 <table class="tbl" style="margin-bottom:8px;">
     <thead>
@@ -180,6 +180,7 @@ body {
             <th class="c" width="38">No.</th>
             <th>Description</th>
             <th class="c" width="52">Qty</th>
+            <th class="r" width="60">Price</th>
         </tr>
     </thead>
     <tbody>
@@ -197,6 +198,7 @@ body {
                 @endforeach
             </td>
             <td class="c" style="font-weight:bold;">{{ $item->quantity }}</td>
+            <td class="r" style="font-weight:bold;">LKR {{ number_format($item->unit_price, 2) }}</td>
         </tr>
         @endforeach
     </tbody>
@@ -235,7 +237,7 @@ body {
         <td style="font-size:9pt;padding:6px 0;">
             @if($quoteType === 'software_only') Software Package Price
             @elseif($quoteType === 'hardware_only') Hardware Package Price
-            @else Complete Package Price
+            @else Total
             @endif
         </td>
         <td style="text-align:right;font-size:13pt;font-weight:bold;white-space:nowrap;padding:6px 0;">

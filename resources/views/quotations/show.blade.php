@@ -117,13 +117,14 @@
 
     {{-- Hardware Package --}}
     @if($quoteType !== 'software_only' && $quotation->items->count())
-    <div class="qpv-sec">Hardware Package</div>
+    <div class="qpv-sec">Hardware/Services</div>
     <table class="qpv-hw" style="margin-bottom:20px;">
         <thead>
-            <tr>
-                <th class="c" width="44">Item</th>
-                <th>Description</th>
-                <th class="c" width="50">Qty</th>
+            <tr style="background:#cc1010;color:#fff;">
+                <th class="c" width="44" style="padding:8px 10px;font-size:8.5pt;font-weight:bold;text-align:center;letter-spacing:.5px;">Item</th>
+                <th style="padding:8px 10px;font-size:8.5pt;font-weight:bold;text-align:left;letter-spacing:.5px;">Description</th>
+                <th class="c" width="50" style="padding:8px 10px;font-size:8.5pt;font-weight:bold;text-align:center;letter-spacing:.5px;">Qty</th>
+                <th class="c" width="70" style="padding:8px 10px;font-size:8.5pt;font-weight:bold;text-align:right;letter-spacing:.5px;">Price</th>
             </tr>
         </thead>
         <tbody>
@@ -132,17 +133,18 @@
                 $lines = array_values(array_filter(array_map('rtrim', explode("\n", $item->description))));
                 $specs = array_slice($lines, 1);
             @endphp
-            <tr>
-                <td class="c" style="font-weight:bold;font-size:11pt;color:#cc1010;">{{ $item->item_number }}</td>
-                <td>
+            <tr style="border:1px solid #e0e0e0;">
+                <td class="c" style="padding:10px;font-weight:bold;font-size:11pt;color:#cc1010;text-align:center;vertical-align:top;">{{ $item->item_number }}</td>
+                <td style="padding:10px;vertical-align:top;">
                     <div style="font-weight:bold;font-size:9.5pt;color:#1a1a1a;margin-bottom:4px;">{{ $lines[0] ?? $item->description }}</div>
                     @if(count($specs))
-                    <div style="font-size:8.5pt;color:#555;line-height:1.72;">
+                    <div style="font-size:8.5pt;color:#555;line-height:1.6;">
                         @foreach($specs as $spec)<span style="color:#cc1010;">&#9679;</span>&nbsp;{{ $spec }}<br>@endforeach
                     </div>
                     @endif
                 </td>
-                <td class="c" style="font-size:11pt;font-weight:bold;color:#1a1a1a;">{{ $item->quantity }}</td>
+                <td class="c" style="padding:10px;font-size:11pt;font-weight:bold;color:#1a1a1a;text-align:center;vertical-align:middle;">{{ $item->quantity }}</td>
+                <td class="c" style="padding:10px;font-weight:bold;font-size:9.5pt;color:#1a1a1a;text-align:right;vertical-align:middle;">LKR<br>{{ number_format($item->unit_price, 2) }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -175,7 +177,7 @@
             <td style="padding:12px 14px;font-size:9.5pt;font-weight:bold;color:#333;border-left:3px solid #cc1010;vertical-align:middle;">
                 @if($quoteType === 'software_only') SOFTWARE PACKAGE PRICE
                 @elseif($quoteType === 'hardware_only') HARDWARE PACKAGE PRICE
-                @else COMPLETE PACKAGE PRICE
+                @else Total
                 @endif
             </td>
             <td style="padding:12px 14px;font-size:15pt;font-weight:bold;color:#cc1010;text-align:right;white-space:nowrap;vertical-align:middle;">
