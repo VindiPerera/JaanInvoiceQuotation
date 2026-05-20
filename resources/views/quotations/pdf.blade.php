@@ -179,7 +179,7 @@ body {
             <td>
                 <div style="font-weight:bold;margin-bottom:3px;">{{ $lines[0] ?? $item->description }}</div>
                 @foreach($specs as $spec)
-                <div style="font-size:8.5pt;color:#333;padding-left:4px;">- {{ $spec }}</div>
+                <div style="font-size:8.5pt;color:#333;padding-left:4px;">- {{ preg_replace('/^[\s•●\-\*]+/', '', $spec) }}</div>
                 @endforeach
             </td>
             <td class="c" style="font-weight:bold;">{{ $item->quantity }}</td>

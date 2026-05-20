@@ -20,7 +20,7 @@
     $rawFeatures = old('software_features', $quotation?->software_features ?? ($defaultFeatures ?? []));
     $formFeatures = $normalizeEntries(is_array($rawFeatures) ? $rawFeatures : []);
 
-    $formTerms = old('terms_conditions', $quotation?->terms_conditions ?? $defaultTerms ?? '');
+    $formTerms = old('terms_conditions', $quotation?->terms_conditions ?? '');
     $isNewQuotation = !$quotation && !old('quote_type');
 
     $normalizeItems = fn(array $arr) => array_values(array_map(
@@ -54,7 +54,7 @@ function quotationForm() {
         features: @json($formFeatures),
         termsText: @json($formTerms),
         taxAmount: {{ old('tax_amount', $quotation?->tax_amount ?? 0) }},
-        quoteType: '{{ old('quote_type', $quotation?->quote_type ?? 'full_set') }}',
+        quoteType: '{{ old('quote_type', $quotation?->quote_type ?? '') }}',
         isNewQuotation: {{ $isNewQuotation ? 'true' : 'false' }},
         _skipTypeWatch: false,
         catalogOpen: false,
@@ -66,7 +66,7 @@ function quotationForm() {
             if (!this.items.length) { this.items = [{ description: '', quantity: 1, unit_price: 0, total: 0 }]; }
             this.calcTotal();
 
-            if (this.isNewQuotation) {
+            if (this.isNewQuotation && this.quoteType) {
                 this.applyTypeDefaults(this.quoteType);
             }
 
