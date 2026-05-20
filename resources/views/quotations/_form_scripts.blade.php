@@ -62,6 +62,7 @@ function quotationForm() {
         taxAmount: {{ old('tax_amount', $quotation?->tax_amount ?? 0) }},
         quoteType: '{{ old('quote_type', $quotation?->quote_type ?? '') }}',
         isNewQuotation: {{ $isNewQuotation ? 'true' : 'false' }},
+        isTemplateApplied: false,
         _skipTypeWatch: false,
         catalogOpen: false,
         catalogSearch: '',
@@ -74,6 +75,9 @@ function quotationForm() {
 
             if (this.isNewQuotation && this.quoteType) {
                 this.applyTypeDefaults(this.quoteType);
+                this.isTemplateApplied = true;
+            } else if (!this.isNewQuotation && this.quoteType) {
+                this.isTemplateApplied = true;
             }
 
             this.$watch('quoteType', (newType, oldType) => {
@@ -87,6 +91,7 @@ function quotationForm() {
                     }
                 }
                 this.applyTypeDefaults(newType);
+                this.isTemplateApplied = true;
             });
         },
 

@@ -107,7 +107,7 @@
     <div x-show="quoteType !== 'software_only'" class="bg-white rounded-xl border border-gray-200 p-6">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-base font-semibold text-gray-800">Hardware/Software Items</h2>
-            <div class="flex items-center gap-2">
+            <div x-show="!isTemplateApplied" class="flex items-center gap-2">
                 {{-- From Catalog custom dropdown --}}
                 <div class="relative">
                     <button type="button" @click="catalogOpen = !catalogOpen"
@@ -145,6 +145,9 @@
                     <i class="fa-solid fa-plus"></i> Add
                 </button>
             </div>
+            <div x-show="isTemplateApplied" class="text-xs text-gray-400 italic">
+                <i class="fa-solid fa-lock mr-1"></i> Template applied - items are locked
+            </div>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
@@ -154,39 +157,45 @@
                         <th class="pb-2 text-left text-xs font-medium text-gray-500">Description</th>
                         <th class="pb-2 text-left text-xs font-medium text-gray-500 w-28">Warranty</th>
                         <th class="pb-2 text-left text-xs font-medium text-gray-500 w-24">Qty</th>
-                        <th class="pb-2 text-left text-xs font-medium text-gray-500 w-32">Unit Price</th>
+                        <th class="pb-2 text-right text-xs font-medium text-gray-500 w-28">Price</th>
                         <th class="pb-2 text-right text-xs font-medium text-gray-500 w-32">Total</th>
                         <th class="pb-2 w-10"></th>
                     </tr>
                 </thead>
                 <tbody>
                     <template x-for="(item, index) in items" :key="index">
-                        <tr class="border-b border-gray-50">
+                        <tr class="border-b border-gray-50" :class="{ 'opacity-50 bg-gray-50': isTemplateApplied }">
                             <td class="py-2 pr-2 text-gray-400 text-xs" x-text="index + 1"></td>
                             <td class="py-2 pr-2">
                                 <textarea :name="`items[${index}][description]`" x-model="item.description" rows="3"
-                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 resize-y leading-snug"
+                                    :disabled="isTemplateApplied"
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 resize-y leading-snug disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
                                     placeholder="ITEM/SERVICE NAME (first line bold in PDF)&#10;• Detail one&#10;• Detail two"></textarea>
                                 <input type="hidden" :name="`items[${index}][item_type]`" value="hardware">
                             </td>
                             <td class="py-2 pr-2">
                                 <input type="text" :name="`items[${index}][warranty]`" x-model="item.warranty"
-                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
+                                    :disabled="isTemplateApplied"
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
                                     placeholder="e.g. 1 Year">
                             </td>
                             <td class="py-2 pr-2">
                                 <input type="number" :name="`items[${index}][quantity]`" x-model.number="item.quantity" @input="calcRow(index)"
-                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
+                                    :disabled="isTemplateApplied"
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
                                     min="0" step="0.01">
                             </td>
-                            <td class="py-2 pr-2">
-                                <input type="number" :name="`items[${index}][unit_price]`" x-model.number="item.unit_price" @input="calcRow(index)"
-                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
-                                    min="0" step="0.01">
+                            <td class="py-2 pr-2 text-right">
+                                <div class="flex items-center justify-end">
+                                    <input type="number" :name="`items[${index}][unit_price]`" x-model.number="item.unit_price" @input="calcRow(index)"
+                                        :disabled="isTemplateApplied"
+                                        class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 text-right disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
+                                        min="0" step="0.01" placeholder="0.00">
+                                </div>
                             </td>
-                            <td class="py-2 text-right font-medium text-gray-700" x-text="formatNum(item.total)"></td>
+                            <td class="py-2 text-right font-medium text-gray-700" x-text="'LKR ' + formatNum(item.total)"></td>
                             <td class="py-2 pl-2">
-                                <button type="button" @click="removeItem(index)" class="text-gray-300 hover:text-red-500 transition">
+                                <button type="button" @click="removeItem(index)" :disabled="isTemplateApplied" class="text-gray-300 hover:text-red-500 transition disabled:opacity-30 disabled:cursor-not-allowed">
                                     <i class="fa-solid fa-xmark"></i>
                                 </button>
                             </td>
@@ -195,13 +204,13 @@
                 </tbody>
                 <tfoot>
                     <tr class="border-t border-gray-200">
-                        <td colspan="4" class="pt-3 text-right text-sm font-medium text-gray-600">Subtotal</td>
+                        <td colspan="5" class="pt-3 text-right text-sm font-medium text-gray-600">Subtotal</td>
                         <td class="pt-3 text-right font-semibold text-gray-800" x-text="'LKR ' + formatNum(subtotal)"></td>
                         <td></td>
                     </tr>
                     <tr>
-                        <td colspan="3" class="pt-2 text-right text-sm font-medium text-gray-600">Tax / Other</td>
-                        <td class="pt-2 pr-2">
+                        <td colspan="4" class="pt-2 text-right text-sm font-medium text-gray-600">Tax / Other</td>
+                        <td class="pt-2 pr-2 text-right">
                             <input type="number" name="tax_amount" x-model.number="taxAmount" @input="calcTotal"
                                 value="{{ old('tax_amount', $quotation?->tax_amount ?? 0) }}"
                                 class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
@@ -211,7 +220,7 @@
                         <td></td>
                     </tr>
                     <tr class="bg-red-50">
-                        <td colspan="4" class="pt-3 pb-2 px-3 text-right text-base font-bold text-gray-800">TOTAL</td>
+                        <td colspan="5" class="pt-3 pb-2 px-3 text-right text-base font-bold text-gray-800">TOTAL</td>
                         <td class="pt-3 pb-2 text-right text-base font-bold text-red-600 pr-1" x-text="'LKR ' + formatNum(total)"></td>
                         <td></td>
                     </tr>
