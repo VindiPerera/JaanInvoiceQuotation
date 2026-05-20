@@ -56,13 +56,15 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/daily/pdf', [ReportController::class, 'dailyPdf'])->name('daily.pdf');
     });
 
-    Route::resource('quote-templates', QuoteTemplateController::class)->except(['show']);
+    Route::middleware('admin.only')->group(function () {
+        Route::resource('quote-templates', QuoteTemplateController::class)->except(['show']);
 
-    Route::resource('hardware-catalog', HardwareCatalogController::class)->except(['show']);
-    Route::get('/api/hardware-catalog', [HardwareCatalogController::class, 'apiList'])->name('hardware-catalog.api');
+        Route::resource('hardware-catalog', HardwareCatalogController::class)->except(['show']);
+        Route::get('/api/hardware-catalog', [HardwareCatalogController::class, 'apiList'])->name('hardware-catalog.api');
 
-    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
-    Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
+        Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+        Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
+    });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

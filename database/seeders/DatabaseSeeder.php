@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'JAAN Admin',
                 'password' => Hash::make('password'),
+                'is_admin' => true,
             ]
         );
 
@@ -23,8 +24,9 @@ class DatabaseSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'user@jaan.lk'],
             [
-                'name' => 'Demo User',
+                'name' => 'JAAN User',
                 'password' => Hash::make('password'),
+                'is_admin' => false,
             ]
         );
 

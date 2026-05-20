@@ -40,21 +40,23 @@
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('customers.*') ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50' }}">
                 <i class="fa-solid fa-users w-4"></i> Customers
             </a>
-            <div class="pt-3 pb-1">
-                <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">System</p>
-            </div>
-            <a href="{{ route('quote-templates.index') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('quote-templates.*') ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                <i class="fa-solid fa-layer-group w-4"></i> Quote Templates
-            </a>
-            <a href="{{ route('hardware-catalog.index') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('hardware-catalog.*') ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                <i class="fa-solid fa-microchip w-4"></i> Hardware/Services
-            </a>
-            <a href="{{ route('settings.index') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('settings.*') ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                <i class="fa-solid fa-gear w-4"></i> Settings
-            </a>
+            @if(auth()->user()->is_admin)
+                <div class="pt-3 pb-1">
+                    <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">System</p>
+                </div>
+                <a href="{{ route('quote-templates.index') }}"
+                   class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('quote-templates.*') ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50' }}">
+                    <i class="fa-solid fa-layer-group w-4"></i> Quote Templates
+                </a>
+                <a href="{{ route('hardware-catalog.index') }}"
+                   class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('hardware-catalog.*') ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50' }}">
+                    <i class="fa-solid fa-microchip w-4"></i> Hardware/Services
+                </a>
+                <a href="{{ route('settings.index') }}"
+                   class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('settings.*') ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50' }}">
+                    <i class="fa-solid fa-gear w-4"></i> Settings
+                </a>
+            @endif
         </nav>
 
         <div class="px-3 py-4 border-t border-gray-200">
