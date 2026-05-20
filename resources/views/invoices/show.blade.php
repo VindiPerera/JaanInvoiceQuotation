@@ -26,208 +26,197 @@
             font-family:Arial,sans-serif;font-size:10pt;color:#1a1a1a;line-height:1.5;">
 <style>
 .ipv-tbl  { width:100%;border-collapse:collapse; }
-.ipv-tbl thead tr { background:#cc1010;color:#fff; }
-.ipv-tbl th  { padding:6px 8px;font-size:8pt;font-weight:bold;text-align:left; }
+.ipv-tbl thead tr { background:#b91c1c;color:#fff; }
+.ipv-tbl th  { padding:8px;font-size:8pt;font-weight:bold;text-align:left;text-transform:uppercase;letter-spacing:0.5px;border:none; }
 .ipv-tbl th.r { text-align:right; }
 .ipv-tbl th.c { text-align:center; }
-.ipv-tbl td  { padding:7px 8px;border:1px solid #e0e0e0;font-size:9pt;vertical-align:top; }
+.ipv-tbl td  { padding:7px 8px;border-bottom:1px dashed #fecaca;font-size:9pt;vertical-align:top; }
 .ipv-tbl td.r { text-align:right; }
 .ipv-tbl td.c { text-align:center; }
 .ipv-tbl tbody tr:nth-child(odd)  { background:#fff; }
-.ipv-tbl tbody tr:nth-child(even) { background:#f6f6f6; }
+.ipv-tbl tbody tr:nth-child(even) { background:#fef2f2; }
+.ipv-tbl tbody tr:last-child td { border-bottom:1px solid #111; }
 .ipv-th  { font-size:9pt;font-weight:bold;color:#1a1a1a;margin:7px 0 2px; }
 .ipv-ts  { font-size:8.5pt;font-weight:bold;color:#333;margin:5px 0 2px; }
 .ipv-tb  { font-size:8.5pt;color:#444;margin-bottom:3px; }
 .ipv-tbu { font-size:8.5pt;color:#333;padding-left:10px;margin-bottom:3px; }
+.ipv-doc-title { text-align:center;font-size:16pt;font-weight:bold;letter-spacing:5px;margin:8px 0 12px;padding:8px 0;border-top:2px solid #b91c1c;border-bottom:1px solid #b91c1c;border-left:1px solid #fecaca;border-right:1px solid #fecaca;background:#fef2f2;color:#b91c1c; }
+.ipv-section { font-weight:bold;font-size:8.2pt;text-transform:uppercase;letter-spacing:1.6px;margin:16px 0 4px;color:#b91c1c;display:inline-block;padding:4px 10px 4px 8px;border-left:3px solid #b91c1c;background:#fef2f2;border-radius:2px; }
+.ipv-rule { border:none;border-top:1px solid #b91c1c;margin:0 0 8px; }
 </style>
 
 @php $logoPath = !empty($settings['company_logo']) ? public_path($settings['company_logo']) : null; @endphp
 
-{{-- Red top bar --}}
-<div style="height:9mm;background:#cc1010;"></div>
-
-{{-- Header: Logo | Company | Contact --}}
-<table width="100%" cellpadding="0" cellspacing="0" style="padding:6px 30px 5px;table-layout:fixed;">
+{{-- LETTERHEAD --}}
+<table width="100%" cellpadding="0" cellspacing="0" style="padding:14px 20px 10px;border-bottom:2px solid #b91c1c;table-layout:fixed;">
     <tr>
-        <td width="28%" style="vertical-align:middle;">
+        <td width="60%" style="vertical-align:bottom;padding-right:10px;">
             @if($logoPath && file_exists($logoPath))
-                <img src="{{ $logoPath }}" alt="Logo" style="max-height:50px;max-width:150px;">
-            @else
-                <div style="display:inline-block;border:2px solid #cc1010;padding:5px 12px 4px 8px;line-height:1.15;">
-                    <div style="font-size:13pt;font-weight:bold;color:#cc1010;letter-spacing:4px;">JAAN</div>
-                    <div style="font-size:7pt;font-weight:bold;color:#1a1a1a;letter-spacing:2px;">Network</div>
-                </div>
+                <img src="{{ $logoPath }}" alt="Logo" style="max-height:48px;max-width:140px;display:block;margin-bottom:6px;">
             @endif
-        </td>
-        <td width="44%" style="text-align:center;vertical-align:middle;">
-            <div style="font-size:14pt;font-weight:bold;color:#cc1010;letter-spacing:.5px;line-height:1.2;">
-                {{ $settings['company_name'] ?? 'JAAN Network (Pvt) Ltd' }}
+            <div style="font-size:14pt;font-weight:bold;line-height:1.15;letter-spacing:0.3px;color:#111111;">
+                {{ $settings['company_name'] ?? 'JAAN NETWORK PVT. LTD.' }}
             </div>
-            <div style="font-size:8pt;color:#888;font-style:italic;margin-top:3px;">Professional IT Solutions &amp; Services</div>
+            <div style="font-size:8.5pt;color:#b91c1c;margin-top:2px;">
+                Professional IT Solutions &amp; Services
+            </div>
         </td>
-        <td width="28%" style="text-align:right;vertical-align:middle;padding-right:2px;">
-            @if(!empty($settings['company_phone']))<div style="font-size:8pt;color:#444;">{{ $settings['company_phone'] }}</div>@endif
-            @if(!empty($settings['company_email']))<div style="font-size:7.5pt;color:#888;margin-top:2px;">{{ $settings['company_email'] }}</div>@endif
-            @if(!empty($settings['company_address']))<div style="font-size:7pt;color:#aaa;margin-top:2px;">{{ $settings['company_address'] }}</div>@endif
+        <td width="40%" style="vertical-align:bottom;text-align:right;font-size:8.5pt;line-height:1.85;color:#111111;">
+            @if(!empty($settings['company_phone'])){{ $settings['company_phone'] }}<br>@endif
+            @if(!empty($settings['company_email'])){{ $settings['company_email'] }}<br>@endif
+            @if(!empty($settings['company_address'])){{ $settings['company_address'] }}@endif
         </td>
     </tr>
 </table>
-<div style="height:2px;background:#cc1010;"></div>
 
-{{-- Body --}}
-<div style="padding:20px 30px 20px;">
+{{-- DOCUMENT TITLE --}}
+<div class="ipv-doc-title">S A L E S &nbsp; I N V O I C E</div>
 
-    {{-- Client info + Invoice title --}}
-    <table width="100%" cellpadding="0" cellspacing="0"
-           style="margin-bottom:14px;border-bottom:1px solid #e8e8e8;padding-bottom:12px;table-layout:fixed;">
+{{-- BILLING + DOC DETAILS --}}
+<div style="padding:0 20px 20px;">
+<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+    <tr>
+        <td width="58%" style="vertical-align:top;padding:10px 14px 10px 12px;background:#fef2f2;border:1px solid #fecaca;border-top:2px solid #b91c1c;">
+            <div style="font-size:7.5pt;text-transform:uppercase;letter-spacing:1.5px;color:#7f1d1d;margin-bottom:6px;">Bill To</div>
+            <div style="font-weight:bold;font-size:11pt;line-height:1.3;margin-bottom:4px;">{{ $invoice->customer_name }}</div>
+            @if($invoice->customer_address)
+            <div style="font-size:9pt;color:#111111;margin-bottom:2px;">{{ $invoice->customer_address }}</div>
+            @endif
+            @if($invoice->customer_contact)
+            <div style="font-size:9pt;color:#111111;">{{ $invoice->customer_contact }}</div>
+            @endif
+        </td>
+        <td width="42%" style="vertical-align:top;padding:10px 12px;background:#fee2e2;border:1px solid #fecaca;border-top:2px solid #b91c1c;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="font-size:9pt;line-height:1.8;color:#111111;">
+                <tr>
+                    <td style="font-weight:bold;width:48%;">Invoice No</td>
+                    <td style="text-align:right;">:&nbsp;{{ $invoice->invoice_number }}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight:bold;">Date</td>
+                    <td style="text-align:right;">:&nbsp;{{ $invoice->invoice_date->format('d M Y') }}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight:bold;">Status</td>
+                    <td style="text-align:right;font-weight:bold;">
+                        :&nbsp;@if($invoice->payment_status === 'paid') PAID
+                        @elseif($invoice->payment_status === 'partial') PARTIAL
+                        @else PENDING @endif
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+{{-- ITEMS --}}
+<div class="ipv-section">SOFTWARE/HARDWARE/SERVICES</div>
+<hr class="ipv-rule">
+<table class="ipv-tbl" style="margin-bottom:16px;">
+    <thead>
         <tr>
-            <td width="54%" style="vertical-align:top;padding-right:12px;">
-                <div style="font-size:7pt;font-weight:bold;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Prepared For</div>
-                <div style="font-size:13pt;font-weight:bold;color:#1a1a1a;line-height:1.2;">{{ $invoice->customer_name }}</div>
-                @if($invoice->customer_address)<div style="font-size:8.5pt;color:#555;margin-top:3px;">{{ $invoice->customer_address }}</div>@endif
-                @if($invoice->customer_contact)<div style="font-size:8.5pt;color:#555;">{{ $invoice->customer_contact }}</div>@endif
-            </td>
-            <td width="46%" style="text-align:right;vertical-align:top;">
-                <div style="font-size:15pt;font-weight:bold;color:#1a1a1a;line-height:1.1;margin-bottom:8px;">SALES INVOICE</div>
-                <table cellpadding="3" cellspacing="0" style="margin-left:auto;border-collapse:collapse;">
-                    <tr>
-                        <td style="font-size:7pt;font-weight:bold;color:#888;text-transform:uppercase;letter-spacing:1px;text-align:right;padding-right:8px;">Invoice No</td>
-                        <td style="font-size:10pt;font-weight:bold;color:#cc1010;text-align:right;white-space:nowrap;">{{ $invoice->invoice_number }}</td>
-                    </tr>
-                    <tr>
-                        <td style="font-size:7pt;font-weight:bold;color:#888;text-transform:uppercase;letter-spacing:1px;text-align:right;padding-right:8px;">Date</td>
-                        <td style="font-size:10pt;font-weight:bold;text-align:right;white-space:nowrap;">{{ $invoice->invoice_date->format('d/m/Y') }}</td>
-                    </tr>
-                    <tr>
-                        <td style="font-size:7pt;font-weight:bold;color:#888;text-transform:uppercase;letter-spacing:1px;text-align:right;padding-right:8px;">Status</td>
-                        <td style="font-size:9pt;font-weight:bold;text-align:right;white-space:nowrap;
-                            color:{{ $invoice->payment_status === 'paid' ? '#16a34a' : ($invoice->payment_status === 'partial' ? '#d97706' : '#dc2626') }};">
-                            {{ ucfirst($invoice->payment_status) }}
-                        </td>
-                    </tr>
-                </table>
-            </td>
+            <th style="width:36px;">No.</th>
+            <th>Description</th>
+            <th class="c" style="width:52px;">Qty</th>
+            <th class="r" style="width:96px;">Unit Price</th>
+            <th class="r" style="width:96px;">Amount (LKR)</th>
         </tr>
-    </table>
-
-    {{-- Items table --}}
-    <table class="ipv-tbl" style="margin-bottom:14px;">
-        <thead>
-            <tr>
-                <th width="30">Item</th>
-                <th>Description</th>
-                <th class="c" width="48">Qty</th>
-                <th class="r" width="100">Price (LKR)</th>
-                <th class="r" width="100">Total (LKR)</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($invoice->items as $item)
-            <tr>
-                <td style="color:#cc1010;font-weight:bold;text-align:center;">{{ $item->item_number }}</td>
-                <td>{{ $item->description }}</td>
-                <td class="c">{{ number_format($item->quantity, 2) }}</td>
-                <td class="r">{{ number_format($item->unit_price) }}</td>
-                <td class="r" style="font-weight:bold;">{{ number_format($item->total) }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-        <tfoot>
-            @if($invoice->tax_amount > 0)
-            <tr style="background:#f5f5f5;">
-                <td colspan="4" style="text-align:right;padding:5px 8px;font-weight:bold;border:1px solid #e0e0e0;">Subtotal</td>
-                <td class="r" style="border:1px solid #e0e0e0;">{{ number_format($invoice->subtotal) }}</td>
-            </tr>
-            <tr style="background:#f5f5f5;">
-                <td colspan="4" style="text-align:right;padding:5px 8px;font-weight:bold;border:1px solid #e0e0e0;">Tax</td>
-                <td class="r" style="border:1px solid #e0e0e0;">{{ number_format($invoice->tax_amount) }}</td>
-            </tr>
-            @endif
-            <tr>
-                <td colspan="4" style="text-align:right;padding:9px 8px;font-weight:bold;font-size:9.5pt;
-                                       border:1px solid #ddd;background:#f0f0f0;color:#333;">TOTAL (LKR)</td>
-                <td style="text-align:right;padding:9px 8px;font-weight:bold;color:#cc1010;font-size:13pt;
-                           white-space:nowrap;border:1px solid #ddd;background:#fff9f9;">
-                    {{ number_format($invoice->total_amount) }}
-                </td>
-            </tr>
-            @if($invoice->paid_amount > 0)
-            <tr style="background:#f0fdf4;">
-                <td colspan="4" style="text-align:right;padding:6px 8px;font-weight:bold;border:1px solid #e0e0e0;color:#16a34a;">Paid (LKR)</td>
-                <td style="text-align:right;padding:6px 8px;font-weight:bold;border:1px solid #e0e0e0;color:#16a34a;">{{ number_format($invoice->paid_amount) }}</td>
-            </tr>
-            <tr style="background:{{ $invoice->balance > 0 ? '#fff9f9' : '#f0fdf4' }};">
-                <td colspan="4" style="text-align:right;padding:6px 8px;font-weight:bold;border:1px solid #e0e0e0;
-                                       color:{{ $invoice->balance > 0 ? '#dc2626' : '#16a34a' }};">Balance Due (LKR)</td>
-                <td style="text-align:right;padding:6px 8px;font-weight:bold;border:1px solid #e0e0e0;
-                           color:{{ $invoice->balance > 0 ? '#dc2626' : '#16a34a' }};">{{ number_format($invoice->balance) }}</td>
-            </tr>
-            @endif
-        </tfoot>
-    </table>
-
-    {{-- Payment Details (hidden when paid) --}}
-    @if($invoice->payment_status !== 'paid')
-    <div style="border:1px solid #e0e0e0;border-left:3px solid #cc1010;padding:10px 12px;margin-bottom:14px;">
-        <div style="font-weight:bold;font-size:9pt;margin-bottom:6px;padding-bottom:5px;
-                    border-bottom:1px solid #eee;text-transform:uppercase;letter-spacing:.5px;">Payment Details</div>
-        <table width="100%" cellpadding="0" cellspacing="0">
-            <tr>
-                <td width="22%" style="color:#888;font-size:8.5pt;padding-bottom:4px;">Bank Name:</td>
-                <td style="font-weight:bold;font-size:8.5pt;padding-bottom:4px;">{{ $settings['bank_name'] ?? 'DFCC Bank' }}</td>
-                <td width="22%" style="color:#888;font-size:8.5pt;padding-bottom:4px;padding-left:20px;">Branch:</td>
-                <td style="font-weight:bold;font-size:8.5pt;padding-bottom:4px;">{{ $settings['bank_branch'] ?? 'Gampaha' }}</td>
-            </tr>
-            <tr>
-                <td style="color:#888;font-size:8.5pt;">Account Name:</td>
-                <td style="font-weight:bold;font-size:8.5pt;">{{ $settings['bank_account_name'] ?? 'JAAN Network (Pvt) Ltd' }}</td>
-                <td style="color:#888;font-size:8.5pt;padding-left:20px;">Account No:</td>
-                <td style="font-weight:bold;font-size:8.5pt;">{{ $settings['bank_account_number'] ?? '102003031923' }}</td>
-            </tr>
-        </table>
-    </div>
-    @endif
-
-    {{-- Terms & Conditions --}}
-    @if($invoice->terms_conditions)
-    <div style="border-top:1px solid #e8e8e8;padding-top:10px;margin-bottom:14px;">
-        <div style="font-size:8pt;font-weight:bold;text-transform:uppercase;letter-spacing:1px;
-                    color:#1a1a1a;margin-bottom:6px;">Terms &amp; Conditions</div>
-        @php $termsLines = array_map('rtrim', explode("\n", $invoice->terms_conditions)); $prevEmpty = true; $counter = 0; @endphp
-        @foreach($termsLines as $tLine)
-            @if(trim($tLine) === '')<div style="height:3pt;"></div>@php $prevEmpty = true; @endphp
-            @elseif(mb_substr(ltrim($tLine), 0, 1) === '●' || mb_substr(ltrim($tLine), 0, 1) === '•')
-                <div class="ipv-tbu"><span style="color:#cc1010;font-weight:bold;">&#9679;</span>&nbsp;{{ preg_replace('/^[\s●•]+/', '', $tLine) }}</div>@php $prevEmpty = false; @endphp
-            @elseif($prevEmpty)@php $counter++; @endphp
-                <div class="ipv-th">{{ $counter }}. {{ $tLine }}</div>@php $prevEmpty = false; @endphp
-            @elseif(mb_strlen(trim($tLine)) < 60 && mb_substr(trim($tLine), -1) === ':')
-                <div class="ipv-ts">{{ $tLine }}</div>@php $prevEmpty = false; @endphp
-            @else<div class="ipv-tb">{{ $tLine }}</div>@php $prevEmpty = false; @endphp
-            @endif
+    </thead>
+    <tbody>
+        @foreach($invoice->items as $item)
+        <tr>
+            <td class="c" style="font-weight:bold;">{{ $item->item_number }}</td>
+            <td>{{ $item->item_name ?? $item->description }}@if($item->warranty) <span style="color:#7f1d1d;">[{{ $item->warranty }}]</span>@endif</td>
+            <td class="c">{{ number_format((float)$item->quantity, 0) }}</td>
+            <td class="r">{{ number_format((float)$item->unit_price) }}</td>
+            <td class="r" style="font-weight:bold;">{{ number_format((float)$item->total) }}</td>
+        </tr>
         @endforeach
-    </div>
-    @endif
+    </tbody>
+</table>
 
-    {{-- PAID stamp --}}
-    @php $paidStampPath = public_path('images/paid-stamp.png'); @endphp
-    @if($invoice->payment_status === 'paid' && file_exists($paidStampPath))
-    <div style="text-align:center;margin-bottom:10px;">
-        <img src="{{ $paidStampPath }}" alt="PAID" style="width:130px;height:130px;">
-    </div>
+{{-- TOTALS --}}
+<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+    @if($invoice->tax_amount > 0)
+    <tr>
+        <td width="60%"></td>
+        <td style="padding:5px 8px;font-size:9pt;border-bottom:1px dashed #fecaca;">Subtotal</td>
+        <td style="padding:5px 8px;text-align:right;font-size:9pt;border-bottom:1px dashed #fecaca;width:96px;">
+            {{ number_format((float)$invoice->subtotal) }}
+        </td>
+    </tr>
+    <tr>
+        <td></td>
+        <td style="padding:5px 8px;font-size:9pt;border-bottom:1px dashed #fecaca;">Tax</td>
+        <td style="padding:5px 8px;text-align:right;font-size:9pt;border-bottom:1px dashed #fecaca;">
+            {{ number_format((float)$invoice->tax_amount) }}
+        </td>
+    </tr>
     @endif
+    <tr>
+        <td></td>
+        <td style="padding:8px 8px;font-size:9.5pt;font-weight:bold;
+                   border-top:1px solid #111111;border-bottom:3px double #111111;">TOTAL (LKR)</td>
+        <td style="padding:8px 8px;text-align:right;font-size:13pt;font-weight:bold;
+                   white-space:nowrap;border-top:1px solid #111111;border-bottom:3px double #111111;background:#b91c1c;color:#fff;">
+            {{ number_format((float)$invoice->total_amount) }}
+        </td>
+    </tr>
+    @if($invoice->paid_amount > 0 && $invoice->payment_status !== 'paid')
+    <tr>
+        <td></td>
+        <td style="padding:5px 8px;font-size:9pt;border-bottom:1px dashed #fecaca;">Amount Paid</td>
+        <td style="padding:5px 8px;text-align:right;font-size:9pt;border-bottom:1px dashed #fecaca;">
+            {{ number_format((float)$invoice->paid_amount) }}
+        </td>
+    </tr>
+    <tr>
+        <td></td>
+        <td style="padding:7px 8px;font-size:9.5pt;font-weight:bold;border-bottom:1px solid #111111;">Balance Due (LKR)</td>
+        <td style="padding:7px 8px;text-align:right;font-size:11pt;font-weight:bold;border-bottom:1px solid #111111;">
+            {{ number_format((float)$invoice->balance) }}
+        </td>
+    </tr>
+    @endif
+</table>
 
-    {{-- Closing --}}
-    <div style="text-align:center;padding-top:10px;border-top:1px solid #e8e8e8;">
-        <div style="font-size:9.5pt;font-weight:bold;color:#cc1010;">
-            Thank you for choosing {{ $settings['company_name'] ?? 'JAAN Network (Pvt) Ltd' }}
-        </div>
-        <div style="font-size:7.5pt;color:#888;margin-top:3px;">
-            For any inquiries or clarifications, please don&#8217;t hesitate to contact us.
-        </div>
-    </div>
+{{-- PAYMENT DETAILS --}}
+@if($invoice->payment_status !== 'paid')
+<div class="ipv-section">Payment Details</div>
+<hr class="ipv-rule">
+<table width="100%" cellpadding="0" cellspacing="0" style="font-size:9pt;line-height:1.9;margin-bottom:16px;color:#111111;background:#fef2f2;border:1px solid #fecaca;padding:8px 10px;">
+    <tr>
+        <td width="22%" style="font-weight:bold;padding:4px 0;">Bank</td>
+        <td style="padding:4px 0;">:&nbsp;{{ $settings['bank_name'] ?? 'DFCC Bank' }}</td>
+        <td width="22%" style="font-weight:bold;padding:4px 0;">Branch</td>
+        <td style="padding:4px 0;">:&nbsp;{{ $settings['bank_branch'] ?? 'Gampaha' }}</td>
+    </tr>
+    <tr>
+        <td style="font-weight:bold;padding:4px 0;">Account Name</td>
+        <td style="padding:4px 0;">:&nbsp;{{ $settings['bank_account_name'] ?? 'JAAN Network (Pvt) Ltd' }}</td>
+        <td style="font-weight:bold;padding:4px 0;">Account No</td>
+        <td style="padding:4px 0;">:&nbsp;{{ $settings['bank_account_number'] ?? '102003031923' }}</td>
+    </tr>
+</table>
+@endif
+
+{{-- PAID STAMP --}}
+@php $paidStampPath = public_path('images/paid-stamp.png'); @endphp
+@if($invoice->payment_status === 'paid' && file_exists($paidStampPath))
+<div style="text-align:center;margin-top:16px;margin-bottom:8px;">
+    <img src="{{ $paidStampPath }}" alt="PAID" style="width:190px;height:160px;opacity:0.7;">
+</div>
+@endif
+
+<hr style="border:none;border-top:1px solid #b91c1c;margin-top:18px;margin-bottom:8px;">
+<div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:3px;color:#111111;">
+    Thank you for choosing {{ $settings['company_name'] ?? 'JAAN Network (Pvt) Ltd' }}
+</div>
+<div style="text-align:center;font-size:8pt;color:#b91c1c;">
+    For inquiries: {{ $settings['company_phone'] ?? '' }}@if(!empty($settings['company_email'])) &nbsp;/&nbsp; {{ $settings['company_email'] }}@endif
+</div>
 
 </div>{{-- end body --}}
-<div style="height:5mm;background:#cc1010;margin-top:10px;"></div>
 </div>{{-- end paper --}}
 
 {{-- Payment History --}}
