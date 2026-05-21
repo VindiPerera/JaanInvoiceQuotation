@@ -7,14 +7,25 @@
 @php
     $rawItems  = old('hardware_items', $template?->hardware_items ?? []);
     $rawItems  = is_string($rawItems) ? json_decode($rawItems, true) ?? [] : $rawItems;
-    $formItems = is_array($rawItems) ? array_map(fn($i) => [
-        'item_name'   => $i['item_name'] ?? '',
-        'description' => $i['description'] ?? '',
-        'quantity'    => (float)($i['quantity']  ?? 1),
-        'unit_price'  => (float)($i['unit_price'] ?? 0),
-        'warranty'    => $i['warranty'] ?? '',
-        'total'       => (float)($i['quantity'] ?? 1) * (float)($i['unit_price'] ?? 0),
-    ], $rawItems) : [];
+    $formItems = is_array($rawItems) ? array_map(function($i) {
+        $itemName = $i['item_name'] ?? '';
+        if (!$itemName || trim($itemName) === '') {
+            // Extract first line that doesn't start with bullet point
+            $lines = array_filter(
+                array_map('trim', explode("\n", $i['description'] ?? '')),
+                fn($l) => $l && strpos($l, '•') !== 0
+            );
+            $itemName = count($lines) > 0 ? reset($lines) : 'Item';
+        }
+        return [
+            'item_name'   => $itemName,
+            'description' => $i['description'] ?? '',
+            'quantity'    => (float)($i['quantity']  ?? 1),
+            'unit_price'  => (float)($i['unit_price'] ?? 0),
+            'warranty'    => $i['warranty'] ?? '',
+            'total'       => (float)($i['quantity'] ?? 1) * (float)($i['unit_price'] ?? 0),
+        ];
+    }, $rawItems) : [];
     if (empty($formItems)) {
         $formItems = [['item_name' => '', 'description' => '', 'quantity' => 1, 'unit_price' => 0, 'warranty' => '', 'total' => 0]];
     }

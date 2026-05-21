@@ -106,7 +106,10 @@ function quotationForm() {
             const d = quotationTypeDefaults[type] || quotationTypeDefaults[keys[0]] || { items: [], features: [], terms: '', overview: '' };
             if (d.items && d.items.length) {
                 this.items = d.items.map(i => {
-                    const itemName = i.item_name || this.extractItemName(i.description);
+                    let itemName = i.item_name;
+                    if (!itemName || itemName.trim() === '') {
+                        itemName = this.extractItemName(i.description);
+                    }
                     return { ...i, item_name: itemName, isFromTemplate: true };
                 });
             } else {
@@ -121,7 +124,8 @@ function quotationForm() {
         addItem()         { this.items.push({ item_name: '', description: '', quantity: 1, unit_price: 0, warranty: '', total: 0, isFromTemplate: false }); },
 
         extractItemName(description) {
-            const lines = description.split('\n').map(l => l.trim()).filter(l => l);
+            if (!description || typeof description !== 'string') return 'Item';
+            const lines = description.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('•'));
             return lines.length > 0 ? lines[0] : 'Item';
         },
         removeItem(i)     { this.items.splice(i, 1); this.calcTotal(); },
