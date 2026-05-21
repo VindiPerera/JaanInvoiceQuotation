@@ -90,11 +90,11 @@
                 <thead>
                     <tr class="border-b border-gray-100">
                         <th class="pb-2 text-left text-xs font-medium text-gray-500 w-10">#</th>
-                        <th class="pb-2 text-left text-xs font-medium text-gray-500 w-40">Item Name</th>
+                        <th class="pb-2 text-left text-xs font-medium text-gray-500 w-40">Name</th>
                         <th class="pb-2 text-left text-xs font-medium text-gray-500 flex-1">Description</th>
                         <th class="pb-2 text-left text-xs font-medium text-gray-500 w-28">Warranty</th>
                         <th class="pb-2 text-left text-xs font-medium text-gray-500 w-24">Qty</th>
-                        <th class="pb-2 text-left text-xs font-medium text-gray-500 w-36">Unit Price (LKR)</th>
+                        <th class="pb-2 text-left text-xs font-medium text-gray-500 w-36">Price (LKR)</th>
                         <th class="pb-2 text-right text-xs font-medium text-gray-500 w-36">Total (LKR)</th>
                         <th class="pb-2 w-10"></th>
                     </tr>

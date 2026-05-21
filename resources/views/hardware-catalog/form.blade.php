@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', $item ? 'Edit Hardware Item' : 'Add Hardware Item')
+@section('title', $item ? 'Edit Hardware Item' : 'Add Hardware/Software/Services')
 @section('breadcrumb', $item ? 'Edit: ' . $item->name : 'Add a new hardware item to the catalog')
 
 @section('content')
@@ -19,10 +19,10 @@
     @endif
 
     <div class="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-        <h2 class="text-base font-semibold text-gray-800 mb-2">Item Details</h2>
+        <h2 class="text-base font-semibold text-gray-800 mb-2">Details</h2>
 
         <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">Item Name *</label>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Name *</label>
             <input type="text" name="name" value="{{ old('name', $item?->name) }}" required
                 class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
                 placeholder="e.g. Core i5 Desktop PC">
@@ -36,7 +36,7 @@
         </div>
 
         <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">Unit Price (LKR) *</label>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Price (LKR) *</label>
             <input type="number" name="unit_price" value="{{ old('unit_price', $item?->unit_price ?? '0') }}"
                 step="0.01" min="0" required
                 class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300">
