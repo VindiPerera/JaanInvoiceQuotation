@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
 
         // Call all seeders
         $this->call(SettingsSeeder::class);
-        $this->call(HardwareCatalogSeeder::class);
+        
 
     }
 }
