@@ -26,6 +26,7 @@ class HardwareCatalogController extends Controller
             'category'   => 'nullable|string|max:100',
             'description'=> 'nullable|string',
             'unit_price' => 'required|numeric|min:0',
+            'warranty'   => 'nullable|string|max:255',
             'is_active'  => 'boolean',
         ]);
 
@@ -34,6 +35,7 @@ class HardwareCatalogController extends Controller
             'category'    => $request->category,
             'description' => $request->description,
             'unit_price'  => $request->unit_price,
+            'warranty'    => $request->warranty,
             'is_active'   => $request->boolean('is_active', true),
         ]);
 
@@ -53,6 +55,7 @@ class HardwareCatalogController extends Controller
             'category'    => 'nullable|string|max:100',
             'description' => 'nullable|string',
             'unit_price'  => 'required|numeric|min:0',
+            'warranty'    => 'nullable|string|max:255',
             'is_active'   => 'boolean',
         ]);
 
@@ -61,6 +64,7 @@ class HardwareCatalogController extends Controller
             'category'    => $request->category,
             'description' => $request->description,
             'unit_price'  => $request->unit_price,
+            'warranty'    => $request->warranty,
             'is_active'   => $request->boolean('is_active', true),
         ]);
 
@@ -78,7 +82,7 @@ class HardwareCatalogController extends Controller
         $items = HardwareCatalog::active()
             ->orderBy('category')
             ->orderBy('name')
-            ->get(['id', 'name', 'category', 'description', 'unit_price']);
+            ->get(['id', 'name', 'category', 'description', 'unit_price', 'warranty']);
 
         return response()->json($items);
     }

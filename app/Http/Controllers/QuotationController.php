@@ -138,7 +138,7 @@ class QuotationController extends Controller
         $defaultFeatures = [];
         $defaultBenefits = [];
         $templates       = QuoteTemplate::orderBy('sort_order')->orderBy('id')->get();
-        $hardware        = HardwareCatalog::active()->orderBy('category')->orderBy('name')->get(['id', 'name', 'description', 'category', 'unit_price']);
+        $hardware        = HardwareCatalog::active()->orderBy('category')->orderBy('name')->get(['id', 'name', 'description', 'category', 'unit_price', 'warranty']);
         return view('quotations.edit', compact('quotation', 'customers', 'defaultTerms', 'defaultFeatures', 'defaultBenefits', 'templates', 'hardware'));
     }
 
@@ -241,7 +241,7 @@ class QuotationController extends Controller
         $customers = Customer::orderBy('name')->get();
         $nextNumber = \App\Models\Invoice::generateNumber();
         $settings = Setting::pluck('value', 'key');
-        $hardware = HardwareCatalog::active()->orderBy('category')->orderBy('name')->get(['id', 'name', 'description', 'category', 'unit_price']);
+        $hardware = HardwareCatalog::active()->orderBy('category')->orderBy('name')->get(['id', 'name', 'description', 'category', 'unit_price', 'warranty']);
         return view('invoices.create', compact('quotation', 'customers', 'nextNumber', 'settings', 'hardware'));
     }
 

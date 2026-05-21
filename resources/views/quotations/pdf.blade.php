@@ -188,11 +188,12 @@ body {
         @php
             $lines = array_values(array_filter(array_map('rtrim', explode("\n", $item->description))));
             $specs = array_slice($lines, 1);
+            $itemName = $item->item_name ?: ($lines[0] ?? 'Item');
         @endphp
         <tr>
             <td class="c" style="font-weight:bold;">{{ $item->item_number }}</td>
             <td>
-                <div style="font-weight:bold;margin-bottom:3px;">{{ $lines[0] ?? $item->description }}@if($item->warranty) <span style="font-weight:normal;color:#7f1d1d;">[{{ $item->warranty }}]</span>@endif</div>
+                <div style="font-weight:bold;margin-bottom:3px;">{{ $itemName }}@if($item->warranty) <span style="font-weight:normal;color:#7f1d1d;">[{{ $item->warranty }}]</span>@endif</div>
                 @foreach($specs as $spec)
                 <div style="font-size:8.5pt;color:#111111;padding-left:4px;">- {{ preg_replace('/^[\s•●\-\*]+/', '', $spec) }}</div>
                 @endforeach

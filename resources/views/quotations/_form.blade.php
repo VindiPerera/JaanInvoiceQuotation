@@ -166,21 +166,21 @@
                             <td class="py-2 pr-2 text-gray-400 text-xs" x-text="index + 1"></td>
                             <td class="py-2 pr-2">
                                 <input type="text" :name="`items[${index}][item_name]`" x-model="item.item_name"
-                                    :disabled="item.isFromTemplate && isTemplateApplied"
-                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-red-300 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
+                                    :readonly="item.isFromTemplate && isTemplateApplied"
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-red-300 read-only:bg-gray-100 read-only:text-gray-700 read-only:cursor-not-allowed"
                                     placeholder="e.g. 2D Barcode Scanner">
                             </td>
                             <td class="py-2 pr-2">
                                 <textarea :name="`items[${index}][description]`" x-model="item.description" rows="2"
-                                    :disabled="item.isFromTemplate && isTemplateApplied"
-                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 resize-none leading-snug disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
+                                    :readonly="item.isFromTemplate && isTemplateApplied"
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 resize-none leading-snug read-only:bg-gray-100 read-only:text-gray-700 read-only:cursor-not-allowed"
                                     placeholder="Specs / details (optional)"></textarea>
                                 <input type="hidden" :name="`items[${index}][item_type]`" value="hardware">
                             </td>
                             <td class="py-2 pr-2">
                                 <input type="text" :name="`items[${index}][warranty]`" x-model="item.warranty"
-                                    :disabled="item.isFromTemplate && isTemplateApplied"
-                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
+                                    :readonly="item.isFromTemplate && isTemplateApplied"
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 read-only:bg-gray-100 read-only:text-gray-700 read-only:cursor-not-allowed"
                                     placeholder="e.g. 1 Year">
                             </td>
                             <td class="py-2 pr-2">
@@ -191,8 +191,8 @@
                             <td class="py-2 pr-2 text-right">
                                 <div class="flex items-center justify-end">
                                     <input type="number" :name="`items[${index}][unit_price]`" x-model.number="item.unit_price" @input="calcRow(index)"
-                                        :disabled="item.isFromTemplate && isTemplateApplied"
-                                        class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 text-right disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
+                                        :readonly="item.isFromTemplate && isTemplateApplied"
+                                        class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 text-right read-only:bg-gray-100 read-only:text-gray-700 read-only:cursor-not-allowed"
                                         min="0" step="0.01" placeholder="0.00">
                                 </div>
                             </td>
