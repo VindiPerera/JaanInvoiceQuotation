@@ -90,7 +90,7 @@
                                     @php $itemSearchStr = strtolower($ci->name . ' ' . ($ci->description ?? '')); @endphp
                                     <button type="button"
                                         x-show="{{ e(json_encode($itemSearchStr)) }}.includes(search.toLowerCase())"
-                                        @click="addItemFromCatalog({ description: {{ Js::from($ci->description ?: $ci->name) }}, unit_price: {{ (float)$ci->unit_price }}, warranty: {{ Js::from($ci->warranty ?? '') }} }); open = false;"
+                                        @click="addItemFromCatalog({ name: {{ Js::from($ci->name) }}, description: {{ Js::from($ci->description ?: '') }}, unit_price: {{ (float)$ci->unit_price }}, warranty: {{ Js::from($ci->warranty ?? '') }} }); open = false;"
                                         class="w-full text-left px-3 py-2 hover:bg-red-50 transition flex items-center justify-between gap-2 group">
                                         <span class="text-sm text-gray-700 group-hover:text-red-700 truncate">{{ $ci->name }}</span>
                                         <span class="text-xs text-gray-400 shrink-0">LKR {{ number_format($ci->unit_price, 2) }}</span>
@@ -193,8 +193,9 @@ function templateForm() {
 
         addItem() { this.items.push({ item_name: '', description: '', quantity: 1, unit_price: 0, warranty: '', total: 0 }); },
         addItemFromCatalog(catalog) {
-            const itemName = this.extractItemName(catalog.description);
-            this.items.push({ item_name: itemName, description: catalog.description, quantity: 1, unit_price: catalog.unit_price, warranty: catalog.warranty || '', total: catalog.unit_price });
+            const itemName = catalog.name || this.extractItemName(catalog.description);
+            const description = catalog.description && catalog.description.trim() ? '• ' + catalog.description : '';
+            this.items.push({ item_name: itemName, description, quantity: 1, unit_price: catalog.unit_price, warranty: catalog.warranty || '', total: catalog.unit_price });
             this.calcSubtotal();
         },
         extractItemName(description) {

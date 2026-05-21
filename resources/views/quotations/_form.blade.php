@@ -151,6 +151,7 @@
                 <thead>
                     <tr class="border-b border-gray-100">
                         <th class="pb-2 text-left text-xs font-medium text-gray-500 w-10">#</th>
+                        <th class="pb-2 text-left text-xs font-medium text-gray-500 w-40">Item Name</th>
                         <th class="pb-2 text-left text-xs font-medium text-gray-500">Description</th>
                         <th class="pb-2 text-left text-xs font-medium text-gray-500 w-28">Warranty</th>
                         <th class="pb-2 text-left text-xs font-medium text-gray-500 w-24">Qty</th>
@@ -164,11 +165,16 @@
                         <tr class="border-b border-gray-50" :class="{ 'bg-yellow-50': item.isFromTemplate }">
                             <td class="py-2 pr-2 text-gray-400 text-xs" x-text="index + 1"></td>
                             <td class="py-2 pr-2">
-                                <textarea :name="`items[${index}][description]`" x-model="item.description" rows="3"
+                                <input type="text" :name="`items[${index}][item_name]`" x-model="item.item_name"
                                     :disabled="item.isFromTemplate && isTemplateApplied"
-                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 resize-y leading-snug disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
-                                    placeholder="ITEM/SERVICE NAME (first line bold in PDF)&#10;• Detail one&#10;• Detail two"></textarea>
-                                <input type="hidden" :name="`items[${index}][item_name]`" x-model="item.item_name || ''">
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-red-300 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
+                                    placeholder="e.g. 2D Barcode Scanner">
+                            </td>
+                            <td class="py-2 pr-2">
+                                <textarea :name="`items[${index}][description]`" x-model="item.description" rows="2"
+                                    :disabled="item.isFromTemplate && isTemplateApplied"
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 resize-none leading-snug disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
+                                    placeholder="Specs / details (optional)"></textarea>
                                 <input type="hidden" :name="`items[${index}][item_type]`" value="hardware">
                             </td>
                             <td class="py-2 pr-2">
