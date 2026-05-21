@@ -189,17 +189,11 @@
         <p class="text-xs text-gray-400 mt-2">Change in <a href="{{ route('settings.index') }}" class="underline">Settings</a></p>
     </div>
 
-    {{-- Terms & Notes --}}
+    {{-- Notes --}}
     <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 class="text-base font-semibold text-gray-800 mb-1">Terms & Conditions</h2>
-        <p class="text-xs text-gray-400 mb-2">Blank line = section heading &nbsp;|&nbsp; • bullet &nbsp;|&nbsp; Content line</p>
-        <textarea name="terms_conditions" rows="10"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 font-mono">{{ old('terms_conditions', $invoice?->terms_conditions ?? ((isset($quotation) && $quotation)?->terms_conditions ?? "Software Warranty (Lifetime Warranty):\nCovers defects, malfunctions, and lifetime support.\nUnauthorized modifications void the warranty.\n\nService Terms:\n● Lifetime software support.\n● Free Hardware repair or replacement within 1 year.\n● Post-warranty repairs are Chargeable")) }}</textarea>
-        <div class="mt-4">
-            <label class="block text-xs font-medium text-gray-500 mb-1">Notes (internal)</label>
-            <textarea name="notes" rows="2"
-                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300">{{ old('notes', $invoice->notes ?? '') }}</textarea>
-        </div>
+        <label class="block text-xs font-medium text-gray-500 mb-2">Notes (internal)</label>
+        <textarea name="notes" rows="4"
+            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300">{{ old('notes', $invoice->notes ?? '') }}</textarea>
     </div>
 
     <div class="flex items-center gap-3">

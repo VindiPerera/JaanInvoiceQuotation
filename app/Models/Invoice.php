@@ -13,7 +13,7 @@ class Invoice extends Model
         'invoice_number', 'invoice_date', 'customer_id', 'quotation_id',
         'customer_name', 'customer_address', 'customer_contact',
         'subtotal', 'tax_amount', 'total_amount', 'paid_amount', 'balance',
-        'payment_status', 'terms_conditions', 'notes',
+        'payment_status', 'notes',
     ];
 
     protected $casts = [

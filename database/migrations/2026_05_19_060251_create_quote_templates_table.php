@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('subtitle')->nullable();
             $table->json('software_features')->nullable();
             $table->json('additional_benefits')->nullable();
-            $table->longText('terms_conditions')->nullable();
             $table->unsignedSmallInteger('sort_order')->default(0);
             $table->timestamps();
         });

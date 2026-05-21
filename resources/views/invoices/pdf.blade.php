@@ -248,38 +248,6 @@ body {
 </table>
 @endif
 
-{{-- TERMS & CONDITIONS --}}
-@if($invoice->terms_conditions)
-<div class="sec">Terms &amp; Conditions</div>
-<hr class="rule">
-<div style="margin-bottom:8px;font-size:8.5pt;line-height:1.8;color:#111111;">
-    @php
-        $termsLines = array_map('rtrim', explode("\n", $invoice->terms_conditions));
-        $prevEmpty  = true;
-        $counter    = 0;
-    @endphp
-    @foreach($termsLines as $tLine)
-        @if(trim($tLine) === '')
-            <div style="height:5pt;"></div>
-            @php $prevEmpty = true; @endphp
-        @elseif(mb_substr(ltrim($tLine), 0, 1) === '●' || mb_substr(ltrim($tLine), 0, 1) === '•')
-            <div style="padding-left:14px;margin-bottom:2px;">- {{ preg_replace('/^[\s●•]+/', '', $tLine) }}</div>
-            @php $prevEmpty = false; @endphp
-        @elseif($prevEmpty)
-            @php $counter++; @endphp
-            <div style="font-weight:bold;margin-top:6px;">{{ $counter }}. {{ $tLine }}</div>
-            @php $prevEmpty = false; @endphp
-        @elseif(mb_strlen(trim($tLine)) < 60 && mb_substr(trim($tLine), -1) === ':')
-            <div style="font-weight:bold;margin-top:2px;">{{ $tLine }}</div>
-            @php $prevEmpty = false; @endphp
-        @else
-            <div style="margin-bottom:2px;">{{ $tLine }}</div>
-            @php $prevEmpty = false; @endphp
-        @endif
-    @endforeach
-</div>
-@endif
-
 {{-- PAID STAMP --}}
 @php $paidStampPath = public_path('images/paid-stamp.png'); @endphp
 @if($invoice->payment_status === 'paid' && file_exists($paidStampPath))

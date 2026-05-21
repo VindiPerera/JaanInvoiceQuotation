@@ -172,7 +172,7 @@ body {
 
 {{-- HARDWARE PACKAGE --}}
 @if($quoteType !== 'software_only' && $quotation->items->count())
-<div class="sec">Hardware/Services</div>
+<div class="sec">Software/Hardware/Services</div>
 <hr class="rule">
 <table class="tbl" style="margin-bottom:8px;">
     <thead>
@@ -205,30 +205,6 @@ body {
 </table>
 @endif
 
-{{-- SOFTWARE FEATURES --}}
-@if($quoteType !== 'hardware_only' && !empty($quotation->software_features))
-<div class="sec">Software Features</div>
-<hr class="rule">
-<div style="margin-bottom:8px;">
-    @foreach($quotation->software_features as $f)
-        @php
-            $kind = is_array($f) ? ($f['kind'] ?? 'item') : 'item';
-            $text = is_array($f) ? ($f['text'] ?? '') : $f;
-        @endphp
-        @if($kind === 'space')
-            <div style="height:6pt;"></div>
-        @elseif($kind === 'heading')
-            <div style="font-weight:bold;font-size:9pt;margin:8px 0 4px;">{{ $text }}</div>
-        @else
-            @php $parts = explode(' - ', $text, 2); @endphp
-            <div style="font-size:9pt;padding-left:6px;margin-bottom:3px;">
-                [+] <strong>{{ $parts[0] }}</strong>@if(isset($parts[1]))<span style="color:#7f1d1d;"> - {{ $parts[1] }}</span>@endif
-            </div>
-        @endif
-    @endforeach
-</div>
-@endif
-
 {{-- PAYMENT BREAKDOWN --}}
 <div class="sec">Payment Breakdown</div>
 <hr class="rule">
@@ -246,36 +222,6 @@ body {
     </tr>
 </table>
 <hr class="drule">
-
-{{-- TERMS & CONDITIONS --}}
-@if($quotation->terms_conditions)
-<div class="sec">Terms &amp; Conditions</div>
-<hr class="rule">
-<div style="margin-bottom:8px;font-size:8.5pt;line-height:1.8;color:#111111;">
-    @php
-        $termsLines = array_map('rtrim', explode("\n", $quotation->terms_conditions));
-        $prevEmpty  = true;
-    @endphp
-    @foreach($termsLines as $tLine)
-        @if(trim($tLine) === '')
-            <div style="height:5pt;"></div>
-            @php $prevEmpty = true; @endphp
-        @elseif(mb_substr(ltrim($tLine), 0, 1) === '●' || mb_substr(ltrim($tLine), 0, 1) === '•')
-            <div style="padding-left:14px;margin-bottom:2px;">- {{ preg_replace('/^[\s●•]+/', '', $tLine) }}</div>
-            @php $prevEmpty = false; @endphp
-        @elseif($prevEmpty)
-            <div style="font-weight:bold;margin-top:6px;">{{ $tLine }}</div>
-            @php $prevEmpty = false; @endphp
-        @elseif(mb_strlen(trim($tLine)) < 60 && mb_substr(trim($tLine), -1) === ':')
-            <div style="font-weight:bold;margin-top:2px;">{{ $tLine }}</div>
-            @php $prevEmpty = false; @endphp
-        @else
-            <div style="margin-bottom:2px;">{{ $tLine }}</div>
-            @php $prevEmpty = false; @endphp
-        @endif
-    @endforeach
-</div>
-@endif
 
 {{-- CONTACT INFORMATION --}}
 <div class="sec">Contact Information</div>

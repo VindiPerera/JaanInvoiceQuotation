@@ -87,7 +87,6 @@ class InvoiceController extends Controller
                 'customer_address' => $request->customer_address,
                 'customer_contact' => $request->customer_contact,
                 'tax_amount'       => $request->tax_amount ?? 0,
-                'terms_conditions' => $request->terms_conditions,
                 'notes'            => $request->notes,
                 'subtotal'         => 0,
                 'total_amount'     => 0,
@@ -162,7 +161,6 @@ class InvoiceController extends Controller
                 'customer_address' => $request->customer_address,
                 'customer_contact' => $request->customer_contact,
                 'tax_amount'       => $request->tax_amount ?? 0,
-                'terms_conditions' => $request->terms_conditions,
                 'notes'            => $request->notes,
                 'payment_status'   => $status,
             ]);

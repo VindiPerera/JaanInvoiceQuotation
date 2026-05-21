@@ -9,16 +9,14 @@
             'total'       => (float) $i->total,
           ])->toArray()
         : (isset($quotation) && $quotation
-            ? [
-                [
-                    'item_name'   => $quotation->subject ?? '',
-                    'description' => $quotation->subject ?? '',
-                    'quantity'    => 1,
-                    'unit_price'  => (float) $quotation->total_amount,
-                    'warranty'    => '',
-                    'total'       => (float) $quotation->total_amount,
-                ]
-              ]
+            ? $quotation->items->map(fn($i) => [
+                'item_name'   => $i->item_name ?? '',
+                'description' => $i->description,
+                'quantity'    => (float) $i->quantity,
+                'unit_price'  => (float) $i->unit_price,
+                'warranty'    => $i->warranty ?? '',
+                'total'       => (float) $i->total,
+              ])->toArray()
             : []));
 
 @endphp

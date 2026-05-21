@@ -89,7 +89,6 @@ class QuotationController extends Controller
                 'software_features'   => $this->filterEntries($request->software_features),
                 'additional_benefits' => $this->filterEntries($request->additional_benefits),
                 'tax_amount'          => $request->tax_amount ?? 0,
-                'terms_conditions'    => $request->terms_conditions,
                 'status'              => $request->status ?? 'draft',
             ]);
 
@@ -98,10 +97,13 @@ class QuotationController extends Controller
                 foreach ($request->items as $i => $item) {
                     if (empty($item['description'])) { continue; }
                     $total = ($item['quantity'] ?? 1) * ($item['unit_price'] ?? 0);
+                    $description = $item['description'];
+                    $itemName = $item['item_name'] ?? $this->extractItemName($description);
                     QuotationItem::create([
                         'quotation_id' => $quotation->id,
                         'item_number'  => $i + 1,
-                        'description'  => $item['description'],
+                        'item_name'    => $itemName,
+                        'description'  => $description,
                         'quantity'     => $item['quantity'] ?? 1,
                         'unit_price'   => $item['unit_price'] ?? 0,
                         'warranty'     => $item['warranty'] ?? null,
@@ -165,7 +167,6 @@ class QuotationController extends Controller
                 'software_features'   => $this->filterEntries($request->software_features),
                 'additional_benefits' => $this->filterEntries($request->additional_benefits),
                 'tax_amount'          => $request->tax_amount ?? 0,
-                'terms_conditions'    => $request->terms_conditions,
                 'status'              => $request->status ?? 'draft',
             ]);
 
@@ -175,10 +176,13 @@ class QuotationController extends Controller
                 foreach ($request->items as $i => $item) {
                     if (empty($item['description'])) { continue; }
                     $total = ($item['quantity'] ?? 1) * ($item['unit_price'] ?? 0);
+                    $description = $item['description'];
+                    $itemName = $item['item_name'] ?? $this->extractItemName($description);
                     QuotationItem::create([
                         'quotation_id' => $quotation->id,
                         'item_number'  => $i + 1,
-                        'description'  => $item['description'],
+                        'item_name'    => $itemName,
+                        'description'  => $description,
                         'quantity'     => $item['quantity'] ?? 1,
                         'unit_price'   => $item['unit_price'] ?? 0,
                         'warranty'     => $item['warranty'] ?? null,
@@ -248,5 +252,11 @@ class QuotationController extends Controller
             is_array($e) && isset($e['kind']) &&
             ($e['kind'] === 'space' || !empty(trim($e['text'] ?? '')))
         ));
+    }
+
+    private function extractItemName(string $description): string
+    {
+        $lines = array_filter(array_map('trim', explode("\n", $description)));
+        return count($lines) > 0 ? reset($lines) : 'Item';
     }
 }

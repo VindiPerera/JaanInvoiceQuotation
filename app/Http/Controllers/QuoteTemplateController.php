@@ -64,7 +64,6 @@ class QuoteTemplateController extends Controller
             'name'               => 'required|string|max:255',
             'subtitle'           => 'nullable|string|max:255',
             'project_overview'   => 'nullable|string',
-            'terms_conditions'   => 'nullable|string',
         ]);
     }
 

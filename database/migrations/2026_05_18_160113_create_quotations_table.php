@@ -25,7 +25,6 @@ return new class extends Migration
             $table->decimal('subtotal', 12, 2)->default(0);
             $table->decimal('tax_amount', 12, 2)->default(0);
             $table->decimal('total_amount', 12, 2)->default(0);
-            $table->text('terms_conditions')->nullable();
             $table->enum('status', ['draft', 'finalized', 'sent', 'accepted', 'rejected'])->default('draft');
             $table->timestamps();
             $table->softDeletes();

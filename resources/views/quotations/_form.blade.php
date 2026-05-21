@@ -106,7 +106,7 @@
     {{-- Items / Hardware/Software Package --}}
     <div x-show="quoteType !== 'software_only'" class="bg-white rounded-xl border border-gray-200 p-6">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-base font-semibold text-gray-800">Hardware/Software Items</h2>
+            <h2 class="text-base font-semibold text-gray-800">Software/Hardware/Services</h2>
             <div class="flex items-center gap-2">
                 {{-- From Catalog custom dropdown --}}
                 <div class="relative">
@@ -136,7 +136,7 @@
                                 </div>
                                 @endforeach
                             @empty
-                                <div class="px-3 py-4 text-center text-sm text-gray-400">No hardware/services in catalog.</div>
+                                <div class="px-3 py-4 text-center text-sm text-gray-400">No Software/Hardware/Services in catalog.</div>
                             @endforelse
                         </div>
                     </div>
@@ -168,6 +168,7 @@
                                     :disabled="item.isFromTemplate && isTemplateApplied"
                                     class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 resize-y leading-snug disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
                                     placeholder="ITEM/SERVICE NAME (first line bold in PDF)&#10;• Detail one&#10;• Detail two"></textarea>
+                                <input type="hidden" :name="`items[${index}][item_name]`" x-model="item.item_name || ''">
                                 <input type="hidden" :name="`items[${index}][item_type]`" value="hardware">
                             </td>
                             <td class="py-2 pr-2">
@@ -223,72 +224,6 @@
                 </tfoot>
             </table>
         </div>
-    </div>
-
-    {{-- Software Features --}}
-    <div x-show="quoteType !== 'hardware_only'" class="bg-white rounded-xl border border-gray-200 p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-base font-semibold text-gray-800">Software Features</h2>
-            <div class="flex items-center gap-2">
-                <button type="button" @click="addFeature('heading')"
-                    class="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 border border-gray-200 rounded-md px-2 py-1 transition">
-                    <i class="fa-solid fa-heading text-xs"></i> Heading
-                </button>
-                <button type="button" @click="addFeature('space')"
-                    class="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 border border-gray-200 rounded-md px-2 py-1 transition">
-                    <i class="fa-solid fa-grip-lines text-xs"></i> Space
-                </button>
-                <button type="button" @click="addFeature('item')"
-                    class="inline-flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 font-medium">
-                    <i class="fa-solid fa-plus"></i> Add Feature
-                </button>
-            </div>
-        </div>
-        <div class="space-y-1">
-            <template x-for="(feat, idx) in features" :key="idx">
-                <div>
-                    <input type="hidden" :name="`software_features[${idx}][kind]`" :value="feat.kind">
-
-                    <template x-if="feat.kind === 'space'">
-                        <div class="flex items-center gap-2 py-2">
-                            <i class="fa-solid fa-grip-lines text-gray-300 text-xs shrink-0"></i>
-                            <div class="flex-1 border-t border-dashed border-gray-200"></div>
-                            <input type="hidden" :name="`software_features[${idx}][text]`" value="">
-                            <button type="button" @click="features.splice(idx,1)" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-xmark text-xs"></i></button>
-                        </div>
-                    </template>
-
-                    <template x-if="feat.kind === 'heading'">
-                        <div class="flex items-center gap-2 py-0.5">
-                            <i class="fa-solid fa-minus text-gray-400 text-xs shrink-0 w-4 text-center"></i>
-                            <input type="text" :name="`software_features[${idx}][text]`" x-model="feat.text"
-                                class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-800 focus:outline-none focus:ring-1 focus:ring-red-300"
-                                placeholder="Section heading (e.g. 1. Software Warranty:)">
-                            <button type="button" @click="features.splice(idx,1)" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-xmark text-xs"></i></button>
-                        </div>
-                    </template>
-
-                    <template x-if="feat.kind === 'item'">
-                        <div class="flex items-center gap-2 py-0.5">
-                            <i class="fa-solid fa-check text-red-500 text-xs shrink-0 w-4 text-center"></i>
-                            <input type="text" :name="`software_features[${idx}][text]`" x-model="feat.text"
-                                class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
-                                placeholder="Feature description">
-                            <button type="button" @click="features.splice(idx,1)" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-xmark text-xs"></i></button>
-                        </div>
-                    </template>
-                </div>
-            </template>
-        </div>
-    </div>
-
-    {{-- Terms --}}
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 class="text-base font-semibold text-gray-800 mb-3">Terms & Conditions</h2>
-        <p class="text-xs text-gray-400 mb-3">Blank line = section heading &nbsp;|&nbsp; • bullet &nbsp;|&nbsp; Content line</p>
-        <textarea name="terms_conditions" x-model="termsText" rows="16"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 font-mono">{{ old('terms_conditions', $quotation?->terms_conditions ?? ($defaultWarrantyTerms ?? '')) }}</textarea>
-        <p class="text-xs text-gray-500 mt-2">💡 You can edit the terms as needed. Use bullet points (●) for items and leave blank lines for section headings.</p>
     </div>
 
     {{-- Actions --}}

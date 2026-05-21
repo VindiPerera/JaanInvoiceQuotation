@@ -42,11 +42,6 @@
                         @if($template->additional_benefits && count($template->additional_benefits))
                         <span><i class="fa-solid fa-star mr-1"></i>{{ count($template->additional_benefits) }} benefit row(s)</span>
                         @endif
-                        @if($template->terms_conditions)
-                        <span><i class="fa-solid fa-file-lines mr-1"></i>Terms set</span>
-                        @else
-                        <span class="text-amber-400"><i class="fa-solid fa-triangle-exclamation mr-1"></i>No terms</span>
-                        @endif
                     </div>
                 </div>
             </div>

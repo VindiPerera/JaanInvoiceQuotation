@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Hardware/Services')
+@section('title', 'Software/Hardware/Services')
 @section('breadcrumb', 'Manage hardware items and prices')
 
 @section('content')
@@ -12,7 +12,7 @@
 
 <div class="bg-white rounded-xl border border-gray-200">
     <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-        <h2 class="text-base font-semibold text-gray-800">Hardware/Services</h2>
+        <h2 class="text-base font-semibold text-gray-800">Software/Hardware/Services</h2>
         <a href="{{ route('hardware-catalog.create') }}"
            class="inline-flex items-center gap-1.5 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition">
             <i class="fa-solid fa-plus"></i> Add Item
@@ -22,7 +22,7 @@
     @if($items->isEmpty())
     <div class="text-center py-16 text-gray-400">
         <i class="fa-solid fa-microchip text-4xl mb-3"></i>
-        <p class="text-sm">No hardware/services yet. <a href="{{ route('hardware-catalog.create') }}" class="text-red-600 hover:underline">Add the first item.</a></p>
+        <p class="text-sm">No Software/hardware/services yet. <a href="{{ route('hardware-catalog.create') }}" class="text-red-600 hover:underline">Add the first item.</a></p>
     </div>
     @else
     <div class="overflow-x-auto">

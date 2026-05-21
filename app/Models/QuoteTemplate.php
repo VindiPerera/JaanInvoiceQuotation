@@ -9,7 +9,6 @@ class QuoteTemplate extends Model
     protected $fillable = [
         'name', 'key', 'subtitle', 'project_overview', 'template_type',
         'hardware_items', 'software_features', 'additional_benefits',
-        'terms_conditions',
     ];
 
     protected $casts = [

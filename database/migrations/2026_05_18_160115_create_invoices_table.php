@@ -26,7 +26,6 @@ return new class extends Migration
             $table->decimal('paid_amount', 12, 2)->default(0);
             $table->decimal('balance', 12, 2)->default(0);
             $table->enum('payment_status', ['pending', 'partial', 'paid'])->default('pending');
-            $table->text('terms_conditions')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
             $table->softDeletes();
