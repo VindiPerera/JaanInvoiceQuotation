@@ -30,8 +30,15 @@ class SettingController extends Controller
         if ($request->hasFile('company_logo')) {
             $file = $request->file('company_logo');
             $ext  = $file->getClientOriginalExtension();
-            $file->move(public_path('images'), 'company_logo.' . $ext);
-            Setting::set('company_logo', 'images/company_logo.' . $ext);
+            $imagesPath = public_path('images');
+
+            if (!is_dir($imagesPath)) {
+                mkdir($imagesPath, 0755, true);
+            }
+
+            $filename = 'company_logo.' . $ext;
+            $file->move($imagesPath, $filename);
+            Setting::set('company_logo', 'images/' . $filename);
         }
 
         return redirect()->route('settings.index')->with('success', 'Settings saved.');
