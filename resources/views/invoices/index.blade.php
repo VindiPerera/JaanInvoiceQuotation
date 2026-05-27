@@ -99,6 +99,11 @@
                                     @csrf
                                     <button type="submit" title="Duplicate" class="text-gray-400 hover:text-purple-600"><i class="fa-solid fa-copy"></i></button>
                                 </form>
+                                <form method="POST" action="{{ route('invoices.destroy', $inv) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this invoice?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" title="Delete" class="text-gray-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
+                                </form>
                             </div>
                         </td>
                     </tr>
