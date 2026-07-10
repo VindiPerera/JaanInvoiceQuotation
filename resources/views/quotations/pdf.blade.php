@@ -192,18 +192,21 @@ $hasQtyPrice = $visibleItems->some(fn($item) => (float)$item->quantity > 0 || (f
     <tbody>
         @foreach($visibleItems as $item)
         <tr>
-            <td class="c" style="font-weight:bold;">{{ $item->item_number }}</td>
-            <td>
+            <td class="c" style="font-weight:bold;vertical-align:top;">{{ $item->item_number }}</td>
+            <td style="vertical-align:top;">
                 @if($item->item_name)
-                <div style="font-weight:bold;margin-bottom:8px;">{{ $item->item_name }}@if($item->warranty) <span style="font-weight:normal;color:#7f1d1d;">[{{ $item->warranty }}]</span>@endif</div>
+                <div style="font-weight:bold;margin-bottom:10px;font-size:9.5pt;">{{ $item->item_name }}@if($item->warranty) <span style="font-weight:normal;color:#7f1d1d;font-size:8.5pt;">[{{ $item->warranty }}]</span>@endif</div>
                 @endif
                 @if($item->description)
-                <div style="font-size:9pt;color:#111111;line-height:2;white-space:pre-wrap;word-wrap:break-word;">{{ $item->description }}</div>
+                <div style="font-size:9pt;color:#333333;line-height:1.8;white-space:pre-wrap;word-wrap:break-word;">@php
+                    $lines = array_filter(array_map('trim', explode("\n", $item->description)));
+                    echo implode("</div><div style=\"font-size:9pt;color:#333333;line-height:1.8;margin:4px 0;\">", $lines);
+                @endphp</div>
                 @endif
             </td>
             @if($hasQtyPrice)
-            <td class="c" style="font-weight:bold;">{{ $item->quantity }}</td>
-            <td class="r" style="font-weight:bold;">LKR {{ number_format($item->unit_price, 2) }}</td>
+            <td class="c" style="font-weight:bold;vertical-align:top;">{{ $item->quantity }}</td>
+            <td class="r" style="font-weight:bold;vertical-align:top;">LKR {{ number_format($item->unit_price, 2) }}</td>
             @endif
         </tr>
         @endforeach

@@ -190,9 +190,9 @@
                                     placeholder="Item name">
                             </td>
                             <td class="px-4 py-3">
-                                <textarea :name="`items[${index}][description]`" x-model="item.description" rows="2"
-                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition resize-none"
-                                    placeholder="Description..."></textarea>
+                                <textarea :name="`items[${index}][description]`" x-model="item.description" rows="3"
+                                    class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition resize-none font-mono"
+                                    placeholder="Enter features/details (one per line)&#10;- Fully Responsive Design&#10;- SEO Optimized&#10;- Mobile Friendly"></textarea>
                             </td>
                             <td class="px-4 py-3">
                                 <input type="number" :name="`items[${index}][quantity]`" x-model.number="item.quantity" @input="calcRow(index)"
