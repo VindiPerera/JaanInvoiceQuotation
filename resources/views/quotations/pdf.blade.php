@@ -168,10 +168,13 @@ body {
 </div>
 @endif
 
-@php $quoteType = $quotation->quote_type ?? 'full_set'; @endphp
+@php
+$quoteType = $quotation->quote_type ?? 'full_set';
+$visibleItems = $quotation->items->where('is_hidden', false);
+@endphp
 
 {{-- HARDWARE PACKAGE --}}
-@if($quoteType !== 'software_only' && $quotation->items->count())
+@if($quoteType !== 'software_only' && $visibleItems->count() > 0)
 <div class="sec">Software/Hardware/Services</div>
 <hr class="rule">
 <table class="tbl" style="margin-bottom:8px;">
@@ -184,7 +187,7 @@ body {
         </tr>
     </thead>
     <tbody>
-        @foreach($quotation->items as $item)
+        @foreach($visibleItems as $item)
         @php
             $lines = array_values(array_filter(array_map('rtrim', explode("\n", $item->description))));
             $specs = array_slice($lines, 1);

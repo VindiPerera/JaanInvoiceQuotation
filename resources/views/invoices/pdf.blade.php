@@ -157,6 +157,8 @@ body {
 <hr style="border:none;border-top:1px solid #111111;margin-bottom:16px;">
 
 {{-- ITEMS --}}
+@php $visibleItems = $invoice->items->where('is_hidden', false); @endphp
+@if($visibleItems->count() > 0)
 <div class="sec">SOFTWARE/HARDWARE/SERVICES
 </div>
 <hr class="rule">
@@ -171,7 +173,7 @@ body {
         </tr>
     </thead>
     <tbody>
-        @foreach($invoice->items as $item)
+        @foreach($visibleItems as $item)
         <tr>
             <td class="c" style="font-weight:bold;">{{ $item->item_number }}</td>
             <td>{{ $item->item_name }}@if($item->warranty) <span style="color:#7f1d1d;">[{{ $item->warranty }}]</span>@endif</td>
@@ -182,6 +184,7 @@ body {
         @endforeach
     </tbody>
 </table>
+@endif
 
 {{-- TOTALS --}}
 <table width="100%" cellpadding="0" cellspacing="0">

@@ -3,182 +3,165 @@
 @section('breadcrumb', 'Quotations / ' . $quotation->quotation_number)
 
 @section('header-actions')
-    <a href="{{ route('quotations.pdf', $quotation) }}" class="inline-flex items-center gap-2 bg-red-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-red-700 transition">
-        <i class="fa-solid fa-file-pdf"></i> Download PDF
-    </a>
-    <a href="{{ route('quotations.edit', $quotation) }}" class="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-50 transition">
-        <i class="fa-solid fa-pencil"></i> Edit
-    </a>
-    <a href="{{ route('quotations.convert', $quotation) }}" class="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-50 transition">
-        <i class="fa-solid fa-arrow-right-arrow-left"></i> Convert to Invoice
-    </a>
+    <x-button href="{{ route('quotations.pdf', $quotation) }}" variant="danger" icon="fa-file-pdf">
+        Download PDF
+    </x-button>
+    <x-button href="{{ route('quotations.edit', $quotation) }}" variant="secondary" icon="fa-pencil">
+        Edit
+    </x-button>
+    <x-button href="{{ route('quotations.convert', $quotation) }}" variant="success" icon="fa-arrow-right-arrow-left">
+        Convert to Invoice
+    </x-button>
 @endsection
 
 @section('content')
-<div style="max-width:860px;">
+<div class="space-y-6 max-w-4xl">
+    {{-- Quotation Header --}}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <x-stat-card
+            title="Quotation Total"
+            value="LKR {{ number_format($quotation->total_amount) }}"
+            color="blue"
+        />
+        <x-stat-card
+            title="Status"
+            value="{{ ucfirst($quotation->status) }}"
+            color="indigo"
+        />
+        <x-stat-card
+            title="Date"
+            value="{{ $quotation->quotation_date->format('d M Y') }}"
+            color="slate"
+        />
+    </div>
 
-{{-- Paper preview --}}
-<div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;
-            box-shadow:0 2px 8px rgba(0,0,0,0.07);margin-bottom:20px;
-            font-family:Arial,sans-serif;font-size:10pt;color:#1a1a1a;line-height:1.5;">
-<style>
-.qpv-tbl  { width:100%;border-collapse:collapse; }
-.qpv-tbl thead tr { background:#b91c1c;color:#fff; }
-.qpv-tbl th  { padding:8px;font-size:8pt;font-weight:bold;text-align:left;text-transform:uppercase;letter-spacing:0.5px;border:none; }
-.qpv-tbl th.r { text-align:right; }
-.qpv-tbl th.c { text-align:center; }
-.qpv-tbl td  { padding:7px 8px;border-bottom:1px dashed #fecaca;font-size:9pt;vertical-align:top; }
-.qpv-tbl td.r { text-align:right; }
-.qpv-tbl td.c { text-align:center; }
-.qpv-tbl tbody tr:nth-child(odd)  { background:#fff; }
-.qpv-tbl tbody tr:nth-child(even) { background:#fef2f2; }
-.qpv-tbl tbody tr:last-child td { border-bottom:1px solid #111; }
-.qpv-th  { font-size:9pt;font-weight:bold;color:#1a1a1a;margin:7px 0 2px; }
-.qpv-ts  { font-size:8.5pt;font-weight:bold;color:#333;margin:5px 0 2px; }
-.qpv-tb  { font-size:8.5pt;color:#444;margin-bottom:3px; }
-.qpv-tbu { font-size:8.5pt;color:#333;padding-left:10px;margin-bottom:3px; }
-.qpv-doc-title { text-align:center;font-size:16pt;font-weight:bold;letter-spacing:5px;margin:8px 0 12px;padding:8px 0;border-top:2px solid #b91c1c;border-bottom:1px solid #b91c1c;border-left:1px solid #fecaca;border-right:1px solid #fecaca;background:#fef2f2;color:#b91c1c; }
-.qpv-section { font-weight:bold;font-size:8.2pt;text-transform:uppercase;letter-spacing:1.6px;margin:16px 0 4px;color:#b91c1c;display:inline-block;padding:4px 10px 4px 8px;border-left:3px solid #b91c1c;background:#fef2f2;border-radius:2px; }
-.qpv-rule { border:none;border-top:1px solid #b91c1c;margin:0 0 8px; }
-</style>
-
-@php $logoPath = !empty($settings['company_logo']) ? public_path($settings['company_logo']) : null; @endphp
-
-{{-- LETTERHEAD --}}
-<table width="100%" cellpadding="0" cellspacing="0" style="padding:14px 20px 10px;border-bottom:2px solid #b91c1c;table-layout:fixed;">
-    <tr>
-        <td width="60%" style="vertical-align:bottom;padding-right:10px;">
-            @if($logoPath && file_exists($logoPath))
-                <img src="{{ $logoPath }}" alt="Logo" style="max-height:48px;max-width:140px;display:block;margin-bottom:6px;">
-            @endif
-            <div style="font-size:14pt;font-weight:bold;line-height:1.15;letter-spacing:0.3px;color:#111111;">
-                {{ $settings['company_name'] ?? 'JAAN NETWORK PVT. LTD.' }}
+    {{-- Quotation Details --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {{-- Bill To --}}
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+            <h3 class="text-lg font-bold text-slate-900 mb-4">Bill To</h3>
+            <div class="space-y-2">
+                <p class="text-sm text-slate-600"><span class="font-semibold text-slate-900">{{ $quotation->customer_name }}</span></p>
+                @if($quotation->customer_address)
+                    <p class="text-sm text-slate-600">{{ $quotation->customer_address }}</p>
+                @endif
+                @if($quotation->customer_contact)
+                    <p class="text-sm text-slate-600">{{ $quotation->customer_contact }}</p>
+                @endif
             </div>
-            <div style="font-size:8.5pt;color:#b91c1c;margin-top:2px;">
-                Professional IT Solutions &amp; Services
+        </div>
+
+        {{-- Quotation Info --}}
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+            <h3 class="text-lg font-bold text-slate-900 mb-4">Quotation Details</h3>
+            <div class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Quotation Number</span>
+                    <span class="font-semibold text-slate-900">{{ $quotation->quotation_number }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Quotation Date</span>
+                    <span class="font-semibold text-slate-900">{{ $quotation->quotation_date->format('d M Y') }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Status</span>
+                    <span class="font-bold">
+                        @if($quotation->status === 'accepted')
+                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs">Accepted</span>
+                        @elseif($quotation->status === 'rejected')
+                            <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs">Rejected</span>
+                        @elseif($quotation->status === 'sent')
+                            <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">Sent</span>
+                        @elseif($quotation->status === 'finalized')
+                            <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">Finalized</span>
+                        @else
+                            <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs">Draft</span>
+                        @endif
+                    </span>
+                </div>
             </div>
-        </td>
-        <td width="40%" style="vertical-align:bottom;text-align:right;font-size:8.5pt;line-height:1.85;color:#111111;">
-            @if(!empty($settings['company_phone'])){{ $settings['company_phone'] }}<br>@endif
-            @if(!empty($settings['company_email'])){{ $settings['company_email'] }}<br>@endif
-            @if(!empty($settings['company_address'])){{ $settings['company_address'] }}@endif
-        </td>
-    </tr>
-</table>
+        </div>
+    </div>
 
-{{-- DOCUMENT TITLE --}}
-<div class="qpv-doc-title">Q U O T A T I O N</div>
+    {{-- Project Overview --}}
+    @if($quotation->project_overview)
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+        <h3 class="text-lg font-bold text-slate-900 mb-4">Project Overview</h3>
+        <p class="text-slate-700 text-sm leading-relaxed whitespace-pre-wrap">{{ $quotation->project_overview }}</p>
+    </div>
+    @endif
 
-{{-- BILLING + DOC DETAILS --}}
-<div style="padding:0 20px 20px;">
-<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
-    <tr>
-        <td width="58%" style="vertical-align:top;padding:10px 14px 10px 12px;background:#fef2f2;border:1px solid #fecaca;border-top:2px solid #b91c1c;">
-            <div style="font-size:7.5pt;text-transform:uppercase;letter-spacing:1.5px;color:#7f1d1d;margin-bottom:6px;">Bill To</div>
-            <div style="font-weight:bold;font-size:11pt;line-height:1.3;margin-bottom:4px;">{{ $quotation->customer_name }}</div>
-            @if($quotation->customer_address)
-            <div style="font-size:9pt;color:#111111;margin-bottom:2px;">{{ $quotation->customer_address }}</div>
-            @endif
-            @if($quotation->customer_contact)
-            <div style="font-size:9pt;color:#111111;">{{ $quotation->customer_contact }}</div>
-            @endif
-        </td>
-        <td width="42%" style="vertical-align:top;padding:10px 12px;background:#fee2e2;border:1px solid #fecaca;border-top:2px solid #b91c1c;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="font-size:9pt;line-height:1.8;color:#111111;">
-                <tr>
-                    <td style="font-weight:bold;width:48%;">Quotation No</td>
-                    <td style="text-align:right;">:&nbsp;{{ $quotation->quotation_number }}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight:bold;">Date</td>
-                    <td style="text-align:right;">:&nbsp;{{ $quotation->quotation_date->format('d M Y') }}</td>
-                </tr>
+    {{-- Line Items Table --}}
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+        <div class="p-6 border-b border-slate-200">
+            <h3 class="text-lg font-bold text-slate-900">Line Items</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b border-slate-200 bg-slate-50">
+                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-700">#</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-700">Description</th>
+                        <th class="px-6 py-3 text-center text-xs font-bold text-slate-700">Qty</th>
+                        <th class="px-6 py-3 text-right text-xs font-bold text-slate-700">Unit Price</th>
+                        <th class="px-6 py-3 text-right text-xs font-bold text-slate-700">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($quotation->items->where('is_hidden', false) as $item)
+                    <tr class="border-b border-slate-200 hover:bg-slate-50">
+                        <td class="px-6 py-3 font-semibold text-slate-900">{{ $item->item_number }}</td>
+                        <td class="px-6 py-3">
+                            <div class="font-medium text-slate-900">{{ $item->item_name }}</div>
+                            @if($item->description)
+                                <div class="text-xs text-slate-500">{{ $item->description }}</div>
+                            @endif
+                        </td>
+                        <td class="px-6 py-3 text-center">{{ number_format((float)$item->quantity, 0) }}</td>
+                        <td class="px-6 py-3 text-right">LKR {{ number_format((float)$item->unit_price) }}</td>
+                        <td class="px-6 py-3 text-right font-bold text-slate-900">LKR {{ number_format((float)$item->total) }}</td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-8 text-center text-slate-500">No items to display</td>
+                    </tr>
+                    @endforelse
+                </tbody>
             </table>
-        </td>
-    </tr>
-</table>
+        </div>
 
-{{-- ITEMS --}}
-@if($quotation->items->count())
-<div class="qpv-section">SOFTWARE/HARDWARE/SERVICES</div>
-<hr class="qpv-rule">
-<table class="qpv-tbl" style="margin-bottom:16px;">
-    <thead>
-        <tr>
-            <th style="width:36px;">No.</th>
-            <th>Description</th>
-            <th class="c" style="width:52px;">Qty</th>
-            <th class="r" style="width:96px;">Unit Price</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($quotation->items as $item)
-        <tr>
-            <td class="c" style="font-weight:bold;">{{ $item->item_number }}</td>
-            <td>{{ $item->item_name ?? $item->description }}</td>
-            <td class="c">{{ number_format((float)$item->quantity, 0) }}</td>
-            <td class="r">{{ number_format((float)$item->unit_price) }}</td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
-@endif
-
-{{-- SOFTWARE FEATURES --}}
-@if(!empty($quotation->software_features))
-<div class="qpv-section">Software Features</div>
-<hr class="qpv-rule">
-<div style="margin-bottom:16px;padding:0 8px;font-size:9pt;line-height:1.8;">
-    @foreach($quotation->software_features as $f)
-        @php $kind = is_array($f) ? ($f['kind'] ?? 'item') : 'item'; $text = is_array($f) ? ($f['text'] ?? '') : $f; @endphp
-        @if($kind === 'space')<div style="height:6pt;"></div>
-        @elseif($kind === 'heading')
-            <div style="font-size:9pt;font-weight:bold;color:#1a1a1a;border-bottom:1px dashed #fecaca;padding-bottom:3px;margin:7px 0 6px;">{{ $text }}</div>
-        @else
-            @php $parts = explode(' - ', $text, 2); @endphp
-            <div style="margin-bottom:4px;">
-                <span style="color:#b91c1c;font-weight:bold;">✓</span>&nbsp;<strong>{{ $parts[0] }}</strong>@if(isset($parts[1]))<span style="color:#555;"> - {{ $parts[1] }}</span>@endif
+        {{-- Total --}}
+        <div class="bg-slate-50 border-t border-slate-200 p-6">
+            <div class="flex justify-end max-w-sm space-y-3">
+                <div class="w-full">
+                    <div class="flex justify-between pt-2">
+                        <span class="font-bold text-slate-900 text-lg">Total (LKR)</span>
+                        <span class="font-bold text-blue-600 text-lg">{{ number_format($quotation->total_amount) }}</span>
+                    </div>
+                </div>
             </div>
-        @endif
-    @endforeach
-</div>
-@endif
+        </div>
+    </div>
 
-{{-- TOTALS --}}
-<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
-    <tr>
-        <td></td>
-        <td style="padding:8px 8px;font-size:9.5pt;font-weight:bold;
-                   border-top:1px solid #111111;border-bottom:3px double #111111;">TOTAL (LKR)</td>
-        <td style="padding:8px 8px;text-align:right;font-size:13pt;font-weight:bold;
-                   white-space:nowrap;border-top:1px solid #111111;border-bottom:3px double #111111;background:#b91c1c;color:#fff;">
-            {{ number_format((float)$quotation->total_amount) }}
-        </td>
-    </tr>
-</table>
+    {{-- Terms and Conditions --}}
+    @if($quotation->terms_and_conditions)
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+        <h3 class="text-lg font-bold text-slate-900 mb-4">Terms & Conditions</h3>
+        <p class="text-slate-700 text-sm leading-relaxed whitespace-pre-wrap">{{ $quotation->terms_and_conditions }}</p>
+    </div>
+    @endif
 
-{{-- CLOSING --}}
-<hr style="border:none;border-top:1px solid #b91c1c;margin-top:18px;margin-bottom:8px;">
-<div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:3px;color:#111111;">
-    Thank you for choosing {{ $settings['company_name'] ?? 'JAAN Network (Pvt) Ltd' }}
-</div>
-<div style="text-align:center;font-size:8pt;color:#b91c1c;">
-    For inquiries: {{ $settings['company_phone'] ?? '' }}@if(!empty($settings['company_email'])) &nbsp;/&nbsp; {{ $settings['company_email'] }}@endif
-</div>
-
-</div>{{-- end body --}}
-</div>{{-- end paper --}}
-
-<div class="flex items-center gap-3 mt-2">
-    <a href="{{ route('quotations.index') }}" class="text-sm text-gray-500 hover:text-gray-700">
-        <i class="fa-solid fa-arrow-left mr-1"></i> Back to list
-    </a>
-    <form method="POST" action="{{ route('quotations.destroy', $quotation) }}" onsubmit="return confirm('Delete this quotation?')">
-        @csrf @method('DELETE')
-        <button type="submit" class="text-sm text-red-500 hover:text-red-700">
-            <i class="fa-solid fa-trash mr-1"></i> Delete
-        </button>
-    </form>
-</div>
+    {{-- Actions --}}
+    <div class="flex gap-3">
+        <x-button href="{{ route('quotations.index') }}" variant="outline" icon="fa-arrow-left">
+            Back to Quotations
+        </x-button>
+        <form method="POST" action="{{ route('quotations.destroy', $quotation) }}" class="inline" onsubmit="return confirm('Delete this quotation?');">
+            @csrf @method('DELETE')
+            <x-button type="submit" variant="danger" icon="fa-trash">
+                Delete Quotation
+            </x-button>
+        </form>
+    </div>
 </div>
 @endsection

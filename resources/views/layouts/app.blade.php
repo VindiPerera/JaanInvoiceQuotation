@@ -4,114 +4,190 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'JAAN Invoice') }} – @yield('title', 'Dashboard')</title>
+    <title>{{ config('app.name', 'JAAN') }} – @yield('title', 'Dashboard')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @stack('styles')
-</head>
-<body class="font-sans antialiased bg-gray-50 text-gray-800">
+    <style>
+        :root {
+            --primary: #2563EB;
+            --secondary: #6366F1;
+            --success: #22C55E;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --bg: #F8FAFC;
+            --surface: #FFFFFF;
+            --text-primary: #0F172A;
+            --text-secondary: #64748B;
+            --border: #E2E8F0;
+        }
 
-<div class="flex h-screen overflow-hidden">
-    {{-- Sidebar --}}
-    <aside class="w-60 bg-white border-r border-gray-200 flex flex-col shrink-0">
-        <div class="flex items-center gap-3 px-5 py-4 border-b border-gray-200">
-            <img src="{{ asset('images/company_logo.jpg') }}" alt="JAAN Network" class="h-10 w-auto object-contain">
+        * {
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+
+<div class="flex h-screen bg-slate-50">
+    {{-- Modern Sidebar --}}
+    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 shadow-sm lg:relative fixed left-0 top-0 h-full z-40 lg:z-auto" id="sidebar">
+        {{-- Logo Section --}}
+        <div class="p-6 border-b border-slate-200 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg">
+                    J
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold text-slate-900">JAAN</h1>
+                    <p class="text-xs text-slate-500">Invoice Suite</p>
+                </div>
+            </div>
+            <button class="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition" onclick="document.getElementById('sidebar').classList.toggle('-translate-x-full')">
+                <i class="fas fa-times text-slate-600"></i>
+            </button>
         </div>
 
-        <nav class="flex-1 px-3 py-4 space-y-1">
-            <a href="{{ route('dashboard') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('dashboard') ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                <i class="fa-solid fa-gauge-high w-4"></i> Dashboard
-            </a>
-            <div class="pt-3 pb-1">
-                <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Documents</p>
+        {{-- Navigation --}}
+        <nav class="flex-1 overflow-y-auto px-4 py-6 space-y-1">
+            {{-- Main Section --}}
+            <div class="mb-6">
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm transition {{ request()->routeIs('dashboard') ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50' }}">
+                    <i class="fas fa-chart-line w-5"></i>
+                    <span>Dashboard</span>
+                </a>
             </div>
-            <a href="{{ route('quotations.index') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('quotations.*') ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                <i class="fa-solid fa-file-invoice w-4"></i> Quotations
-            </a>
-            <a href="{{ route('invoices.index') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('invoices.*') ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                <i class="fa-solid fa-receipt w-4"></i> Invoices
-            </a>
-            <div class="pt-3 pb-1">
-                <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Management</p>
-            </div>
-            <a href="{{ route('customers.index') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('customers.*') ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                <i class="fa-solid fa-users w-4"></i> Customers
-            </a>
-            @if(auth()->user()->is_admin)
-                <div class="pt-3 pb-1">
-                    <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">System</p>
+
+            {{-- Documents Section --}}
+            <div>
+                <h3 class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Documents</h3>
+                <div class="space-y-1">
+                    <a href="{{ route('quotations.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm transition {{ request()->routeIs('quotations.*') ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50' }}">
+                        <i class="fas fa-file-lines w-5"></i>
+                        <span>Quotations</span>
+                    </a>
+                    <a href="{{ route('invoices.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm transition {{ request()->routeIs('invoices.*') ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50' }}">
+                        <i class="fas fa-receipt w-5"></i>
+                        <span>Invoices</span>
+                    </a>
                 </div>
-                <a href="{{ route('quote-templates.index') }}"
-                   class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('quote-templates.*') ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                    <i class="fa-solid fa-layer-group w-4"></i> Quote Templates
-                </a>
-                <a href="{{ route('hardware-catalog.index') }}"
-                   class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('hardware-catalog.*') ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                    <i class="fa-solid fa-microchip w-4"></i> Software/Hardware/Services
-                </a>
-                <a href="{{ route('settings.index') }}"
-                   class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('settings.*') ? 'bg-red-50 text-red-700' : 'text-gray-600 hover:bg-gray-50' }}">
-                    <i class="fa-solid fa-gear w-4"></i> Settings
-                </a>
+            </div>
+
+            {{-- Management Section --}}
+            <div class="pt-6 border-t border-slate-200">
+                <h3 class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Management</h3>
+                <div class="space-y-1">
+                    <a href="{{ route('customers.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm transition {{ request()->routeIs('customers.*') ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50' }}">
+                        <i class="fas fa-people-group w-5"></i>
+                        <span>Customers</span>
+                    </a>
+                </div>
+            </div>
+
+            {{-- Admin Section --}}
+            @if(auth()->user()->is_admin)
+            <div class="pt-6 border-t border-slate-200">
+                <h3 class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Administration</h3>
+                <div class="space-y-1">
+                    <a href="{{ route('quote-templates.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm transition {{ request()->routeIs('quote-templates.*') ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50' }}">
+                        <i class="fas fa-layer-group w-5"></i>
+                        <span>Templates</span>
+                    </a>
+                    <a href="{{ route('hardware-catalog.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm transition {{ request()->routeIs('hardware-catalog.*') ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50' }}">
+                        <i class="fas fa-microchip w-5"></i>
+                        <span>Catalog</span>
+                    </a>
+                    <a href="{{ route('settings.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm transition {{ request()->routeIs('settings.*') ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600' : 'text-slate-600 hover:bg-slate-50' }}">
+                        <i class="fas fa-cog w-5"></i>
+                        <span>Settings</span>
+                    </a>
+                </div>
+            </div>
             @endif
         </nav>
 
-        <div class="px-3 py-4 border-t border-gray-200">
-            <div class="flex items-center gap-3 px-3 py-2">
-                <div class="w-7 h-7 rounded-full bg-red-100 flex items-center justify-center">
-                    <span class="text-red-600 font-bold text-xs">{{ substr(auth()->user()->name, 0, 1) }}</span>
+        {{-- User Profile Card --}}
+        <div class="p-6 border-t border-slate-200 bg-gradient-to-b from-slate-50 to-white">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                    {{ substr(auth()->user()->name, 0, 1) }}
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-gray-800 truncate">{{ auth()->user()->name }}</p>
+                    <p class="text-sm font-semibold text-slate-900 truncate">{{ auth()->user()->name }}</p>
+                    <p class="text-xs text-slate-500">Administrator</p>
                 </div>
             </div>
-            <form method="POST" action="{{ route('logout') }}" class="mt-1">
+            <form method="POST" action="{{ route('logout') }}" class="w-full">
                 @csrf
-                <button type="submit" class="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition">
-                    <i class="fa-solid fa-right-from-bracket w-4"></i> Sign out
+                <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 font-medium text-sm rounded-lg transition duration-200">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Sign Out</span>
                 </button>
             </form>
         </div>
     </aside>
 
-    {{-- Main content --}}
-    <div class="flex-1 flex flex-col overflow-hidden">
-        <header class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between shrink-0">
-            <div>
-                <h1 class="text-lg font-semibold text-gray-900">@yield('title', 'Dashboard')</h1>
-                @hasSection('breadcrumb')
-                    <p class="text-xs text-gray-400 mt-0.5">@yield('breadcrumb')</p>
-                @endif
+    {{-- Main Content --}}
+    <div class="flex-1 flex flex-col overflow-hidden lg:ml-0">
+        {{-- Top Navigation --}}
+        <header class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shrink-0 shadow-xs">
+            <div class="flex items-center gap-4">
+                <button class="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition" onclick="document.getElementById('sidebar').classList.toggle('-translate-x-full')">
+                    <i class="fas fa-bars text-slate-700 text-lg"></i>
+                </button>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900">@yield('title', 'Dashboard')</h1>
+                    @hasSection('breadcrumb')
+                        <p class="text-xs text-slate-500 mt-0.5">@yield('breadcrumb')</p>
+                    @endif
+                </div>
             </div>
-            <div class="flex items-center gap-3">
+
+            {{-- Header Actions --}}
+            <div class="flex items-center gap-4">
                 @yield('header-actions')
             </div>
         </header>
 
-        @if(session('success'))
-            <div class="mx-6 mt-4 flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-2.5 rounded-lg" x-data="{ show: true }" x-show="show">
-                <i class="fa-solid fa-circle-check"></i>
-                {{ session('success') }}
-                <button class="ml-auto text-green-400 hover:text-green-600" @click="show=false"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-        @endif
-        @if(session('error'))
-            <div class="mx-6 mt-4 flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-2.5 rounded-lg" x-data="{ show: true }" x-show="show">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                {{ session('error') }}
-                <button class="ml-auto text-red-400 hover:text-red-600" @click="show=false"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-        @endif
+        {{-- Notifications --}}
+        <div class="px-6 pt-4">
+            @if(session('success'))
+                <div class="flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3.5 rounded-xl shadow-sm mb-4" x-data="{ show: true }" x-show="show" x-transition>
+                    <i class="fas fa-check-circle text-lg"></i>
+                    <span class="font-medium">{{ session('success') }}</span>
+                    <button class="ml-auto p-1 hover:bg-emerald-100 rounded transition" @click="show=false">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            @endif
+            @if(session('error'))
+                <div class="flex items-center gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3.5 rounded-xl shadow-sm mb-4" x-data="{ show: true }" x-show="show" x-transition>
+                    <i class="fas fa-exclamation-circle text-lg"></i>
+                    <span class="font-medium">{{ session('error') }}</span>
+                    <button class="ml-auto p-1 hover:bg-red-100 rounded transition" @click="show=false">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            @endif
+        </div>
 
-        <main class="flex-1 overflow-y-auto p-6">
+        {{-- Main Content Area --}}
+        <main class="flex-1 overflow-y-auto px-6 pb-6">
             @yield('content')
         </main>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 @stack('scripts')
 </body>
 </html>

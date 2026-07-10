@@ -70,7 +70,6 @@ class InvoiceController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'invoice_number' => 'required|unique:invoices,invoice_number',
             'invoice_date'   => 'required|date',
             'customer_name'  => 'required|string|max:255',
         ]);
@@ -78,8 +77,15 @@ class InvoiceController extends Controller
         DB::transaction(function () use ($request) {
             $status   = in_array($request->payment_status, ['pending', 'paid']) ? $request->payment_status : 'pending';
             $subtotal = 0;
+
+            // Generate unique invoice number (regenerate if duplicate exists)
+            $invoiceNumber = $request->invoice_number;
+            if (Invoice::where('invoice_number', $invoiceNumber)->exists()) {
+                $invoiceNumber = Invoice::generateNumber();
+            }
+
             $invoice = Invoice::create([
-                'invoice_number'   => $request->invoice_number,
+                'invoice_number'   => $invoiceNumber,
                 'invoice_date'     => $request->invoice_date,
                 'customer_id'      => $request->customer_id ?: null,
                 'quotation_id'     => $request->quotation_id ?: null,
@@ -99,6 +105,7 @@ class InvoiceController extends Controller
                 foreach ($request->items as $i => $item) {
                     if (empty($item['item_name']) && empty($item['description'])) { continue; }
                     $total = ($item['quantity'] ?? 1) * ($item['unit_price'] ?? 0);
+                    $isHidden = (bool) ($item['is_hidden'] ?? false);
                     InvoiceItem::create([
                         'invoice_id'  => $invoice->id,
                         'item_number' => $i + 1,
@@ -108,17 +115,20 @@ class InvoiceController extends Controller
                         'unit_price'  => $item['unit_price'] ?? 0,
                         'warranty'    => $item['warranty'] ?? null,
                         'total'       => $total,
+                        'is_hidden'   => $isHidden,
                     ]);
                     $subtotal += $total;
                 }
             }
 
-            $grandTotal = $subtotal + ($request->tax_amount ?? 0);
+            $calculatedTotal = $subtotal + ($request->tax_amount ?? 0);
+            $finalTotal = !empty($request->manual_total) ? (float) $request->manual_total : $calculatedTotal;
+
             $invoice->update([
                 'subtotal'       => $subtotal,
-                'total_amount'   => $grandTotal,
-                'paid_amount'    => $status === 'paid' ? $grandTotal : 0,
-                'balance'        => $status === 'paid' ? 0 : $grandTotal,
+                'total_amount'   => $finalTotal,
+                'paid_amount'    => $status === 'paid' ? $finalTotal : 0,
+                'balance'        => $status === 'paid' ? 0 : $finalTotal,
                 'payment_status' => $status,
             ]);
         });
@@ -172,6 +182,7 @@ class InvoiceController extends Controller
                 foreach ($request->items as $i => $item) {
                     if (empty($item['item_name']) && empty($item['description'])) { continue; }
                     $total = ($item['quantity'] ?? 1) * ($item['unit_price'] ?? 0);
+                    $isHidden = (bool) ($item['is_hidden'] ?? false);
                     InvoiceItem::create([
                         'invoice_id'  => $invoice->id,
                         'item_number' => $i + 1,
@@ -181,17 +192,20 @@ class InvoiceController extends Controller
                         'unit_price'  => $item['unit_price'] ?? 0,
                         'warranty'    => $item['warranty'] ?? null,
                         'total'       => $total,
+                        'is_hidden'   => $isHidden,
                     ]);
                     $subtotal += $total;
                 }
             }
 
-            $newTotal = $subtotal + ($request->tax_amount ?? 0);
+            $calculatedTotal = $subtotal + ($request->tax_amount ?? 0);
+            $finalTotal = !empty($request->manual_total) ? (float) $request->manual_total : $calculatedTotal;
+
             $invoice->update([
                 'subtotal'       => $subtotal,
-                'total_amount'   => $newTotal,
-                'paid_amount'    => $status === 'paid' ? $newTotal : $invoice->paid_amount,
-                'balance'        => $status === 'paid' ? 0 : $newTotal - $invoice->paid_amount,
+                'total_amount'   => $finalTotal,
+                'paid_amount'    => $status === 'paid' ? $finalTotal : $invoice->paid_amount,
+                'balance'        => $status === 'paid' ? 0 : $finalTotal - $invoice->paid_amount,
                 'payment_status' => $status,
             ]);
         });

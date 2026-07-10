@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class InvoiceItem extends Model
 {
     protected $fillable = [
-        'invoice_id', 'item_number', 'item_name', 'description', 'quantity', 'unit_price', 'total', 'warranty',
+        'invoice_id', 'item_number', 'item_name', 'description', 'quantity', 'unit_price', 'total', 'warranty', 'is_hidden',
     ];
 
     protected $casts = [

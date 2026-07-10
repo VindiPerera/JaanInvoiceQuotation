@@ -42,8 +42,15 @@ class Quotation extends Model
 
     public static function generateNumber(): string
     {
-        $last = static::withTrashed()->orderBy('id', 'desc')->first();
+        // Get the highest numeric part from existing quotation numbers
+        $last = static::withTrashed()->where('quotation_number', 'like', 'QT-%')->orderByRaw('CAST(SUBSTRING(quotation_number, 4) AS UNSIGNED) DESC')->first();
         $next = $last ? ((int) substr($last->quotation_number, 3)) + 1 : 1;
+
+        // Ensure uniqueness by incrementing if number already exists
+        while (static::where('quotation_number', 'QT-' . str_pad($next, 4, '0', STR_PAD_LEFT))->exists()) {
+            $next++;
+        }
+
         return 'QT-' . str_pad($next, 4, '0', STR_PAD_LEFT);
     }
 }

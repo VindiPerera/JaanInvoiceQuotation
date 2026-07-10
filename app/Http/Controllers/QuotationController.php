@@ -67,7 +67,6 @@ class QuotationController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'quotation_number' => 'required|unique:quotations,quotation_number',
             'quotation_date'   => 'required|date',
             'customer_name'    => 'required|string|max:255',
         ]);
@@ -76,8 +75,14 @@ class QuotationController extends Controller
             $quoteType = in_array($request->quote_type, ['full_set', 'software_only', 'hardware_only'])
                 ? $request->quote_type : 'full_set';
 
+            // Generate unique quotation number (regenerate if duplicate exists)
+            $quotationNumber = $request->quotation_number;
+            if (Quotation::where('quotation_number', $quotationNumber)->exists()) {
+                $quotationNumber = Quotation::generateNumber();
+            }
+
             $quotation = Quotation::create([
-                'quotation_number'    => $request->quotation_number,
+                'quotation_number'    => $quotationNumber,
                 'quotation_date'      => $request->quotation_date,
                 'customer_id'         => $request->customer_id ?: null,
                 'customer_name'       => $request->customer_name,
@@ -99,6 +104,7 @@ class QuotationController extends Controller
                     $total = ($item['quantity'] ?? 1) * ($item['unit_price'] ?? 0);
                     $description = $item['description'];
                     $itemName = $item['item_name'] ?? $this->extractItemName($description);
+                    $isHidden = (bool) ($item['is_hidden'] ?? false);
                     QuotationItem::create([
                         'quotation_id' => $quotation->id,
                         'item_number'  => $i + 1,
@@ -109,14 +115,18 @@ class QuotationController extends Controller
                         'warranty'     => $item['warranty'] ?? null,
                         'total'        => $total,
                         'item_type'    => $item['item_type'] ?? 'hardware',
+                        'is_hidden'    => $isHidden,
                     ]);
                     $subtotal += $total;
                 }
             }
 
+            $calculatedTotal = $subtotal + ($request->tax_amount ?? 0);
+            $finalTotal = !empty($request->manual_total) ? (float) $request->manual_total : $calculatedTotal;
+
             $quotation->update([
                 'subtotal'     => $subtotal,
-                'total_amount' => $subtotal + ($request->tax_amount ?? 0),
+                'total_amount' => $finalTotal,
             ]);
         });
 
@@ -178,6 +188,7 @@ class QuotationController extends Controller
                     $total = ($item['quantity'] ?? 1) * ($item['unit_price'] ?? 0);
                     $description = $item['description'];
                     $itemName = $item['item_name'] ?? $this->extractItemName($description);
+                    $isHidden = (bool) ($item['is_hidden'] ?? false);
                     QuotationItem::create([
                         'quotation_id' => $quotation->id,
                         'item_number'  => $i + 1,
@@ -188,14 +199,18 @@ class QuotationController extends Controller
                         'warranty'     => $item['warranty'] ?? null,
                         'total'        => $total,
                         'item_type'    => $item['item_type'] ?? 'hardware',
+                        'is_hidden'    => $isHidden,
                     ]);
                     $subtotal += $total;
                 }
             }
 
+            $calculatedTotal = $subtotal + ($request->tax_amount ?? 0);
+            $finalTotal = !empty($request->manual_total) ? (float) $request->manual_total : $calculatedTotal;
+
             $quotation->update([
                 'subtotal'     => $subtotal,
-                'total_amount' => $subtotal + ($request->tax_amount ?? 0),
+                'total_amount' => $finalTotal,
             ]);
         });
 

@@ -1,320 +1,292 @@
 @extends('layouts.app')
-@section('title', $invoice->invoice_number)
+@section('title', 'View Invoice ' . $invoice->invoice_number)
 @section('breadcrumb', 'Invoices / ' . $invoice->invoice_number)
 
 @section('header-actions')
-    <a href="{{ route('invoices.pdf', $invoice) }}" class="inline-flex items-center gap-2 bg-red-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-red-700 transition">
-        <i class="fa-solid fa-file-pdf"></i> Download PDF
-    </a>
-    <a href="{{ route('invoices.edit', $invoice) }}" class="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-50 transition">
-        <i class="fa-solid fa-pencil"></i> Edit
-    </a>
+    <x-button href="{{ route('invoices.pdf', $invoice) }}" variant="danger" icon="fa-file-pdf">
+        Download PDF
+    </x-button>
+    <x-button href="{{ route('invoices.edit', $invoice) }}" variant="primary" icon="fa-pencil">
+        Edit Invoice
+    </x-button>
     @if($invoice->payment_status !== 'paid')
-    <button onclick="document.getElementById('paymentModal').classList.remove('hidden')"
-        class="inline-flex items-center gap-2 bg-green-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-green-700 transition">
-        <i class="fa-solid fa-money-bill"></i> Record Payment
-    </button>
+        <x-button @click="showPaymentModal = true" variant="success" icon="fa-money-bill">
+            Record Payment
+        </x-button>
     @endif
 @endsection
 
 @section('content')
-<div style="max-width:860px;">
+<div x-data="{ showPaymentModal: false }" class="space-y-6">
+    {{-- Invoice Summary Cards --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <x-stat-card
+            title="Invoice Total"
+            value="LKR {{ number_format($invoice->total_amount) }}"
+            icon="fa-money-bill"
+            color="blue"
+        />
+        <x-stat-card
+            title="Amount Paid"
+            value="LKR {{ number_format($invoice->paid_amount) }}"
+            icon="fa-check-circle"
+            color="green"
+        />
+        <x-stat-card
+            title="Outstanding"
+            value="LKR {{ number_format($invoice->balance) }}"
+            icon="fa-clock"
+            color="amber"
+        />
+        <x-stat-card
+            title="Status"
+            value="{{ ucfirst($invoice->payment_status) }}"
+            icon="fa-circle-info"
+            color="indigo"
+        />
+    </div>
 
-{{-- Paper preview --}}
-<div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;
-            box-shadow:0 2px 8px rgba(0,0,0,0.07);margin-bottom:20px;
-            font-family:Arial,sans-serif;font-size:10pt;color:#1a1a1a;line-height:1.5;">
-<style>
-.ipv-tbl  { width:100%;border-collapse:collapse; }
-.ipv-tbl thead tr { background:#b91c1c;color:#fff; }
-.ipv-tbl th  { padding:8px;font-size:8pt;font-weight:bold;text-align:left;text-transform:uppercase;letter-spacing:0.5px;border:none; }
-.ipv-tbl th.r { text-align:right; }
-.ipv-tbl th.c { text-align:center; }
-.ipv-tbl td  { padding:7px 8px;border-bottom:1px dashed #fecaca;font-size:9pt;vertical-align:top; }
-.ipv-tbl td.r { text-align:right; }
-.ipv-tbl td.c { text-align:center; }
-.ipv-tbl tbody tr:nth-child(odd)  { background:#fff; }
-.ipv-tbl tbody tr:nth-child(even) { background:#fef2f2; }
-.ipv-tbl tbody tr:last-child td { border-bottom:1px solid #111; }
-.ipv-th  { font-size:9pt;font-weight:bold;color:#1a1a1a;margin:7px 0 2px; }
-.ipv-ts  { font-size:8.5pt;font-weight:bold;color:#333;margin:5px 0 2px; }
-.ipv-tb  { font-size:8.5pt;color:#444;margin-bottom:3px; }
-.ipv-tbu { font-size:8.5pt;color:#333;padding-left:10px;margin-bottom:3px; }
-.ipv-doc-title { text-align:center;font-size:16pt;font-weight:bold;letter-spacing:5px;margin:8px 0 12px;padding:8px 0;border-top:2px solid #b91c1c;border-bottom:1px solid #b91c1c;border-left:1px solid #fecaca;border-right:1px solid #fecaca;background:#fef2f2;color:#b91c1c; }
-.ipv-section { font-weight:bold;font-size:8.2pt;text-transform:uppercase;letter-spacing:1.6px;margin:16px 0 4px;color:#b91c1c;display:inline-block;padding:4px 10px 4px 8px;border-left:3px solid #b91c1c;background:#fef2f2;border-radius:2px; }
-.ipv-rule { border:none;border-top:1px solid #b91c1c;margin:0 0 8px; }
-</style>
-
-@php $logoPath = !empty($settings['company_logo']) ? public_path($settings['company_logo']) : null; @endphp
-
-{{-- LETTERHEAD --}}
-<table width="100%" cellpadding="0" cellspacing="0" style="padding:14px 20px 10px;border-bottom:2px solid #b91c1c;table-layout:fixed;">
-    <tr>
-        <td width="60%" style="vertical-align:bottom;padding-right:10px;">
-            @if($logoPath && file_exists($logoPath))
-                <img src="{{ $logoPath }}" alt="Logo" style="max-height:48px;max-width:140px;display:block;margin-bottom:6px;">
-            @endif
-            <div style="font-size:14pt;font-weight:bold;line-height:1.15;letter-spacing:0.3px;color:#111111;">
-                {{ $settings['company_name'] ?? 'JAAN NETWORK PVT. LTD.' }}
+    {{-- Invoice Details --}}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {{-- Bill To --}}
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+            <div class="flex items-center gap-3 mb-4 pb-4 border-b border-slate-200">
+                <div class="w-1 h-6 bg-blue-600 rounded-full"></div>
+                <h3 class="text-lg font-bold text-slate-900">Bill To</h3>
             </div>
-            <div style="font-size:8.5pt;color:#b91c1c;margin-top:2px;">
-                Professional IT Solutions &amp; Services
+            <div class="space-y-2">
+                <p class="text-sm text-slate-600"><span class="font-bold text-slate-900">{{ $invoice->customer_name }}</span></p>
+                @if($invoice->customer_address)
+                    <p class="text-sm text-slate-600">{{ $invoice->customer_address }}</p>
+                @endif
+                @if($invoice->customer_contact)
+                    <p class="text-sm text-slate-600">{{ $invoice->customer_contact }}</p>
+                @endif
             </div>
-        </td>
-        <td width="40%" style="vertical-align:bottom;text-align:right;font-size:8.5pt;line-height:1.85;color:#111111;">
-            @if(!empty($settings['company_phone'])){{ $settings['company_phone'] }}<br>@endif
-            @if(!empty($settings['company_email'])){{ $settings['company_email'] }}<br>@endif
-            @if(!empty($settings['company_address'])){{ $settings['company_address'] }}@endif
-        </td>
-    </tr>
-</table>
-
-{{-- DOCUMENT TITLE --}}
-<div class="ipv-doc-title">S A L E S &nbsp; I N V O I C E</div>
-
-{{-- BILLING + DOC DETAILS --}}
-<div style="padding:0 20px 20px;">
-<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
-    <tr>
-        <td width="58%" style="vertical-align:top;padding:10px 14px 10px 12px;background:#fef2f2;border:1px solid #fecaca;border-top:2px solid #b91c1c;">
-            <div style="font-size:7.5pt;text-transform:uppercase;letter-spacing:1.5px;color:#7f1d1d;margin-bottom:6px;">Bill To</div>
-            <div style="font-weight:bold;font-size:11pt;line-height:1.3;margin-bottom:4px;">{{ $invoice->customer_name }}</div>
-            @if($invoice->customer_address)
-            <div style="font-size:9pt;color:#111111;margin-bottom:2px;">{{ $invoice->customer_address }}</div>
-            @endif
-            @if($invoice->customer_contact)
-            <div style="font-size:9pt;color:#111111;">{{ $invoice->customer_contact }}</div>
-            @endif
-        </td>
-        <td width="42%" style="vertical-align:top;padding:10px 12px;background:#fee2e2;border:1px solid #fecaca;border-top:2px solid #b91c1c;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="font-size:9pt;line-height:1.8;color:#111111;">
-                <tr>
-                    <td style="font-weight:bold;width:48%;">Invoice No</td>
-                    <td style="text-align:right;">:&nbsp;{{ $invoice->invoice_number }}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight:bold;">Date</td>
-                    <td style="text-align:right;">:&nbsp;{{ $invoice->invoice_date->format('d M Y') }}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight:bold;">Status</td>
-                    <td style="text-align:right;font-weight:bold;">
-                        :&nbsp;@if($invoice->payment_status === 'paid') PAID
-                        @elseif($invoice->payment_status === 'partial') PARTIAL
-                        @else PENDING @endif
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table>
-
-{{-- ITEMS --}}
-<div class="ipv-section">SOFTWARE/HARDWARE/SERVICES</div>
-<hr class="ipv-rule">
-<table class="ipv-tbl" style="margin-bottom:16px;">
-    <thead>
-        <tr>
-            <th style="width:36px;">No.</th>
-            <th>Description</th>
-            <th class="c" style="width:52px;">Qty</th>
-            <th class="r" style="width:96px;">Unit Price</th>
-            <th class="r" style="width:96px;">Amount (LKR)</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($invoice->items as $item)
-        <tr>
-            <td class="c" style="font-weight:bold;">{{ $item->item_number }}</td>
-            <td>{{ $item->item_name ?? $item->description }}@if($item->warranty) <span style="color:#7f1d1d;">[{{ $item->warranty }}]</span>@endif</td>
-            <td class="c">{{ number_format((float)$item->quantity, 0) }}</td>
-            <td class="r">{{ number_format((float)$item->unit_price) }}</td>
-            <td class="r" style="font-weight:bold;">{{ number_format((float)$item->total) }}</td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
-
-{{-- TOTALS --}}
-<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
-    @if($invoice->tax_amount > 0)
-    <tr>
-        <td width="60%"></td>
-        <td style="padding:5px 8px;font-size:9pt;border-bottom:1px dashed #fecaca;">Subtotal</td>
-        <td style="padding:5px 8px;text-align:right;font-size:9pt;border-bottom:1px dashed #fecaca;width:96px;">
-            {{ number_format((float)$invoice->subtotal) }}
-        </td>
-    </tr>
-    <tr>
-        <td></td>
-        <td style="padding:5px 8px;font-size:9pt;border-bottom:1px dashed #fecaca;">Tax</td>
-        <td style="padding:5px 8px;text-align:right;font-size:9pt;border-bottom:1px dashed #fecaca;">
-            {{ number_format((float)$invoice->tax_amount) }}
-        </td>
-    </tr>
-    @endif
-    <tr>
-        <td></td>
-        <td style="padding:8px 8px;font-size:9.5pt;font-weight:bold;
-                   border-top:1px solid #111111;border-bottom:3px double #111111;">TOTAL (LKR)</td>
-        <td style="padding:8px 8px;text-align:right;font-size:13pt;font-weight:bold;
-                   white-space:nowrap;border-top:1px solid #111111;border-bottom:3px double #111111;background:#b91c1c;color:#fff;">
-            {{ number_format((float)$invoice->total_amount) }}
-        </td>
-    </tr>
-    @if($invoice->paid_amount > 0 && $invoice->payment_status !== 'paid')
-    <tr>
-        <td></td>
-        <td style="padding:5px 8px;font-size:9pt;border-bottom:1px dashed #fecaca;">Amount Paid</td>
-        <td style="padding:5px 8px;text-align:right;font-size:9pt;border-bottom:1px dashed #fecaca;">
-            {{ number_format((float)$invoice->paid_amount) }}
-        </td>
-    </tr>
-    <tr>
-        <td></td>
-        <td style="padding:7px 8px;font-size:9.5pt;font-weight:bold;border-bottom:1px solid #111111;">Balance Due (LKR)</td>
-        <td style="padding:7px 8px;text-align:right;font-size:11pt;font-weight:bold;border-bottom:1px solid #111111;">
-            {{ number_format((float)$invoice->balance) }}
-        </td>
-    </tr>
-    @endif
-</table>
-
-{{-- PAYMENT DETAILS --}}
-@if($invoice->payment_status !== 'paid')
-<div class="ipv-section">Payment Details</div>
-<hr class="ipv-rule">
-<table width="100%" cellpadding="0" cellspacing="0" style="font-size:9pt;line-height:1.9;margin-bottom:16px;color:#111111;background:#fef2f2;border:1px solid #fecaca;padding:8px 10px;">
-    <tr>
-        <td width="22%" style="font-weight:bold;padding:4px 0;">Bank</td>
-        <td style="padding:4px 0;">:&nbsp;{{ $settings['bank_name'] ?? 'DFCC Bank' }}</td>
-        <td width="22%" style="font-weight:bold;padding:4px 0;">Branch</td>
-        <td style="padding:4px 0;">:&nbsp;{{ $settings['bank_branch'] ?? 'Gampaha' }}</td>
-    </tr>
-    <tr>
-        <td style="font-weight:bold;padding:4px 0;">Account Name</td>
-        <td style="padding:4px 0;">:&nbsp;{{ $settings['bank_account_name'] ?? 'JAAN Network (Pvt) Ltd' }}</td>
-        <td style="font-weight:bold;padding:4px 0;">Account No</td>
-        <td style="padding:4px 0;">:&nbsp;{{ $settings['bank_account_number'] ?? '102003031923' }}</td>
-    </tr>
-</table>
-@endif
-
-{{-- PAID STAMP --}}
-@php $paidStampPath = public_path('images/paid-stamp.png'); @endphp
-@if($invoice->payment_status === 'paid' && file_exists($paidStampPath))
-<div style="text-align:center;margin-top:16px;margin-bottom:8px;">
-    <img src="{{ $paidStampPath }}" alt="PAID" style="width:190px;height:160px;opacity:0.7;">
-</div>
-@endif
-
-<hr style="border:none;border-top:1px solid #b91c1c;margin-top:18px;margin-bottom:8px;">
-<div style="text-align:center;font-size:9pt;font-weight:bold;margin-bottom:3px;color:#111111;">
-    Thank you for choosing {{ $settings['company_name'] ?? 'JAAN Network (Pvt) Ltd' }}
-</div>
-<div style="text-align:center;font-size:8pt;color:#b91c1c;">
-    For inquiries: {{ $settings['company_phone'] ?? '' }}@if(!empty($settings['company_email'])) &nbsp;/&nbsp; {{ $settings['company_email'] }}@endif
-</div>
-
-</div>{{-- end body --}}
-</div>{{-- end paper --}}
-
-{{-- Payment History --}}
-@if($invoice->payments->count())
-<div class="bg-white rounded-xl border border-gray-200 p-6 mb-4">
-    <h3 class="text-sm font-semibold text-gray-800 mb-4">Payment History</h3>
-    <table class="w-full text-sm">
-        <thead>
-            <tr class="border-b border-gray-100">
-                <th class="pb-2 text-left text-xs font-medium text-gray-500">Date</th>
-                <th class="pb-2 text-left text-xs font-medium text-gray-500">Method</th>
-                <th class="pb-2 text-left text-xs font-medium text-gray-500">Reference</th>
-                <th class="pb-2 text-right text-xs font-medium text-gray-500">Amount</th>
-                <th class="pb-2"></th>
-            </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-50">
-            @foreach($invoice->payments as $pmt)
-            <tr>
-                <td class="py-2 text-gray-600">{{ $pmt->payment_date->format('d M Y') }}</td>
-                <td class="py-2 capitalize text-gray-600">{{ str_replace('_', ' ', $pmt->payment_method) }}</td>
-                <td class="py-2 text-gray-500">{{ $pmt->reference_number ?: '—' }}</td>
-                <td class="py-2 text-right font-semibold text-green-600">LKR {{ number_format($pmt->amount) }}</td>
-                <td class="py-2 pl-2">
-                    <form method="POST" action="{{ route('invoices.payment.delete', [$invoice, $pmt]) }}" onsubmit="return confirm('Remove this payment?')">
-                        @csrf @method('DELETE')
-                        <button type="submit" class="text-gray-300 hover:text-red-500 text-xs"><i class="fa-solid fa-trash"></i></button>
-                    </form>
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-</div>
-@endif
-
-<div class="flex items-center gap-3 mt-2">
-    <a href="{{ route('invoices.index') }}" class="text-sm text-gray-500 hover:text-gray-700">
-        <i class="fa-solid fa-arrow-left mr-1"></i> Back to list
-    </a>
-    <form method="POST" action="{{ route('invoices.destroy', $invoice) }}" onsubmit="return confirm('Delete this invoice?')">
-        @csrf @method('DELETE')
-        <button type="submit" class="text-sm text-red-500 hover:text-red-700">
-            <i class="fa-solid fa-trash mr-1"></i> Delete
-        </button>
-    </form>
-</div>
-</div>
-
-{{-- Record Payment Modal --}}
-<div id="paymentModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50" x-data>
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
-        <div class="flex items-center justify-between mb-5">
-            <h3 class="text-base font-semibold text-gray-900">Record Payment</h3>
-            <button onclick="document.getElementById('paymentModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
         </div>
-        <form method="POST" action="{{ route('invoices.payment', $invoice) }}" class="space-y-4">
-            @csrf
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label for="pmt_date" class="block text-xs font-medium text-gray-500 mb-1">Date *</label>
-                    <input type="date" id="pmt_date" name="payment_date" value="{{ now()->format('Y-m-d') }}"
-                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300" required>
+
+        {{-- Invoice Info --}}
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+            <div class="flex items-center gap-3 mb-4 pb-4 border-b border-slate-200">
+                <div class="w-1 h-6 bg-indigo-600 rounded-full"></div>
+                <h3 class="text-lg font-bold text-slate-900">Invoice Details</h3>
+            </div>
+            <div class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-slate-600 font-medium">Invoice Number</span>
+                    <span class="font-bold text-slate-900">{{ $invoice->invoice_number }}</span>
                 </div>
-                <div>
-                    <label for="pmt_amount" class="block text-xs font-medium text-gray-500 mb-1">Amount (LKR) *</label>
-                    <input type="number" id="pmt_amount" name="amount" value="{{ $invoice->balance }}" step="0.01" min="0.01"
-                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300" required>
+                <div class="flex justify-between">
+                    <span class="text-slate-600 font-medium">Invoice Date</span>
+                    <span class="font-bold text-slate-900">{{ $invoice->invoice_date->format('d M Y') }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-600 font-medium">Payment Status</span>
+                    <span>
+                        @if($invoice->payment_status === 'paid')
+                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-300">
+                                <i class="fas fa-check-circle mr-1"></i>Paid
+                            </span>
+                        @elseif($invoice->payment_status === 'partial')
+                            <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold border border-amber-300">
+                                <i class="fas fa-hourglass-half mr-1"></i>Partial
+                            </span>
+                        @else
+                            <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold border border-red-300">
+                                <i class="fas fa-clock mr-1"></i>Pending
+                            </span>
+                        @endif
+                    </span>
                 </div>
             </div>
-            <div>
-                <label for="pmt_method" class="block text-xs font-medium text-gray-500 mb-1">Payment Method *</label>
-                <select id="pmt_method" name="payment_method" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300" required>
-                    @foreach(['cash' => 'Cash', 'bank_transfer' => 'Bank Transfer', 'card' => 'Card', 'cheque' => 'Cheque'] as $v => $l)
-                        <option value="{{ $v }}">{{ $l }}</option>
+        </div>
+    </div>
+
+    {{-- Line Items --}}
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+        <div class="p-6 border-b border-slate-200 bg-slate-50">
+            <h3 class="text-lg font-bold text-slate-900">Line Items</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b border-slate-200 bg-slate-50">
+                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-700">#</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-700">Description</th>
+                        <th class="px-6 py-3 text-center text-xs font-bold text-slate-700">Qty</th>
+                        <th class="px-6 py-3 text-right text-xs font-bold text-slate-700">Unit Price</th>
+                        <th class="px-6 py-3 text-right text-xs font-bold text-slate-700">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($invoice->items->where('is_hidden', false) as $item)
+                    <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
+                        <td class="px-6 py-3 font-bold text-slate-900">{{ $item->item_number }}</td>
+                        <td class="px-6 py-3">
+                            <div class="font-semibold text-slate-900">{{ $item->item_name }}</div>
+                            @if($item->warranty)
+                                <div class="text-xs text-slate-500 mt-0.5">Warranty: {{ $item->warranty }}</div>
+                            @endif
+                            @if($item->description)
+                                <div class="text-xs text-slate-500 mt-0.5">{{ $item->description }}</div>
+                            @endif
+                        </td>
+                        <td class="px-6 py-3 text-center">{{ number_format((float)$item->quantity, 0) }}</td>
+                        <td class="px-6 py-3 text-right">LKR {{ number_format((float)$item->unit_price) }}</td>
+                        <td class="px-6 py-3 text-right font-bold text-slate-900">LKR {{ number_format((float)$item->total) }}</td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-8 text-center text-slate-500">No items to display</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        {{-- Totals --}}
+        <div class="bg-slate-50 border-t border-slate-200 p-6">
+            <div class="flex justify-end max-w-sm">
+                <div class="w-full space-y-3">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-slate-600 font-medium">Subtotal</span>
+                        <span class="font-semibold text-slate-900">LKR {{ number_format($invoice->subtotal) }}</span>
+                    </div>
+                    @if($invoice->tax_amount > 0)
+                    <div class="flex justify-between text-sm pb-3 border-b border-slate-200">
+                        <span class="text-slate-600 font-medium">Tax/Other</span>
+                        <span class="font-semibold text-slate-900">LKR {{ number_format($invoice->tax_amount) }}</span>
+                    </div>
+                    @endif
+                    <div class="flex justify-between text-lg pt-2">
+                        <span class="font-bold text-slate-900">Total (LKR)</span>
+                        <span class="font-bold text-blue-600">{{ number_format($invoice->total_amount) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Payment History --}}
+    @if($invoice->payments->count())
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+        <div class="mb-4 pb-4 border-b border-slate-200">
+            <h3 class="text-lg font-bold text-slate-900">Payment History</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b border-slate-200 bg-slate-50">
+                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-700">Date</th>
+                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-700">Method</th>
+                        <th class="px-4 py-3 text-left text-xs font-bold text-slate-700">Reference</th>
+                        <th class="px-4 py-3 text-right text-xs font-bold text-slate-700">Amount</th>
+                        <th class="px-4 py-3"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($invoice->payments as $pmt)
+                    <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
+                        <td class="px-4 py-3 text-slate-600">{{ $pmt->payment_date->format('d M Y') }}</td>
+                        <td class="px-4 py-3 capitalize text-slate-600">{{ str_replace('_', ' ', $pmt->payment_method) }}</td>
+                        <td class="px-4 py-3 text-slate-600">{{ $pmt->reference_number ?: '—' }}</td>
+                        <td class="px-4 py-3 text-right font-bold text-green-600">LKR {{ number_format($pmt->amount) }}</td>
+                        <td class="px-4 py-3">
+                            <form method="POST" action="{{ route('invoices.payment.delete', [$invoice, $pmt]) }}" class="inline" onsubmit="return confirm('Remove this payment?');">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="text-slate-400 hover:text-red-600 transition text-sm">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
                     @endforeach
-                </select>
-            </div>
-            <div>
-                <label for="pmt_ref" class="block text-xs font-medium text-gray-500 mb-1">Reference Number</label>
-                <input type="text" id="pmt_ref" name="reference_number" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300" placeholder="Optional">
-            </div>
-            <div>
-                <label for="pmt_notes" class="block text-xs font-medium text-gray-500 mb-1">Notes</label>
-                <textarea id="pmt_notes" name="notes" rows="2" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"></textarea>
-            </div>
-            <div class="flex gap-3 pt-2">
-                <button type="submit" class="flex-1 bg-green-600 text-white text-sm font-semibold py-2.5 rounded-lg hover:bg-green-700 transition">
-                    Save Payment
-                </button>
-                <button type="button" onclick="document.getElementById('paymentModal').classList.add('hidden')"
-                    class="flex-1 bg-white border border-gray-200 text-gray-600 text-sm py-2.5 rounded-lg hover:bg-gray-50 transition">
-                    Cancel
-                </button>
-            </div>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+
+    {{-- Actions --}}
+    <div class="flex gap-3">
+        <x-button href="{{ route('invoices.index') }}" variant="outline" icon="fa-arrow-left">
+            Back to Invoices
+        </x-button>
+        <x-button href="{{ route('invoices.edit', $invoice) }}" variant="primary" icon="fa-pencil">
+            Edit Invoice
+        </x-button>
+        <form method="POST" action="{{ route('invoices.destroy', $invoice) }}" class="inline" onsubmit="return confirm('Delete this invoice?');">
+            @csrf @method('DELETE')
+            <x-button type="submit" variant="danger" icon="fa-trash">
+                Delete Invoice
+            </x-button>
         </form>
+    </div>
+
+    {{-- Payment Modal --}}
+    <div x-show="showPaymentModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" x-transition>
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6" @click.stop>
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-slate-900">Record Payment</h3>
+                <button @click="showPaymentModal = false" class="text-slate-400 hover:text-slate-600">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+
+            <form method="POST" action="{{ route('invoices.payment', $invoice) }}" class="space-y-4">
+                @csrf
+
+                <div class="grid grid-cols-2 gap-4">
+                    <x-form-input
+                        label="Date"
+                        name="payment_date"
+                        type="date"
+                        value="{{ now()->format('Y-m-d') }}"
+                        required
+                    />
+
+                    <x-form-input
+                        label="Amount (LKR)"
+                        name="amount"
+                        type="number"
+                        value="{{ $invoice->balance }}"
+                        step="0.01"
+                        min="0.01"
+                        required
+                    />
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-slate-700">Payment Method *</label>
+                    <select name="payment_method" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" required>
+                        <option value="cash">Cash</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="card">Card</option>
+                        <option value="cheque">Cheque</option>
+                    </select>
+                </div>
+
+                <x-form-input
+                    label="Reference Number"
+                    name="reference_number"
+                    placeholder="Optional"
+                />
+
+                <div class="space-y-2">
+                    <label for="pmt_notes" class="block text-sm font-semibold text-slate-700">Notes</label>
+                    <textarea name="notes" id="pmt_notes" rows="2" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition resize-none"></textarea>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <x-button type="submit" variant="success" class="flex-1">
+                        Save Payment
+                    </x-button>
+                    <x-button type="button" variant="outline" class="flex-1" @click="showPaymentModal = false">
+                        Cancel
+                    </x-button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 @endsection

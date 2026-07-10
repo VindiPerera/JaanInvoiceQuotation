@@ -1,69 +1,97 @@
-<div class="space-y-6 max-w-5xl">
-
+<div class="space-y-6 max-w-6xl">
+    {{-- Alerts --}}
     @if($errors->any())
-    <div class="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
-        <ul class="list-disc list-inside space-y-1">
-            @foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach
-        </ul>
-    </div>
+        <div class="bg-red-50 border-l-4 border-l-red-600 border border-red-200 rounded-xl p-4 shadow-sm">
+            <div class="flex items-start gap-3">
+                <i class="fas fa-circle-exclamation text-red-600 mt-0.5 flex-shrink-0 text-lg"></i>
+                <div>
+                    <h3 class="font-bold text-red-900 mb-2">Validation Errors</h3>
+                    <ul class="space-y-1 text-red-700 text-sm">
+                        @foreach($errors->all() as $error)
+                            <li class="flex items-center gap-2">
+                                <span class="w-1 h-1 bg-red-600 rounded-full"></span>
+                                {{ $error }}
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        </div>
     @endif
 
-    {{-- Quote Type Selector --}}
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-base font-semibold text-gray-800">Quote Template</h2>
-            <a href="{{ route('quote-templates.index') }}" class="text-xs text-gray-400 hover:text-red-600 transition">
-                <i class="fa-solid fa-gear mr-1"></i> Manage Templates
-            </a>
+    {{-- Template Selector --}}
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-200">
+            <div class="w-1 h-8 bg-blue-600 rounded-full"></div>
+            <h2 class="text-xl font-bold text-slate-900">Select Template</h2>
         </div>
-        <input type="hidden" name="quote_type" x-model="quoteType">
-        <input type="hidden" name="status" value="draft">
+
         @if(isset($templates) && $templates->isNotEmpty())
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <input type="hidden" name="quote_type" x-model="quoteType">
             @foreach($templates as $tpl)
             <button type="button" @click="quoteType = '{{ $tpl->key }}'"
                 :class="quoteType === '{{ $tpl->key }}'
-                    ? 'border-red-500 bg-red-50 text-red-700 ring-2 ring-red-300'
-                    : 'border-gray-200 text-gray-600 hover:border-red-300 hover:bg-red-50'"
-                class="flex flex-col items-center gap-2 border-2 rounded-xl p-4 transition cursor-pointer text-left">
-                <i class="fa-solid {{ $tpl->icon ?: 'fa-file-alt' }} text-2xl"></i>
-                <span class="font-semibold text-sm">{{ $tpl->name }}</span>
-                @if($tpl->subtitle)
-                <span class="text-xs text-gray-400">{{ $tpl->subtitle }}</span>
-                @endif
+                    ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-md'
+                    : 'border-slate-300 text-slate-700 hover:border-blue-400 hover:bg-blue-50'"
+                class="flex flex-col items-center justify-center gap-3 p-6 border-2 rounded-xl transition-all cursor-pointer">
+                <i class="fas {{ $tpl->icon ?: 'fa-file' }} text-3xl"></i>
+                <div>
+                    <div class="font-bold text-sm">{{ $tpl->name }}</div>
+                    @if($tpl->subtitle)
+                    <div class="text-xs text-slate-500">{{ $tpl->subtitle }}</div>
+                    @endif
+                </div>
             </button>
             @endforeach
         </div>
         @else
-        <p class="text-sm text-gray-400">No templates configured. <a href="{{ route('quote-templates.create') }}" class="text-red-600 hover:underline">Add one</a>.</p>
+        <div class="text-center py-8">
+            <p class="text-slate-600 mb-4">No templates configured yet.</p>
+            <x-button href="{{ route('quote-templates.create') }}" variant="secondary" icon="fa-plus">
+                Create Your First Template
+            </x-button>
+        </div>
         @endif
     </div>
 
-    {{-- Header card --}}
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 class="text-base font-semibold text-gray-800 mb-4">Quotation Details</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Quotation Number *</label>
-                <input type="text" name="quotation_number" value="{{ old('quotation_number', $quotation?->quotation_number ?? $nextNumber) }}"
-                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300" required>
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Date *</label>
-                <input type="date" name="quotation_date" value="{{ old('quotation_date', $quotation ? $quotation->quotation_date->format('Y-m-d') : now()->format('Y-m-d')) }}"
-                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300" required>
-            </div>
+    {{-- Quotation Details --}}
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-200">
+            <div class="w-1 h-8 bg-indigo-600 rounded-full"></div>
+            <h2 class="text-xl font-bold text-slate-900">Quotation Information</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <x-form-input
+                label="Quotation Number"
+                name="quotation_number"
+                value="{{ $quotation?->quotation_number ?? $nextNumber }}"
+                required
+            />
+
+            <x-form-input
+                label="Date"
+                name="quotation_date"
+                type="date"
+                value="{{ $quotation ? $quotation->quotation_date->format('Y-m-d') : now()->format('Y-m-d') }}"
+                required
+            />
         </div>
     </div>
 
-    {{-- Customer card --}}
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 class="text-base font-semibold text-gray-800 mb-4">Customer Details</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Select Existing Customer</label>
+    {{-- Customer Details --}}
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-200">
+            <div class="w-1 h-8 bg-green-600 rounded-full"></div>
+            <h2 class="text-xl font-bold text-slate-900">Customer Information</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+                <label class="block text-sm font-semibold text-slate-700">Select Existing Customer</label>
                 <select name="customer_id" x-model="selectedCustomer" @change="fillCustomer($event)"
-                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300">
+                    class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition">
                     <option value="">— Select customer —</option>
                     @foreach($customers as $c)
                         <option value="{{ $c->id }}" data-address="{{ $c->address }}" data-contact="{{ $c->contact }}"
@@ -73,172 +101,213 @@
                     @endforeach
                 </select>
             </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Customer Name *</label>
-                <input type="text" name="customer_name" id="customer_name" value="{{ old('customer_name', $quotation?->customer_name ?? '') }}"
-                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300" required>
+
+            <x-form-input
+                label="Customer Name"
+                name="customer_name"
+                id="customer_name"
+                value="{{ $quotation?->customer_name ?? '' }}"
+                required
+            />
+
+            <div class="space-y-2">
+                <label for="customer_address" class="block text-sm font-semibold text-slate-700">Address</label>
+                <textarea name="customer_address" id="customer_address" rows="3"
+                    class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition resize-none">{{ old('customer_address', $quotation?->customer_address ?? '') }}</textarea>
             </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Address</label>
-                <textarea name="customer_address" id="customer_address" rows="2"
-                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300">{{ old('customer_address', $quotation?->customer_address ?? '') }}</textarea>
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Contact</label>
-                <input type="text" name="customer_contact" id="customer_contact" value="{{ old('customer_contact', $quotation?->customer_contact ?? '') }}"
-                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300">
-            </div>
+
+            <x-form-input
+                label="Contact"
+                name="customer_contact"
+                id="customer_contact"
+                value="{{ $quotation?->customer_contact ?? '' }}"
+            />
+
             <div class="md:col-span-2">
-                <label class="block text-xs font-medium text-gray-500 mb-1">Subject</label>
-                <input type="text" name="subject" value="{{ old('subject', $quotation?->subject ?? '') }}"
-                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
-                    placeholder="e.g. Quotation for Maria POS System - Complete Package">
+                <x-form-input
+                    label="Subject"
+                    name="subject"
+                    value="{{ $quotation?->subject ?? '' }}"
+                    placeholder="e.g. Maria POS System - Complete Package"
+                />
             </div>
+
             <div class="md:col-span-2">
-                <label class="block text-xs font-medium text-gray-500 mb-1">Project Overview <span class="text-gray-400 font-normal">(optional)</span></label>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Project Overview <span class="font-normal text-slate-500">(optional)</span></label>
                 <textarea name="project_overview" x-model="projectOverview" rows="4"
-                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
-                    placeholder="Enter project overview/introduction text that will appear in the quotation PDF..."></textarea>
+                    class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition resize-none"
+                    placeholder="Describe the project scope, requirements, and deliverables...">{{ old('project_overview', $quotation?->project_overview ?? '') }}</textarea>
             </div>
         </div>
     </div>
 
-    {{-- Items / Hardware/Software Package --}}
-    <div x-show="quoteType !== 'software_only'" class="bg-white rounded-xl border border-gray-200 p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-base font-semibold text-gray-800">Software/Hardware/Services</h2>
-            <div class="flex items-center gap-2">
-                {{-- From Catalog custom dropdown --}}
-                <div class="relative">
-                    <button type="button" @click="catalogOpen = !catalogOpen"
-                        class="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-800 border border-gray-200 rounded-lg px-3 py-1.5 bg-white transition">
-                        <i class="fa-solid fa-database text-xs"></i> From Catalog
-                        <i class="fa-solid fa-chevron-down text-xs"></i>
-                    </button>
-                    <div x-show="catalogOpen" @click.outside="catalogOpen = false" style="display:none"
-                        class="absolute right-0 top-full mt-1 w-72 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
-                        <div class="p-2 border-b border-gray-100">
-                            <input type="text" x-model="catalogSearch" @click.stop
-                                placeholder="Search catalog..."
-                                class="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
-                                autocomplete="off">
-                        </div>
-                        <div class="overflow-y-auto max-h-56 py-1">
-                            @php $grouped = ($hardware ?? collect())->groupBy(fn($h) => $h->category ?: 'General'); @endphp
-                            @forelse($grouped as $category => $items)
-                                <div class="px-3 pt-2 pb-0.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">{{ $category }}</div>
-                                @foreach($items as $hw)
-                                <div x-show="{{ json_encode(strtolower($hw->name . ' ' . ($hw->description ?? ''))) }}.includes(catalogSearch.toLowerCase())"
-                                    @click="addFromCatalog({{ Js::from($hw->name) }}, {{ Js::from($hw->description ?? '') }}, {{ (float)$hw->unit_price }}, {{ Js::from($hw->warranty ?? '') }})"
-                                    class="flex items-center justify-between px-3 py-2 hover:bg-red-50 cursor-pointer transition">
-                                    <span class="text-sm text-gray-800 truncate mr-2">{{ $hw->name }}</span>
-                                    <span class="text-xs text-gray-400 shrink-0">LKR {{ number_format($hw->unit_price, 2) }}</span>
-                                </div>
-                                @endforeach
-                            @empty
-                                <div class="px-3 py-4 text-center text-sm text-gray-400">No Software/Hardware/Services in catalog.</div>
-                            @endforelse
-                        </div>
-                    </div>
-                </div>
-                <button type="button" @click="addItem" x-show="!isTemplateApplied" class="inline-flex items-center gap-1.5 text-sm text-red-600 hover:text-red-700 font-medium">
-                    <i class="fa-solid fa-plus"></i> Add
-                </button>
+    {{-- Line Items --}}
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+        <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-200">
+            <div class="flex items-center gap-3">
+                <div class="w-1 h-8 bg-purple-600 rounded-full"></div>
+                <h2 class="text-xl font-bold text-slate-900">Line Items</h2>
             </div>
+            <x-button type="button" @click="addItem" variant="success" size="sm" icon="fa-plus">
+                Add Item
+            </x-button>
         </div>
+
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b border-gray-100">
-                        <th class="pb-2 text-left text-xs font-medium text-gray-500 w-10">#</th>
-                        <th class="pb-2 text-left text-xs font-medium text-gray-500 w-40">Item Name</th>
-                        <th class="pb-2 text-left text-xs font-medium text-gray-500">Description</th>
-                        <th class="pb-2 text-left text-xs font-medium text-gray-500 w-28">Warranty</th>
-                        <th class="pb-2 text-left text-xs font-medium text-gray-500 w-24">Qty</th>
-                        <th class="pb-2 text-right text-xs font-medium text-gray-500 w-28">Price</th>
-                        <th class="pb-2 text-right text-xs font-medium text-gray-500 w-32">Total</th>
-                        <th class="pb-2 w-10"></th>
+                    <tr class="border-b-2 border-slate-200 bg-slate-50">
+                        <th class="px-4 py-3 text-left font-bold text-slate-700">#</th>
+                        <th class="px-4 py-3 text-left font-bold text-slate-700">Item Name</th>
+                        <th class="px-4 py-3 text-left font-bold text-slate-700">Description</th>
+                        <th class="px-4 py-3 text-center font-bold text-slate-700">Qty</th>
+                        <th class="px-4 py-3 text-right font-bold text-slate-700">Unit Price</th>
+                        <th class="px-4 py-3 text-right font-bold text-slate-700">Total</th>
+                        <th class="px-4 py-3 text-center font-bold text-slate-700">Hide</th>
+                        <th class="px-4 py-3"></th>
                     </tr>
                 </thead>
                 <tbody>
                     <template x-for="(item, index) in items" :key="index">
-                        <tr class="border-b border-gray-50" :class="{ 'bg-yellow-50': item.isFromTemplate }">
-                            <td class="py-2 pr-2 text-gray-400 text-xs" x-text="index + 1"></td>
-                            <td class="py-2 pr-2">
+                        <tr class="border-b border-slate-200 hover:bg-blue-50 transition">
+                            <td class="px-4 py-3 text-slate-500 font-semibold" x-text="index + 1"></td>
+                            <td class="px-4 py-3">
+                                <select @change="pickHardware(index, $event)"
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 mb-2 transition">
+                                    <option value="">— Select from catalog —</option>
+                                    @foreach($hardware as $hw)
+                                        <option value="{{ $hw->id }}"
+                                            data-name="{{ $hw->name }}"
+                                            data-desc="{{ $hw->description }}"
+                                            data-price="{{ $hw->unit_price }}"
+                                            data-warranty="{{ $hw->warranty ?? '' }}">
+                                            {{ $hw->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
                                 <input type="text" :name="`items[${index}][item_name]`" x-model="item.item_name"
-                                    :readonly="item.isFromTemplate && isTemplateApplied"
-                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm font-medium focus:outline-none focus:ring-1 focus:ring-red-300 read-only:bg-gray-100 read-only:text-gray-700 read-only:cursor-not-allowed"
-                                    placeholder="e.g. 2D Barcode Scanner">
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-medium focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                                    placeholder="Item name">
                             </td>
-                            <td class="py-2 pr-2">
+                            <td class="px-4 py-3">
                                 <textarea :name="`items[${index}][description]`" x-model="item.description" rows="2"
-                                    :readonly="item.isFromTemplate && isTemplateApplied"
-                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 resize-none leading-snug read-only:bg-gray-100 read-only:text-gray-700 read-only:cursor-not-allowed"
-                                    placeholder="Specs / details (optional)"></textarea>
-                                <input type="hidden" :name="`items[${index}][item_type]`" value="hardware">
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition resize-none"
+                                    placeholder="Description..."></textarea>
                             </td>
-                            <td class="py-2 pr-2">
-                                <input type="text" :name="`items[${index}][warranty]`" x-model="item.warranty"
-                                    :readonly="item.isFromTemplate && isTemplateApplied"
-                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 read-only:bg-gray-100 read-only:text-gray-700 read-only:cursor-not-allowed"
-                                    placeholder="e.g. 1 Year">
-                            </td>
-                            <td class="py-2 pr-2">
+                            <td class="px-4 py-3">
                                 <input type="number" :name="`items[${index}][quantity]`" x-model.number="item.quantity" @input="calcRow(index)"
-                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm text-center focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
                                     min="0" step="0.01">
                             </td>
-                            <td class="py-2 pr-2 text-right">
-                                <div class="flex items-center justify-end">
-                                    <input type="number" :name="`items[${index}][unit_price]`" x-model.number="item.unit_price" @input="calcRow(index)"
-                                        :readonly="item.isFromTemplate && isTemplateApplied"
-                                        class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300 text-right read-only:bg-gray-100 read-only:text-gray-700 read-only:cursor-not-allowed"
-                                        min="0" step="0.01" placeholder="0.00">
-                                </div>
+                            <td class="px-4 py-3">
+                                <input type="number" :name="`items[${index}][unit_price]`" x-model.number="item.unit_price" @input="calcRow(index)"
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm text-right focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                                    min="0" step="0.01">
                             </td>
-                            <td class="py-2 text-right font-medium text-gray-700" x-text="'LKR ' + formatNum(item.total)"></td>
-                            <td class="py-2 pl-2">
-                                <button type="button" @click="removeItem(index)" class="text-gray-300 hover:text-red-500 transition">
-                                    <i class="fa-solid fa-xmark"></i>
+                            <td class="px-4 py-3 text-right font-bold text-slate-900">
+                                <input type="hidden" :name="`items[${index}][total]`" :value="item.total">
+                                <span x-text="formatNum(item.total)"></span>
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                <input type="hidden" :name="`items[${index}][is_hidden]`" :value="item.is_hidden ? '1' : '0'">
+                                <input type="checkbox" @change="item.is_hidden = $event.target.checked"
+                                    :checked="item.is_hidden"
+                                    class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-200">
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                <button type="button" @click="removeItem(index)" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition">
+                                    <i class="fas fa-trash"></i>
                                 </button>
                             </td>
                         </tr>
                     </template>
                 </tbody>
                 <tfoot>
-                    <tr class="border-t border-gray-200">
-                        <td colspan="5" class="pt-3 text-right text-sm font-medium text-gray-600">Subtotal</td>
-                        <td class="pt-3 text-right font-semibold text-gray-800" x-text="'LKR ' + formatNum(subtotal)"></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td colspan="4" class="pt-2 text-right text-sm font-medium text-gray-600">Tax / Other</td>
-                        <td class="pt-2 pr-2 text-right">
-                            <input type="number" name="tax_amount" x-model.number="taxAmount" @input="calcTotal"
-                                value="{{ old('tax_amount', $quotation?->tax_amount ?? 0) }}"
-                                class="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
-                                min="0" step="0.01">
-                        </td>
-                        <td class="pt-2 text-right font-semibold text-gray-700" x-text="'LKR ' + formatNum(taxAmount)"></td>
-                        <td></td>
-                    </tr>
-                    <tr class="bg-red-50">
-                        <td colspan="5" class="pt-3 pb-2 px-3 text-right text-base font-bold text-gray-800">TOTAL</td>
-                        <td class="pt-3 pb-2 text-right text-base font-bold text-red-600 pr-1" x-text="'LKR ' + formatNum(total)"></td>
-                        <td></td>
+                    <tr class="bg-slate-50 border-t-2 border-slate-200">
+                        <td colspan="4" class="px-4 py-3 text-right font-bold text-slate-700">Total Amount (LKR)</td>
+                        <td class="px-4 py-3 text-right font-bold text-slate-900" x-text="formatNum(total)"></td>
                     </tr>
                 </tfoot>
             </table>
         </div>
     </div>
 
-    {{-- Actions --}}
-    <div class="flex items-center gap-3">
-        <button type="submit" class="px-6 py-2.5 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition">
-            {{ $quotation ? 'Update Quotation' : 'Save Quotation' }}
-        </button>
-        <a href="{{ route('quotations.index') }}" class="px-6 py-2.5 bg-white border border-gray-200 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-50 transition">
+    {{-- Notes & Terms --}}
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+        <label class="block text-sm font-bold text-slate-700 mb-3">Terms & Conditions</label>
+        <textarea name="terms_and_conditions" rows="4"
+            class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition resize-none"
+            placeholder="Enter your terms and conditions...">{{ old('terms_and_conditions', $quotation->terms_and_conditions ?? '') }}</textarea>
+    </div>
+
+    {{-- Form Actions --}}
+    <div class="flex gap-3 pt-6">
+        <x-button type="submit" variant="primary" size="lg" icon="fa-save">
+            {{ isset($quotation) && $quotation ? 'Update Quotation' : 'Create Quotation' }}
+        </x-button>
+        <x-button href="{{ route('quotations.index') }}" variant="outline" size="lg" icon="fa-arrow-left">
             Cancel
-        </a>
+        </x-button>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('quotationForm', () => ({
+            items: @json(isset($quotation) && $quotation ? $quotation->items->toArray() : []),
+            quoteType: '{{ old('quote_type', $quotation?->quote_type ?? '') }}',
+            selectedCustomer: '{{ old('customer_id', $quotation?->customer_id ?? '') }}',
+            projectOverview: '{{ old('project_overview', $quotation?->project_overview ?? '') }}',
+
+            get total() {
+                return this.items.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
+            },
+
+            addItem() {
+                this.items.push({
+                    item_name: '',
+                    description: '',
+                    quantity: 1,
+                    unit_price: 0,
+                    total: 0,
+                    is_hidden: false
+                });
+            },
+
+            removeItem(index) {
+                this.items.splice(index, 1);
+            },
+
+            calcRow(index) {
+                const item = this.items[index];
+                item.total = (parseFloat(item.quantity) || 0) * (parseFloat(item.unit_price) || 0);
+            },
+
+            pickHardware(index, event) {
+                const option = event.target.selectedOptions[0];
+                if (option.value) {
+                    const item = this.items[index];
+                    item.item_name = option.dataset.name;
+                    item.description = option.dataset.desc;
+                    item.unit_price = parseFloat(option.dataset.price);
+                    this.calcRow(index);
+                }
+            },
+
+            fillCustomer(event) {
+                const option = event.target.selectedOptions[0];
+                if (option.value) {
+                    document.querySelector('#customer_name').value = option.text;
+                    document.querySelector('#customer_address').value = option.dataset.address;
+                    document.querySelector('#customer_contact').value = option.dataset.contact;
+                }
+            },
+
+            formatNum(num) {
+                return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(num || 0);
+            }
+        }))
+    });
+</script>
+@endpush

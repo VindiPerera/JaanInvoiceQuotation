@@ -1,5 +1,5 @@
 @php
-    $defaultItems = [['item_name' => '', 'description' => '', 'quantity' => 1, 'unit_price' => 0, 'warranty' => '', 'total' => 0]];
+    $defaultItems = [['item_name' => '', 'description' => '', 'quantity' => 1, 'unit_price' => 0, 'warranty' => '', 'total' => 0, 'is_hidden' => false]];
     $formItems = old('items', $quotation
         ? $quotation->items->map(fn($i) => [
             'item_name'   => $i->item_name ?? '',
@@ -8,6 +8,7 @@
             'unit_price'  => $i->unit_price,
             'warranty'    => $i->warranty ?? '',
             'total'       => $i->total,
+            'is_hidden'   => (bool) $i->is_hidden,
           ])->toArray()
         : $defaultItems);
 
@@ -58,6 +59,7 @@ function quotationForm() {
         features: @json($formFeatures),
         projectOverview: '{{ old('project_overview', $quotation?->project_overview ?? '') }}',
         taxAmount: {{ old('tax_amount', $quotation?->tax_amount ?? 0) }},
+        manualTotal: {{ old('manual_total', $quotation?->total_amount ?? '0') }},
         quoteType: '{{ old('quote_type', $quotation?->quote_type ?? '') }}',
         isNewQuotation: {{ $isNewQuotation ? 'true' : 'false' }},
         isTemplateApplied: false,
@@ -68,14 +70,23 @@ function quotationForm() {
         total: 0,
 
         init() {
-            if (!this.items.length) { this.items = [{ item_name: '', description: '', quantity: 1, unit_price: 0, warranty: '', total: 0, isFromTemplate: false }]; }
+            if (!this.items.length) { this.items = [{ item_name: '', description: '', quantity: 1, unit_price: 0, warranty: '', total: 0, is_hidden: false, isFromTemplate: false }]; }
 
             // Ensure all items have item_name set
             this.items = this.items.map(i => ({
                 ...i,
                 item_name: i.item_name || this.extractItemName(i.description),
+                is_hidden: i.is_hidden || false,
                 isFromTemplate: i.isFromTemplate !== false ? true : false
             }));
+
+            // Recalculate the correct total from items
+            const calculatedTotal = this.items.reduce((s, r) => s + (r.total || 0), 0) + (this.taxAmount || 0);
+
+            // If there was a manual override but it doesn't match calculated, use calculated
+            if (this.manualTotal > 0 && Math.abs(this.manualTotal - calculatedTotal) > 0.01) {
+                this.manualTotal = 0;
+            }
 
             this.calcTotal();
 
@@ -99,6 +110,18 @@ function quotationForm() {
                 this.applyTypeDefaults(newType);
                 this.isTemplateApplied = true;
             });
+
+            this.$watch('taxAmount', () => {
+                this.calcTotal();
+            });
+
+            this.$watch('manualTotal', () => {
+                this.calcTotal();
+            });
+
+            this.$watch('items', () => {
+                this.calcTotal();
+            }, { deep: true });
         },
 
         applyTypeDefaults(type) {
@@ -110,10 +133,10 @@ function quotationForm() {
                     if (!itemName || itemName.trim() === '') {
                         itemName = this.extractItemName(i.description);
                     }
-                    return { ...i, item_name: itemName, isFromTemplate: true };
+                    return { ...i, item_name: itemName, is_hidden: false, isFromTemplate: true };
                 });
             } else {
-                this.items = [{ item_name: '', description: '', quantity: 1, unit_price: 0, warranty: '', total: 0, isFromTemplate: false }];
+                this.items = [{ item_name: '', description: '', quantity: 1, unit_price: 0, warranty: '', total: 0, is_hidden: false, isFromTemplate: false }];
             }
             this.features  = (d.features || []).map(f => ({ ...f }));
             this.termsText = d.terms || '';
@@ -121,7 +144,15 @@ function quotationForm() {
             this.calcTotal();
         },
 
-        addItem()         { this.items.push({ item_name: '', description: '', quantity: 1, unit_price: 0, warranty: '', total: 0, isFromTemplate: false }); },
+        addItem()         { this.items.push({ item_name: '', description: '', quantity: 1, unit_price: 0, warranty: '', total: 0, is_hidden: false, isFromTemplate: false }); },
+
+        toggleAllHide(event) {
+            const isChecked = event.target.checked;
+            this.items.forEach(item => {
+                item.is_hidden = isChecked;
+            });
+            this.calcTotal();
+        },
 
         extractItemName(description) {
             if (!description || typeof description !== 'string') return 'Item';
@@ -133,7 +164,7 @@ function quotationForm() {
         addFromCatalog(name, desc, price, warranty) {
             const description = desc ? name + '\n• ' + desc : name;
             const unitPrice = parseFloat(price) || 0;
-            this.items.push({ item_name: name, description, quantity: 1, unit_price: unitPrice, warranty: warranty || '', total: unitPrice, isFromTemplate: false });
+            this.items.push({ item_name: name, description, quantity: 1, unit_price: unitPrice, warranty: warranty || '', total: unitPrice, is_hidden: false, isFromTemplate: false });
             this.calcTotal();
             this.catalogOpen = false;
             this.catalogSearch = '';
@@ -146,7 +177,8 @@ function quotationForm() {
         },
         calcTotal() {
             this.subtotal = this.items.reduce((s, r) => s + (r.total || 0), 0);
-            this.total = this.subtotal + (this.taxAmount || 0);
+            const calculatedTotal = this.subtotal + (this.taxAmount || 0);
+            this.total = (this.manualTotal && this.manualTotal > 0) ? this.manualTotal : calculatedTotal;
         },
         formatNum(v) {
             return Number(v || 0).toLocaleString('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });

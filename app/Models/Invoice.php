@@ -47,8 +47,15 @@ class Invoice extends Model
 
     public static function generateNumber(): string
     {
-        $last = static::withTrashed()->orderBy('id', 'desc')->first();
+        // Get the highest numeric part from existing invoice numbers
+        $last = static::withTrashed()->where('invoice_number', 'like', 'INV-%')->orderByRaw('CAST(SUBSTRING(invoice_number, 5) AS UNSIGNED) DESC')->first();
         $next = $last ? ((int) substr($last->invoice_number, 4)) + 1 : 1;
+
+        // Ensure uniqueness by incrementing if number already exists
+        while (static::where('invoice_number', 'INV-' . str_pad($next, 4, '0', STR_PAD_LEFT))->exists()) {
+            $next++;
+        }
+
         return 'INV-' . str_pad($next, 4, '0', STR_PAD_LEFT);
     }
 
