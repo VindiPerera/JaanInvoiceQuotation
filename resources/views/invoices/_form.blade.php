@@ -1,4 +1,4 @@
-<div class="space-y-6 max-w-6xl">
+<div class="space-y-6">
     {{-- Alerts --}}
     @if($errors->any())
         <div class="bg-red-50 border-l-4 border-l-red-600 border border-red-200 rounded-xl p-4 shadow-sm">
@@ -252,6 +252,115 @@
             </p>
         </div>
 
+        {{-- Advance Payment Section --}}
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+            <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-200">
+                <div class="flex items-center gap-3">
+                    <div class="w-1 h-8 bg-indigo-600 rounded-full"></div>
+                    <h3 class="text-lg font-bold text-slate-900">Advance Payment (Optional)</h3>
+                </div>
+                <span class="text-xs font-medium text-slate-500 bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">
+                    {{ isset($invoice) && $invoice->payments->count() > 0 ? 'Editable' : 'Initial Payment' }}
+                </span>
+            </div>
+
+            <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-6">
+                <p class="text-sm text-indigo-900">
+                    <i class="fas fa-info-circle text-indigo-600 mr-2"></i>
+                    {{ isset($invoice) && $invoice->payments->count() > 0 ?
+                        'Edit the advance payment or update it. Changing the amount will recalculate invoice totals.' :
+                        'Receive an advance or partial payment at the time of invoice creation. The remaining balance will be due later.' }}
+                </p>
+            </div>
+
+            <div x-data="advancePayment()" class="space-y-4">
+                {{-- Enable Advance Payment Toggle --}}
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" id="has_advance" name="has_advance" x-model="hasAdvance"
+                        class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                    <label for="has_advance" class="text-sm font-semibold text-slate-700 cursor-pointer">
+                        <i class="fas fa-check mr-2 text-indigo-600"></i>
+                        {{ isset($invoice) && $invoice->payments->count() > 0 ? 'Edit advance payment' : 'This invoice has an advance/initial payment' }}
+                    </label>
+                </div>
+
+                {{-- Advance Payment Details --}}
+                <div x-show="hasAdvance" x-transition class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-200">
+                    <x-form-input
+                        label="Advance Amount (LKR)"
+                        name="advance_amount"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        :value="isset($invoice) && $invoice->payments->count() > 0 ? $invoice->payments->first()->amount : old('advance_amount')"
+                        x-model.number="advanceAmount"
+                        @input="updateAdvanceInfo()"
+                        placeholder="0.00"
+                        :required="false"
+                    />
+
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-700">Payment Method</label>
+                        <select name="advance_payment_method" x-model="advanceMethod"
+                            class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition focus:outline-none">
+                            <option value="">— Select Method —</option>
+                            <option value="cash" {{ isset($invoice) && $invoice->payments->count() > 0 && $invoice->payments->first()->payment_method === 'cash' ? 'selected' : '' }}>💵 Cash</option>
+                            <option value="bank_transfer" {{ isset($invoice) && $invoice->payments->count() > 0 && $invoice->payments->first()->payment_method === 'bank_transfer' ? 'selected' : '' }}>🏦 Bank Transfer</option>
+                            <option value="card" {{ isset($invoice) && $invoice->payments->count() > 0 && $invoice->payments->first()->payment_method === 'card' ? 'selected' : '' }}>💳 Card</option>
+                            <option value="cheque" {{ isset($invoice) && $invoice->payments->count() > 0 && $invoice->payments->first()->payment_method === 'cheque' ? 'selected' : '' }}>📋 Cheque</option>
+                            <option value="online" {{ isset($invoice) && $invoice->payments->count() > 0 && $invoice->payments->first()->payment_method === 'online' ? 'selected' : '' }}>🌐 Online</option>
+                        </select>
+                    </div>
+
+                    <x-form-input
+                        label="Reference Number"
+                        name="advance_reference"
+                        :value="isset($invoice) && $invoice->payments->count() > 0 ? $invoice->payments->first()->reference_number : old('advance_reference')"
+                        placeholder="Optional"
+                        :required="false"
+                    />
+                </div>
+
+                {{-- Advance Payment Summary --}}
+                <div x-show="hasAdvance && advanceAmount > 0" x-transition class="bg-indigo-50 border border-indigo-200 rounded-lg p-4 space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-slate-700 font-medium">Invoice Total:</span>
+                        <span class="font-semibold text-slate-900">LKR <span x-text="formatNumber(getInvoiceTotal())"></span></span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-slate-700 font-medium">Advance Paid:</span>
+                        <span class="font-semibold text-green-600">LKR <span x-text="formatNumber(advanceAmount)"></span></span>
+                    </div>
+                    <div class="flex justify-between text-sm pt-2 border-t border-indigo-200 font-semibold">
+                        <span class="text-slate-900">Remaining Due:</span>
+                        <span class="text-indigo-600">LKR <span x-text="formatNumber(getInvoiceTotal() - advanceAmount)"></span></span>
+                    </div>
+                    <div class="text-xs text-indigo-700 mt-2">
+                        <i class="fas fa-check-circle mr-1"></i>
+                        Payment Status: <strong x-text="getAdvanceStatus()"></strong>
+                    </div>
+                </div>
+
+                {{-- Warning if advance exceeds total --}}
+                <div x-show="hasAdvance && advanceAmount > getInvoiceTotal()" class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                    <p class="text-sm text-amber-900">
+                        <i class="fas fa-exclamation-triangle text-amber-600 mr-2"></i>
+                        <strong>Note:</strong> Advance amount exceeds invoice total. This will create an overpayment.
+                    </p>
+                </div>
+
+                {{-- Info for editing existing advance --}}
+                @if(isset($invoice) && $invoice->payments->count() > 0)
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p class="text-sm text-blue-900">
+                        <i class="fas fa-pencil text-blue-600 mr-2"></i>
+                        <strong>Editing existing advance payment</strong> recorded on {{ $invoice->payments->first()->payment_date->format('d M Y') }}
+                    </p>
+                </div>
+                @endif
+            </div>
+        </div>
+
         {{-- Notes --}}
         <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
             <label class="block text-sm font-bold text-slate-700 mb-2">Internal Notes <span class="font-normal text-slate-500">(not shown on invoice)</span></label>
@@ -274,8 +383,9 @@
 
 @push('scripts')
 <script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('invoiceForm', () => ({
+    // Invoice form Alpine component
+    function invoiceForm() {
+        return {
             items: @json(isset($invoice) && $invoice ? $invoice->items->toArray() : []),
             paymentStatus: '{{ old('payment_status', $invoice->payment_status ?? 'pending') }}',
             taxAmount: {{ old('tax_amount', $invoice->tax_amount ?? 0) }},
@@ -342,7 +452,59 @@
             formatNum(num) {
                 return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(num || 0);
             }
-        }))
+        }
+    }
+
+    // Advance Payment Alpine component
+    function advancePayment() {
+        return {
+            hasAdvance: false,
+            advanceAmount: 0,
+            advanceMethod: '',
+
+            getInvoiceTotal() {
+                const form = document.querySelector('form');
+                const manualTotal = parseFloat(form?.querySelector('[name="manual_total"]')?.value) || 0;
+                const taxAmount = parseFloat(form?.querySelector('[name="tax_amount"]')?.value) || 0;
+
+                // Calculate from items if manual total is not set
+                if (manualTotal > 0) return manualTotal;
+
+                let total = taxAmount;
+                const itemElements = form?.querySelectorAll('[name*="[total]"]') || [];
+                itemElements.forEach(el => {
+                    total += parseFloat(el.value) || 0;
+                });
+
+                return total;
+            },
+
+            getAdvanceStatus() {
+                const total = this.getInvoiceTotal();
+                if (this.advanceAmount <= 0) return 'No payment';
+                if (this.advanceAmount >= total) return 'Fully Paid';
+                return 'Partially Paid';
+            },
+
+            updateAdvanceInfo() {
+                // Validation updates in real-time
+                this.$watch('advanceAmount', (val) => {
+                    // Amount is validated dynamically
+                });
+            },
+
+            formatNumber(num) {
+                return new Intl.NumberFormat('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(num || 0);
+            }
+        }
+    }
+
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('invoiceForm', invoiceForm);
+        Alpine.data('advancePayment', advancePayment);
     });
 </script>
 @endpush

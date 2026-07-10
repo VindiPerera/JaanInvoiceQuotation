@@ -64,11 +64,56 @@ class Invoice extends Model
         $paid = $this->payments()->sum('amount');
         $this->paid_amount = $paid;
         $this->balance = $this->total_amount - $paid;
-        $this->payment_status = match (true) {
+        $this->payment_status = $this->calculatePaymentStatus();
+        $this->save();
+    }
+
+    public function calculatePaymentStatus(): string
+    {
+        $paid = $this->payments()->sum('amount');
+        return match (true) {
             $paid <= 0 => 'pending',
             $paid >= $this->total_amount => 'paid',
             default => 'partial',
         };
-        $this->save();
+    }
+
+    public function getRemainingBalanceAttribute(): float
+    {
+        return max(0, (float)$this->total_amount - (float)$this->paid_amount);
+    }
+
+    public function canAcceptPayment(float $amount): array
+    {
+        $remaining = $this->getRemainingBalanceAttribute();
+
+        if ($amount <= 0) {
+            return ['valid' => false, 'message' => 'Payment amount must be greater than zero.'];
+        }
+
+        if ($amount > $remaining) {
+            return [
+                'valid' => false,
+                'message' => "Payment exceeds remaining balance of LKR " . number_format($remaining, 2),
+                'remaining' => $remaining,
+            ];
+        }
+
+        return ['valid' => true, 'remaining' => $remaining - $amount];
+    }
+
+    public function isFullyPaid(): bool
+    {
+        return (float)$this->paid_amount >= (float)$this->total_amount;
+    }
+
+    public function isPartiallPaid(): bool
+    {
+        return (float)$this->paid_amount > 0 && (float)$this->paid_amount < (float)$this->total_amount;
+    }
+
+    public function isPending(): bool
+    {
+        return (float)$this->paid_amount <= 0;
     }
 }

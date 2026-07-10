@@ -1,4 +1,4 @@
-<div class="space-y-6 max-w-6xl">
+<div class="space-y-6  ">
     {{-- Alerts --}}
     @if($errors->any())
         <div class="bg-red-50 border-l-4 border-l-red-600 border border-red-200 rounded-xl p-4 shadow-sm">

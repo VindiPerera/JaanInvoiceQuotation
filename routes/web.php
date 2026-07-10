@@ -38,9 +38,13 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{invoice}', [InvoiceController::class, 'update'])->name('update');
         Route::delete('/{invoice}', [InvoiceController::class, 'destroy'])->name('destroy');
         Route::get('/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('pdf');
+        Route::get('/{invoice}/payment-receipt', [InvoiceController::class, 'paymentReceipt'])->name('payment.receipt');
         Route::post('/{invoice}/duplicate', [InvoiceController::class, 'duplicate'])->name('duplicate');
         Route::post('/{invoice}/payment', [InvoiceController::class, 'recordPayment'])->name('payment');
+        Route::get('/{invoice}/payment/{payment}', [InvoiceController::class, 'editPayment'])->name('payment.edit');
+        Route::patch('/{invoice}/payment/{payment}', [InvoiceController::class, 'updatePayment'])->name('payment.update');
         Route::delete('/{invoice}/payment/{payment}', [InvoiceController::class, 'deletePayment'])->name('payment.delete');
+        Route::get('/{invoice}/payment-history', [InvoiceController::class, 'paymentHistory'])->name('payment.history');
     });
 
     Route::prefix('customers')->name('customers.')->group(function () {
