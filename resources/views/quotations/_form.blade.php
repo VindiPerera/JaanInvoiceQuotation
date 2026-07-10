@@ -225,7 +225,12 @@
                 <tfoot>
                     <tr class="bg-slate-50 border-t-2 border-slate-200">
                         <td colspan="4" class="px-4 py-3 text-right font-bold text-slate-700">Total Amount (LKR)</td>
-                        <td class="px-4 py-3 text-right font-bold text-slate-900" x-text="formatNum(total)"></td>
+                        <td class="px-4 py-3">
+                            <input type="number" name="manual_total" x-model.number="manualTotal"
+                                :value="total"
+                                class="w-full px-3 py-2 bg-slate-50 border-2 border-slate-300 rounded-lg text-sm font-bold text-right focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition focus:outline-none"
+                                min="0" step="0.01">
+                        </td>
                     </tr>
                 </tfoot>
             </table>
@@ -259,9 +264,12 @@
             quoteType: '{{ old('quote_type', $quotation?->quote_type ?? '') }}',
             selectedCustomer: '{{ old('customer_id', $quotation?->customer_id ?? '') }}',
             projectOverview: '{{ old('project_overview', $quotation?->project_overview ?? '') }}',
+            manualTotal: {{ isset($quotation) && $quotation ? (float)$quotation->total_amount : 0 }},
 
             get total() {
-                return this.items.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
+                const calculated = this.items.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
+                // If manualTotal is explicitly set (has a value), use it; otherwise use calculated
+                return this.manualTotal > 0 && this.manualTotal !== calculated ? this.manualTotal : calculated;
             },
 
             addItem() {

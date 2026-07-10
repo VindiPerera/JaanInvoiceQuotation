@@ -171,10 +171,11 @@ body {
 @php
 $quoteType = $quotation->quote_type ?? 'full_set';
 $visibleItems = $quotation->items->where('is_hidden', false);
+$hasQtyPrice = $visibleItems->some(fn($item) => (float)$item->quantity > 0 || (float)$item->unit_price > 0);
 @endphp
 
 {{-- HARDWARE PACKAGE --}}
-@if($quoteType !== 'software_only' && $visibleItems->count() > 0)
+@if($visibleItems->count() > 0)
 <div class="sec">Software/Hardware/Services</div>
 <hr class="rule">
 <table class="tbl" style="margin-bottom:8px;">
@@ -182,8 +183,10 @@ $visibleItems = $quotation->items->where('is_hidden', false);
         <tr>
             <th class="c" width="38">No.</th>
             <th>Description</th>
+            @if($hasQtyPrice)
             <th class="c" width="52">Qty</th>
             <th class="r" width="60">Price</th>
+            @endif
         </tr>
     </thead>
     <tbody>
@@ -201,8 +204,10 @@ $visibleItems = $quotation->items->where('is_hidden', false);
                 <div style="font-size:8.5pt;color:#111111;padding-left:4px;">- {{ preg_replace('/^[\s•●\-\*]+/', '', $spec) }}</div>
                 @endforeach
             </td>
+            @if($hasQtyPrice)
             <td class="c" style="font-weight:bold;">{{ $item->quantity }}</td>
             <td class="r" style="font-weight:bold;">LKR {{ number_format($item->unit_price, 2) }}</td>
+            @endif
         </tr>
         @endforeach
     </tbody>
