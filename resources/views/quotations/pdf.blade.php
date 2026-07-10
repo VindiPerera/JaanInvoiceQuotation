@@ -191,18 +191,15 @@ $hasQtyPrice = $visibleItems->some(fn($item) => (float)$item->quantity > 0 || (f
     </thead>
     <tbody>
         @foreach($visibleItems as $item)
-        @php
-            $lines = array_values(array_filter(array_map('rtrim', explode("\n", $item->description))));
-            $specs = array_slice($lines, 1);
-            $itemName = $item->item_name ?: ($lines[0] ?? 'Item');
-        @endphp
         <tr>
             <td class="c" style="font-weight:bold;">{{ $item->item_number }}</td>
             <td>
-                <div style="font-weight:bold;margin-bottom:3px;">{{ $itemName }}@if($item->warranty) <span style="font-weight:normal;color:#7f1d1d;">[{{ $item->warranty }}]</span>@endif</div>
-                @foreach($specs as $spec)
-                <div style="font-size:8.5pt;color:#111111;padding-left:4px;">- {{ preg_replace('/^[\s•●\-\*]+/', '', $spec) }}</div>
-                @endforeach
+                @if($item->item_name)
+                <div style="font-weight:bold;margin-bottom:8px;">{{ $item->item_name }}@if($item->warranty) <span style="font-weight:normal;color:#7f1d1d;">[{{ $item->warranty }}]</span>@endif</div>
+                @endif
+                @if($item->description)
+                <div style="font-size:9pt;color:#111111;line-height:2;white-space:pre-wrap;word-wrap:break-word;">{{ $item->description }}</div>
+                @endif
             </td>
             @if($hasQtyPrice)
             <td class="c" style="font-weight:bold;">{{ $item->quantity }}</td>
