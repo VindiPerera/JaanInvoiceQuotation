@@ -241,6 +241,81 @@ body {
     @endif
 </table>
 
+{{-- PAYMENT PLAN (If scheduled) --}}
+@if($invoice->paymentSchedules->count() > 0)
+<div class="sec">Payment Plan</div>
+<hr class="rule">
+<table class="tbl" style="margin-bottom:16px;">
+    <thead>
+        <tr>
+            <th class="c" style="width:40px;">Step</th>
+            <th style="width:100px;">Due Date</th>
+            <th class="r" style="width:90px;">Amount</th>
+            <th class="r" style="width:100px;">Balance</th>
+            <th class="c" style="width:70px;">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @php
+            $totalAmount = $invoice->total_amount;
+            $paidSoFar = 0;
+        @endphp
+        @foreach($invoice->paymentSchedules->sortBy('step_number') as $step)
+        @php
+            $paidSoFar += (float)$step->amount;
+            $balanceRemaining = $totalAmount - $paidSoFar;
+        @endphp
+        <tr>
+            <td class="c" style="font-weight:bold;">{{ $step->step_number }}</td>
+            <td>{{ $step->due_date->format('d M Y') }}</td>
+            <td class="r" style="font-weight:bold;">{{ number_format((float)$step->amount) }}</td>
+            <td class="r" style="font-weight:bold;color:#b91c1c;">{{ number_format($balanceRemaining) }}</td>
+            <td class="c" style="font-size:8pt;font-weight:bold;{{ $step->status === 'paid' ? 'color:#16a34a;' : ($step->status === 'overdue' ? 'color:#b91c1c;' : 'color:#2563eb;') }}">
+                @if($step->status === 'paid')
+                    ✓ PAID
+                @elseif($step->status === 'overdue')
+                    ⚠ OVERDUE
+                @else
+                    ⏳ PENDING
+                @endif
+            </td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
+@endif
+
+{{-- PAYMENT SCHEDULE --}}
+@if($invoice->payments->count() > 0)
+<div class="sec">Payment Schedule</div>
+<hr class="rule">
+<table class="tbl" style="margin-bottom:16px;">
+    <thead>
+        <tr>
+            <th style="width:80px;">Date</th>
+            <th>Method</th>
+            <th class="c" style="width:90px;">Amount</th>
+            <th class="r" style="width:100px;">Balance</th>
+        </tr>
+    </thead>
+    <tbody>
+        @php
+            $runningBalance = (float)$invoice->total_amount;
+            $payments = $invoice->payments->sortBy('payment_date');
+        @endphp
+        @foreach($payments as $pmt)
+        @php $runningBalance -= (float)$pmt->amount; @endphp
+        <tr>
+            <td style="font-size:8.5pt;">{{ $pmt->payment_date->format('d M Y') }}</td>
+            <td style="font-size:8.5pt;">{{ $pmt->getFormattedMethodAttribute() }}</td>
+            <td class="c" style="color:#16a34a;font-weight:bold;">{{ number_format((float)$pmt->amount) }}</td>
+            <td class="r">{{ number_format($runningBalance) }}</td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
+@endif
+
 {{-- PAYMENT DETAILS --}}
 @if($invoice->payment_status !== 'paid')
 <div class="sec">Payment Details</div>
