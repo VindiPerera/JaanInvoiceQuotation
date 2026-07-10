@@ -165,19 +165,29 @@
             {{ number_format((float)$invoice->total_amount) }}
         </td>
     </tr>
-    @if($invoice->paid_amount > 0 && $invoice->payment_status !== 'paid')
+    @if($invoice->paid_amount > 0)
     <tr>
         <td></td>
-        <td style="padding:5px 8px;font-size:9pt;border-bottom:1px dashed #fecaca;">Amount Paid</td>
-        <td style="padding:5px 8px;text-align:right;font-size:9pt;border-bottom:1px dashed #fecaca;">
-            {{ number_format((float)$invoice->paid_amount) }}
+        <td style="padding:5px 8px;font-size:9pt;border-bottom:1px dashed #fecaca;color:#16a34a;">Less: Advance Payment</td>
+        <td style="padding:5px 8px;text-align:right;font-size:9pt;border-bottom:1px dashed #fecaca;color:#16a34a;font-weight:bold;">
+            ({{ number_format((float)$invoice->paid_amount) }})
         </td>
     </tr>
+    @endif
+    @if($invoice->balance > 0)
     <tr>
         <td></td>
         <td style="padding:7px 8px;font-size:9.5pt;font-weight:bold;border-bottom:1px solid #111111;">Balance Due (LKR)</td>
         <td style="padding:7px 8px;text-align:right;font-size:11pt;font-weight:bold;border-bottom:1px solid #111111;">
             {{ number_format((float)$invoice->balance) }}
+        </td>
+    </tr>
+    @elseif($invoice->payment_status === 'paid')
+    <tr>
+        <td></td>
+        <td style="padding:7px 8px;font-size:9.5pt;font-weight:bold;border-bottom:1px solid #111111;color:#16a34a;">Status</td>
+        <td style="padding:7px 8px;text-align:right;font-size:9.5pt;font-weight:bold;border-bottom:1px solid #111111;color:#16a34a;">
+            FULLY PAID
         </td>
     </tr>
     @endif
@@ -222,10 +232,63 @@
 </div>{{-- end body --}}
 </div>{{-- end paper --}}
 
+{{-- Payment Plan (Scheduled Steps) --}}
+@if($invoice->paymentSchedules->count())
+<div class="bg-white rounded-xl border border-gray-200 p-6 mb-4">
+    <h3 class="text-sm font-semibold text-gray-800 mb-4">📋 Payment Plan</h3>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b-2 border-gray-200 bg-gray-50">
+                    <th class="px-3 py-2 text-center font-bold text-gray-700">Step</th>
+                    <th class="px-3 py-2 text-left font-bold text-gray-700">Due Date</th>
+                    <th class="px-3 py-2 text-right font-bold text-gray-700">Amount</th>
+                    <th class="px-3 py-2 text-right font-bold text-gray-700">Balance</th>
+                    <th class="px-3 py-2 text-center font-bold text-gray-700">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php
+                    $totalAmount = $invoice->total_amount;
+                    $paidSoFar = 0;
+                @endphp
+                @foreach($invoice->paymentSchedules->sortBy('step_number') as $step)
+                @php
+                    $paidSoFar += (float)$step->amount;
+                    $balanceRemaining = $totalAmount - $paidSoFar;
+                @endphp
+                <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+                    <td class="px-3 py-2 text-center">
+                        <span class="w-6 h-6 rounded-full {{ $step->status === 'paid' ? 'bg-green-100 text-green-700' : ($step->status === 'overdue' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700') }} inline-flex items-center justify-center text-xs font-bold">
+                            {{ $step->step_number }}
+                        </span>
+                    </td>
+                    <td class="px-3 py-2 text-gray-600">{{ $step->due_date->format('d M Y') }}</td>
+                    <td class="px-3 py-2 text-right font-semibold text-gray-900">LKR {{ number_format($step->amount) }}</td>
+                    <td class="px-3 py-2 text-right font-bold text-orange-600">LKR {{ number_format($balanceRemaining) }}</td>
+                    <td class="px-3 py-2 text-center">
+                        <span class="text-xs font-semibold {{ $step->status === 'paid' ? 'text-green-600' : ($step->status === 'overdue' ? 'text-red-600' : 'text-blue-600') }}">
+                            @if($step->status === 'paid')
+                                ✓ Paid
+                            @elseif($step->status === 'overdue')
+                                ⚠ Overdue
+                            @else
+                                ⏳ Pending
+                            @endif
+                        </span>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+@endif
+
 {{-- Payment History --}}
 @if($invoice->payments->count())
 <div class="bg-white rounded-xl border border-gray-200 p-6 mb-4">
-    <h3 class="text-sm font-semibold text-gray-800 mb-4">Payment History</h3>
+    <h3 class="text-sm font-semibold text-gray-800 mb-4">Payment Schedule</h3>
     <table class="w-full text-sm">
         <thead>
             <tr class="border-b border-gray-100">
@@ -233,16 +296,23 @@
                 <th class="pb-2 text-left text-xs font-medium text-gray-500">Method</th>
                 <th class="pb-2 text-left text-xs font-medium text-gray-500">Reference</th>
                 <th class="pb-2 text-right text-xs font-medium text-gray-500">Amount</th>
+                <th class="pb-2 text-right text-xs font-medium text-gray-500">Balance</th>
                 <th class="pb-2"></th>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-50">
-            @foreach($invoice->payments as $pmt)
+            @php
+                $runningBalance = (float)$invoice->total_amount;
+                $payments = $invoice->payments->sortBy('payment_date');
+            @endphp
+            @foreach($payments as $pmt)
+            @php $runningBalance -= (float)$pmt->amount; @endphp
             <tr>
                 <td class="py-2 text-gray-600">{{ $pmt->payment_date->format('d M Y') }}</td>
                 <td class="py-2 capitalize text-gray-600">{{ str_replace('_', ' ', $pmt->payment_method) }}</td>
                 <td class="py-2 text-gray-500">{{ $pmt->reference_number ?: '—' }}</td>
                 <td class="py-2 text-right font-semibold text-green-600">LKR {{ number_format($pmt->amount) }}</td>
+                <td class="py-2 text-right font-semibold text-gray-700">LKR {{ number_format($runningBalance) }}</td>
                 <td class="py-2 pl-2">
                     <form method="POST" action="{{ route('invoices.payment.delete', [$invoice, $pmt]) }}" onsubmit="return confirm('Remove this payment?')">
                         @csrf @method('DELETE')

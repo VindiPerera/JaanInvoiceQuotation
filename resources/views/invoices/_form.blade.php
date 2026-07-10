@@ -361,6 +361,191 @@
             </div>
         </div>
 
+        {{-- Payment Schedule & History --}}
+        @if(isset($invoice) && $invoice->payments->count() > 0)
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-200">
+                <div class="w-1 h-8 bg-amber-600 rounded-full"></div>
+                <h2 class="text-xl font-bold text-slate-900">Payment History</h2>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                        <p class="text-amber-700 font-semibold">Invoice Total</p>
+                        <p class="text-xl font-bold text-slate-900">LKR {{ number_format($invoice->total_amount) }}</p>
+                    </div>
+                    <div>
+                        <p class="text-green-700 font-semibold">Amount Paid</p>
+                        <p class="text-xl font-bold text-green-600">LKR {{ number_format($invoice->paid_amount) }}</p>
+                    </div>
+                    <div>
+                        <p class="text-red-700 font-semibold">Balance Remaining</p>
+                        <p class="text-xl font-bold text-red-600">LKR {{ number_format($invoice->balance) }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b-2 border-slate-200 bg-slate-50">
+                            <th class="px-4 py-3 text-left font-bold text-slate-700">Date</th>
+                            <th class="px-4 py-3 text-left font-bold text-slate-700">Method</th>
+                            <th class="px-4 py-3 text-left font-bold text-slate-700">Reference</th>
+                            <th class="px-4 py-3 text-right font-bold text-slate-700">Amount</th>
+                            <th class="px-4 py-3 text-right font-bold text-slate-700">Balance</th>
+                            <th class="px-4 py-3 text-center font-bold text-slate-700">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php
+                            $runningBalance = (float)$invoice->total_amount;
+                            $payments = $invoice->payments->sortBy('payment_date');
+                        @endphp
+                        @foreach($payments as $pmt)
+                        @php $runningBalance -= (float)$pmt->amount; @endphp
+                        <tr class="border-b border-slate-200 hover:bg-amber-50 transition">
+                            <td class="px-4 py-3 text-slate-600 font-medium">{{ $pmt->payment_date->format('d M Y') }}</td>
+                            <td class="px-4 py-3 capitalize text-slate-600">
+                                @php
+                                    $methods = ['cash' => '💵 Cash', 'bank_transfer' => '🏦 Bank Transfer', 'card' => '💳 Card', 'cheque' => '📋 Cheque', 'online' => '🌐 Online'];
+                                @endphp
+                                {{ $methods[$pmt->payment_method] ?? ucfirst(str_replace('_', ' ', $pmt->payment_method)) }}
+                            </td>
+                            <td class="px-4 py-3 text-slate-500">{{ $pmt->reference_number ?: '—' }}</td>
+                            <td class="px-4 py-3 text-right font-semibold text-green-600">LKR {{ number_format($pmt->amount) }}</td>
+                            <td class="px-4 py-3 text-right font-bold text-amber-700">LKR {{ number_format($runningBalance) }}</td>
+                            <td class="px-4 py-3 text-center">
+                                <span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
+                                    ✓ Paid
+                                </span>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            @if($invoice->balance > 0)
+            <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p class="text-sm text-blue-900">
+                    <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                    <strong>Remaining Balance:</strong> LKR {{ number_format($invoice->balance) }} is due
+                </p>
+            </div>
+            @endif
+        </div>
+        @endif
+
+        {{-- Payment Plan / Scheduled Payments --}}
+        @if(isset($invoice) && $invoice)
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs" x-data="paymentPlan()">
+            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-200">
+                <div class="w-1 h-8 bg-blue-600 rounded-full"></div>
+                <h2 class="text-xl font-bold text-slate-900">Payment Schedule / Plan</h2>
+            </div>
+
+            {{-- Existing Payment Schedule --}}
+            @if(isset($invoice) && $invoice->paymentSchedules->count() > 0)
+            <div class="mb-6">
+                <h3 class="text-sm font-bold text-slate-700 mb-4">📋 Payment Steps</h3>
+                <div class="space-y-3">
+                    @php
+                        $totalAmount = $invoice->total_amount;
+                        $paidSoFar = 0;
+                    @endphp
+                    @foreach($invoice->paymentSchedules->sortBy('step_number') as $step)
+                    @php
+                        $paidSoFar += (float)$step->amount;
+                        $balanceRemaining = $totalAmount - $paidSoFar;
+                    @endphp
+                    <div class="flex items-center gap-4 p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
+                        <div class="flex-shrink-0">
+                            <div class="w-10 h-10 rounded-full {{ $step->isPaid() ? 'bg-green-100' : ($step->isOverdue() ? 'bg-red-100' : 'bg-blue-100') }} flex items-center justify-center font-bold {{ $step->isPaid() ? 'text-green-700' : ($step->isOverdue() ? 'text-red-700' : 'text-blue-700') }}">
+                                {{ $step->step_number }}
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="font-semibold text-slate-900">Step {{ $step->step_number }}</p>
+                                    <p class="text-sm text-slate-600">
+                                        Due: <strong>{{ $step->due_date->format('d M Y') }}</strong>
+                                        @if($step->isOverdue() && !$step->isPaid())
+                                        <span class="ml-2 text-red-600 font-semibold">⚠ OVERDUE</span>
+                                        @endif
+                                    </p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-lg font-bold text-slate-900">LKR {{ number_format($step->amount) }}</p>
+                                    <p class="text-xs text-amber-600 font-semibold mb-1">Balance: LKR {{ number_format($balanceRemaining) }}</p>
+                                    <p class="text-xs {{ $step->isPaid() ? 'text-green-600' : 'text-blue-600' }} font-semibold">
+                                        {{ $step->status === 'paid' ? '✓ Paid on ' . $step->payment_date->format('d M Y') : ucfirst($step->status) }}
+                                    </p>
+                                </div>
+                            </div>
+                            @if($step->notes)
+                            <p class="text-xs text-slate-500 mt-2">{{ $step->notes }}</p>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
+            {{-- Add New Step --}}
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <p class="text-sm text-blue-900">
+                    <i class="fas fa-plus-circle text-blue-600 mr-2"></i>
+                    <strong>Add Payment Step:</strong> Create payment schedule steps for installments
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Step Number</label>
+                        <input type="number" x-model.number="stepNumber" min="1"
+                            class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition focus:outline-none"
+                            placeholder="1, 2, 3...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Due Date</label>
+                        <input type="date" x-model="dueDate"
+                            class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition focus:outline-none"
+                            :value="nextDueDate()">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Amount (LKR)</label>
+                        <input type="number" x-model.number="stepAmount" step="0.01" min="0"
+                            class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition focus:outline-none"
+                            placeholder="0.00">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Notes (Optional)</label>
+                        <input type="text" x-model="stepNotes"
+                            class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition focus:outline-none"
+                            placeholder="e.g., 50% payment">
+                    </div>
+                </div>
+                <button type="button" @click="addStep()"
+                    class="w-full px-4 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
+                    <i class="fas fa-plus mr-2"></i>Add Step
+                </button>
+            </div>
+
+            {{-- Hidden inputs for steps --}}
+            <template x-for="(step, index) in scheduleSteps" :key="index">
+                <input type="hidden" :name="`schedule_steps[${index}][step_number]`" :value="step.step_number">
+                <input type="hidden" :name="`schedule_steps[${index}][due_date]`" :value="step.due_date">
+                <input type="hidden" :name="`schedule_steps[${index}][amount]`" :value="step.amount">
+                <input type="hidden" :name="`schedule_steps[${index}][notes]`" :value="step.notes">
+            </template>
+        </div>
+        @endif
+
         {{-- Notes --}}
         <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
             <label class="block text-sm font-bold text-slate-700 mb-2">Internal Notes <span class="font-normal text-slate-500">(not shown on invoice)</span></label>
@@ -502,9 +687,48 @@
         }
     }
 
+    // Payment Plan Alpine component
+    function paymentPlan() {
+        return {
+            scheduleSteps: [],
+            stepNumber: 2,
+            stepAmount: 0,
+            dueDate: '',
+            stepNotes: '',
+
+            nextDueDate() {
+                // Default to 14 days from now
+                const date = new Date();
+                date.setDate(date.getDate() + 14);
+                return date.toISOString().split('T')[0];
+            },
+
+            addStep() {
+                if (!this.stepNumber || !this.dueDate || !this.stepAmount) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+
+                this.scheduleSteps.push({
+                    step_number: this.stepNumber,
+                    due_date: this.dueDate,
+                    amount: this.stepAmount,
+                    notes: this.stepNotes || ''
+                });
+
+                // Reset form
+                this.stepNumber = this.scheduleSteps.length + 2;
+                this.stepAmount = 0;
+                this.dueDate = '';
+                this.stepNotes = '';
+            }
+        }
+    }
+
     document.addEventListener('alpine:init', () => {
         Alpine.data('invoiceForm', invoiceForm);
         Alpine.data('advancePayment', advancePayment);
+        Alpine.data('paymentPlan', paymentPlan);
     });
 </script>
 @endpush

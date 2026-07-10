@@ -45,6 +45,11 @@ class Invoice extends Model
         return $this->hasMany(Payment::class)->orderBy('payment_date', 'desc');
     }
 
+    public function paymentSchedules()
+    {
+        return $this->hasMany(PaymentSchedule::class)->orderBy('step_number');
+    }
+
     public static function generateNumber(): string
     {
         // Get the highest numeric part from existing invoice numbers

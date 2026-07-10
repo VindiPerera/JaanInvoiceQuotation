@@ -7,6 +7,7 @@ use App\Models\HardwareCatalog;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Payment;
+use App\Models\PaymentSchedule;
 use App\Models\Quotation;
 use App\Models\Setting;
 use App\Services\PaymentService;
@@ -158,14 +159,14 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
-        $invoice->load('items', 'customer', 'payments');
+        $invoice->load('items', 'customer', 'payments', 'paymentSchedules');
         $settings = Setting::pluck('value', 'key');
         return view('invoices.show', compact('invoice', 'settings'));
     }
 
     public function edit(Invoice $invoice)
     {
-        $invoice->load('items');
+        $invoice->load('items', 'paymentSchedules');
         $customers = Customer::orderBy('name')->get();
         $settings = Setting::pluck('value', 'key');
         $hardware = HardwareCatalog::active()->orderBy('name')->get(['id', 'name', 'description', 'unit_price', 'warranty']);
@@ -265,6 +266,22 @@ class InvoiceController extends Controller
             if ($request->has_advance && $request->advance_amount > 0) {
                 $invoice->recalculatePaid();
             }
+
+            // Save payment schedule steps if provided
+            if ($request->schedule_steps && is_array($request->schedule_steps)) {
+                foreach ($request->schedule_steps as $step) {
+                    if (!empty($step['step_number']) && !empty($step['due_date']) && !empty($step['amount'])) {
+                        PaymentSchedule::create([
+                            'invoice_id'  => $invoice->id,
+                            'step_number' => $step['step_number'],
+                            'due_date'    => $step['due_date'],
+                            'amount'      => $step['amount'],
+                            'notes'       => $step['notes'] ?? null,
+                            'status'      => 'pending',
+                        ]);
+                    }
+                }
+            }
         });
 
         return redirect()->route('invoices.show', $invoice)->with('success', 'Invoice updated successfully.');
@@ -278,7 +295,7 @@ class InvoiceController extends Controller
 
     public function pdf(Invoice $invoice)
     {
-        $invoice->load('items', 'payments');
+        $invoice->load('items', 'payments', 'paymentSchedules');
         $settings = Setting::pluck('value', 'key');
         $pdf = Pdf::loadView('invoices.pdf', compact('invoice', 'settings'))
             ->setPaper('a4', 'portrait');
