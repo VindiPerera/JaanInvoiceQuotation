@@ -198,7 +198,7 @@ body {
     </tr>
     <tr>
         <td></td>
-        <td style="padding:5px 8px;font-size:9pt;border-bottom:1px dashed #fecaca;">Tax</td>
+        <td style="padding:5px 8px;font-size:9pt;border-bottom:1px dashed #fecaca;">Tax / Other</td>
         <td style="padding:5px 8px;text-align:right;font-size:9pt;border-bottom:1px dashed #fecaca;">
             {{ number_format((float)$invoice->tax_amount) }}
         </td>
@@ -207,25 +207,35 @@ body {
     <tr>
         <td></td>
         <td style="padding:8px 8px;font-size:9.5pt;font-weight:bold;
-                   border-top:1px solid #111111;border-bottom:3px double #111111;">TOTAL (LKR)</td>
+                   border-top:1px solid #111111;border-bottom:3px double #111111;">GRAND TOTAL (LKR)</td>
         <td style="padding:8px 8px;text-align:right;font-size:13pt;font-weight:bold;
                    white-space:nowrap;border-top:1px solid #111111;border-bottom:3px double #111111;background:#b91c1c;color:#fff;">
             {{ number_format((float)$invoice->total_amount) }}
         </td>
     </tr>
-    @if($invoice->paid_amount > 0 && $invoice->payment_status !== 'paid')
+    @if($invoice->paid_amount > 0)
     <tr>
         <td></td>
-        <td style="padding:5px 8px;font-size:9pt;border-bottom:1px dashed #fecaca;">Amount Paid</td>
-        <td style="padding:5px 8px;text-align:right;font-size:9pt;border-bottom:1px dashed #fecaca;">
-            {{ number_format((float)$invoice->paid_amount) }}
+        <td style="padding:5px 8px;font-size:9pt;border-bottom:1px dashed #fecaca;color:#16a34a;">Less: Advance Payment</td>
+        <td style="padding:5px 8px;text-align:right;font-size:9pt;border-bottom:1px dashed #fecaca;color:#16a34a;font-weight:bold;">
+            ({{ number_format((float)$invoice->paid_amount) }})
         </td>
     </tr>
+    @endif
+    @if($invoice->balance > 0)
     <tr>
         <td></td>
         <td style="padding:7px 8px;font-size:9.5pt;font-weight:bold;border-bottom:1px solid #111111;">Balance Due (LKR)</td>
         <td style="padding:7px 8px;text-align:right;font-size:11pt;font-weight:bold;border-bottom:1px solid #111111;">
             {{ number_format((float)$invoice->balance) }}
+        </td>
+    </tr>
+    @elseif($invoice->payment_status === 'paid')
+    <tr>
+        <td></td>
+        <td style="padding:7px 8px;font-size:9.5pt;font-weight:bold;border-bottom:1px solid #111111;color:#16a34a;">Status</td>
+        <td style="padding:7px 8px;text-align:right;font-size:9.5pt;font-weight:bold;border-bottom:1px solid #111111;color:#16a34a;">
+            FULLY PAID
         </td>
     </tr>
     @endif

@@ -218,14 +218,31 @@
                     </div>
                     @if($invoice->tax_amount > 0)
                     <div class="flex justify-between text-sm pb-3 border-b border-slate-200">
-                        <span class="text-slate-600 font-medium">Tax/Other</span>
+                        <span class="text-slate-600 font-medium">Tax / Other</span>
                         <span class="font-semibold text-slate-900">LKR {{ number_format($invoice->tax_amount) }}</span>
                     </div>
                     @endif
-                    <div class="flex justify-between text-lg pt-2">
-                        <span class="font-bold text-slate-900">Total (LKR)</span>
+                    <div class="flex justify-between text-lg pt-2 pb-3 border-b-2 border-blue-600">
+                        <span class="font-bold text-slate-900">GRAND TOTAL (LKR)</span>
                         <span class="font-bold text-blue-600">{{ number_format($invoice->total_amount) }}</span>
                     </div>
+                    @if($invoice->paid_amount > 0)
+                    <div class="flex justify-between text-sm text-green-600">
+                        <span class="font-medium">Less: Advance Payment</span>
+                        <span class="font-semibold">({{ number_format($invoice->paid_amount) }})</span>
+                    </div>
+                    @endif
+                    @if($invoice->balance > 0)
+                    <div class="flex justify-between text-lg pt-2">
+                        <span class="font-bold text-slate-900">Balance Due (LKR)</span>
+                        <span class="font-bold text-amber-600">{{ number_format($invoice->balance) }}</span>
+                    </div>
+                    @elseif($invoice->payment_status === 'paid')
+                    <div class="flex justify-between text-lg pt-2">
+                        <span class="font-bold text-slate-900">Status</span>
+                        <span class="font-bold text-green-600">FULLY PAID</span>
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>

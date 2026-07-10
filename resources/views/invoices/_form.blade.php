@@ -322,20 +322,20 @@
                 </div>
 
                 {{-- Advance Payment Summary --}}
-                <div x-show="hasAdvance && advanceAmount > 0" x-transition class="bg-indigo-50 border border-indigo-200 rounded-lg p-4 space-y-2">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-slate-700 font-medium">Invoice Total:</span>
-                        <span class="font-semibold text-slate-900">LKR <span x-text="formatNumber(getInvoiceTotal())"></span></span>
+                <div x-show="hasAdvance && advanceAmount > 0" x-transition class="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-200 rounded-lg p-4 space-y-2">
+                    <div class="flex justify-between text-sm pb-2 border-b border-indigo-200">
+                        <span class="text-slate-700 font-semibold">GRAND TOTAL:</span>
+                        <span class="font-bold text-slate-900">LKR <span x-text="formatNumber(getInvoiceTotal())"></span></span>
                     </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-slate-700 font-medium">Advance Paid:</span>
-                        <span class="font-semibold text-green-600">LKR <span x-text="formatNumber(advanceAmount)"></span></span>
+                    <div class="flex justify-between text-sm text-green-600">
+                        <span class="font-medium">Less: Advance Payment</span>
+                        <span class="font-semibold">(LKR <span x-text="formatNumber(advanceAmount)"></span>)</span>
                     </div>
-                    <div class="flex justify-between text-sm pt-2 border-t border-indigo-200 font-semibold">
-                        <span class="text-slate-900">Remaining Due:</span>
-                        <span class="text-indigo-600">LKR <span x-text="formatNumber(getInvoiceTotal() - advanceAmount)"></span></span>
+                    <div class="flex justify-between text-sm pt-2 border-t border-indigo-300 font-bold">
+                        <span class="text-slate-900">Balance Due:</span>
+                        <span class="text-amber-600 text-base">LKR <span x-text="formatNumber(getInvoiceTotal() - advanceAmount)"></span></span>
                     </div>
-                    <div class="text-xs text-indigo-700 mt-2">
+                    <div class="text-xs text-indigo-700 mt-3 pt-2 border-t border-indigo-200">
                         <i class="fas fa-check-circle mr-1"></i>
                         Payment Status: <strong x-text="getAdvanceStatus()"></strong>
                     </div>
