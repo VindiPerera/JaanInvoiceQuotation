@@ -265,7 +265,7 @@ body {
 @php $paidStampPath = public_path('images/paid-stamp.png'); @endphp
 @if($invoice->payment_status === 'paid' && file_exists($paidStampPath))
 <div style="text-align:center;margin-top:16px;margin-bottom:8px;">
-    <img src="{{ $paidStampPath }}" alt="PAID" style="width:190px;height:160px;opacity:0.7;">
+    <img src="{{ $paidStampPath }}" alt="PAID" style="width:160px;height:160px;opacity:0.7;border-radius:50%;">
 </div>
 @endif
 
